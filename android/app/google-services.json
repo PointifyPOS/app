@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "321868996666",
+    "project_id": "pointify-9e51e",
+    "storage_bucket": "pointify-9e51e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321868996666:android:a945e907d1708108f59503",
+        "android_client_info": {
+          "package_name": "com.pointify.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "321868996666-mjb93j4q36gc35jji1hdf77m2cedn3j0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFzz1_9FxOLPU7Ax_2mF18cwMhLvgWxGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "321868996666-mjb93j4q36gc35jji1hdf77m2cedn3j0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
