@@ -50,9 +50,16 @@ Future<Uint8List> warehouseInvoicePdf(String type,
                   headers: ["Item", "Quantity", "Total"],
                   data: wareHouseItems!
                       .map((e) => [
-                            e.product?['name'],
-                            "${htmlPrice(e.product?['buyingPrice'])} x ${e.quantity} ",
-                            htmlPrice(e.product?['buyingPrice'] * e.quantity!),
+                            e.product == null ? "" : e.product?['name'],
+                            e.product == null
+                                ? ""
+                                : "${htmlPrice(e.product?['buyingPrice'])} x ${e.quantity ?? e.quantity} ",
+                            e.product == null
+                                ? ""
+                                : htmlPrice(e.product == null
+                                    ? 0
+                                    : e.product?['buyingPrice'] *
+                                        (e.quantity ?? 0)),
                           ])
                       .toList()),
               SizedBox(height: 10),

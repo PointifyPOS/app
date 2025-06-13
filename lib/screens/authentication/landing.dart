@@ -4,7 +4,6 @@ import 'package:pointify/controllers/authcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 
-import '../../services/dynamic_link_services.dart';
 import '../../services/user.dart';
 import '../../utils/colors.dart';
 import '../../utils/constants.dart';
@@ -49,7 +48,7 @@ class _LandingState extends State<Landing> {
         userController.enableOffline.value = true;
       }
     });
-    DynamicLinkService().handleDynamicLinks();
+    // DynamicLinkService().handleDynamicLinks();
   }
 
   @override

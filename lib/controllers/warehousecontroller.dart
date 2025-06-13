@@ -230,7 +230,6 @@ class WareHouseController extends GetxController {
       isLoadingCount.value = false;
       refresh();
     } catch (e) {
-      print(e);
       isLoadingCount.value = false;
     }
   }

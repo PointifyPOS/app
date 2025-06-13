@@ -250,7 +250,7 @@ class SingleWarehouseInvoice extends StatelessWidget {
                                                             ?.status ==
                                                         "pending"
                                                     ? "Requested: ${wareHouseItem.quantity} ${wareHouseItem.product!['measure'] ?? ""}"
-                                                    : "Dispatched: ${wareHouseItem.quantity} ${wareHouseItem.product!['measure'] ?? ""}",
+                                                    : "Dispatched: ${wareHouseItem.quantity} ${wareHouseItem.product == null ? "" : wareHouseItem.product!['measure'] ?? ""}",
                                                 style: const TextStyle(
                                                     fontSize: 12)),
                                             const SizedBox(
@@ -263,7 +263,7 @@ class SingleWarehouseInvoice extends StatelessWidget {
                                                         ?.status ==
                                                     "completed")
                                               Text(
-                                                  "Received: ${misingItems == 0 ? wareHouseItem.quantity : wareHouseItem.received} ${wareHouseItem.product!['measure'] ?? ""}",
+                                                  "Received: ${misingItems == 0 ? wareHouseItem.quantity : wareHouseItem.received} ${wareHouseItem.product == null ? "" : wareHouseItem.product!['measure'] ?? ""}",
                                                   style: const TextStyle(
                                                       fontSize: 12)),
                                             const SizedBox(
@@ -276,7 +276,7 @@ class SingleWarehouseInvoice extends StatelessWidget {
                                                     permission:
                                                         "accept_warehouse_orders"))
                                               Text(
-                                                "Missing: ${wareHouseItem.quantity! - wareHouseItem.received!} ${wareHouseItem.product!['measure'] ?? ""}",
+                                                "Missing: ${wareHouseItem.quantity! - wareHouseItem.received!} ${wareHouseItem.product == null ? "" : wareHouseItem.product!['measure'] ?? ""}",
                                                 style: const TextStyle(
                                                     color: Colors.red,
                                                     fontSize: 12),

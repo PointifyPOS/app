@@ -1,7 +1,7 @@
 name: pointify
 description: "Pointify Pos."
 publish_to: 'none'
-version: 2.0.148+170
+version: 2.0.149+171
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -40,7 +40,6 @@ dependencies:
   firebase_core: ^3.13.0
   location: ^8.0.0
   geocoding: ^3.0.0
-  firebase_dynamic_links: ^6.1.5
   package_info_plus: ^8.3.0
   cached_network_image: ^3.2.0
   dio: ^5.4.0

@@ -654,7 +654,7 @@ class DatabaseHelper {
     };
 
     try {
-      int result = await db.insert(
+      await db.insert(
         'shop',
         shopData,
         conflictAlgorithm: ConflictAlgorithm.replace,
@@ -681,11 +681,15 @@ class DatabaseHelper {
         'startDate': subscription['startDate'],
         'endDate': subscription['endDate'],
         'createAt': subscription['createAt'],
-        'packageId': subscription['packageId']['_id']
+        'packageId': subscription['packageId'] == null
+            ? ''
+            : subscription['packageId']['_id']
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-
+    if (subscription['packageId'] == null) {
+      return;
+    }
     await insertPackageId(subscription['packageId']);
   }
 

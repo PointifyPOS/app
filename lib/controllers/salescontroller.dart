@@ -228,8 +228,11 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     var response = await SalesService.getOrders(
       fromDate: fromDate,
       toDate: toDate,
-      shop: userController.currentUser.value!.primaryShop!.id,
+      shop: userController.currentUser.value?.primaryShop!.id,
     );
+    if (response == null || response["data"] == null) {
+      return;
+    }
     List<OrderItem> sales = (response["data"] as List<dynamic>)
         .map((e) => OrderItem.fromJson(e))
         .toList();

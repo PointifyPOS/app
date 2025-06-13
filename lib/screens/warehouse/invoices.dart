@@ -19,7 +19,7 @@ import '../receipts/pdf/sales/warehouse_requests_report.dart';
 class Invoices extends StatelessWidget {
   final String? page;
 
-  Invoices({Key? key, required this.page}) : super(key: key) {
+  Invoices({super.key, required this.page}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       wareHouseController.getRequests(
         status: "",

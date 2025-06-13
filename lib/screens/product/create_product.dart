@@ -533,7 +533,9 @@ class CreateProduct extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text("Buying Price "),
+                                  Text(productController.managebyPrice.isTrue
+                                      ? "Unit Cost "
+                                      : "Buying Price "),
                                   const SizedBox(height: 5),
                                   TextFormField(
                                     controller:
@@ -575,7 +577,7 @@ class CreateProduct extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(productController.isProduct()
-                                      ? "${productController.managebyPrice.isFalse ? "Selling Price" : "Expected Revenue"} "
+                                      ? "${productController.managebyPrice.isFalse ? "Selling Price" : "Unit Price"} "
                                       : "Service Cost"),
                                   const SizedBox(height: 5),
                                   TextFormField(

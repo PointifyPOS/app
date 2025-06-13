@@ -5,7 +5,6 @@ import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/awards.dart';
 import 'package:pointify/utils/colors.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../controllers/paymentcontroller.dart';
@@ -13,7 +12,6 @@ import '../../controllers/shopcontroller.dart';
 import '../../models/shop.dart';
 import '../../responsive/responsiveness.dart';
 import '../../services/authentication.dart';
-import '../../services/dynamic_link_services.dart';
 import '../../utils/themer.dart';
 import '../../widgets/alert.dart';
 import '../../widgets/major_title.dart';
@@ -131,18 +129,18 @@ class ShareAndUse extends StatelessWidget {
                         )),
                   InkWell(
                     onTap: () {
-                      DynamicLinkService()
-                          .generateShareLink(
-                        userController.currentUser.value!.id!,
-                        type: "app",
-                        title:
-                            "Hello, Check out Pointify to manage your shops, sales, cashflow etc",
-                      )
-                          .then((value) async {
-                        await Share.share(value,
-                            subject:
-                                "Share ${userController.currentUser.value?.username!} Profile");
-                      });
+                      // DynamicLinkService()
+                      //     .generateShareLink(
+                      //   userController.currentUser.value!.id!,
+                      //   type: "app",
+                      //   title:
+                      //       "Hello, Check out Pointify to manage your shops, sales, cashflow etc",
+                      // )
+                      //     .then((value) async {
+                      //   await Share.share(value,
+                      //       subject:
+                      //           "Share ${userController.currentUser.value?.username!} Profile");
+                      // });
                     },
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),

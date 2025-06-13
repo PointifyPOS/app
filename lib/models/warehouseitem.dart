@@ -18,7 +18,8 @@ class WareHouseItem {
   WareHouseItem.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
     inventory = json['inventory'];
-    items = json['inventory']['bundleItems'] ?? [];
+    items =
+        json['inventory'] == null ? [] : json['inventory']['bundleItems'] ?? [];
     received = json['received'] is int ? json['received'].toDouble() : 0.0;
     product = json['product'];
     quantity = double.parse(json['quantity'].toString());
