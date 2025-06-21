@@ -27,9 +27,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Need BLE permission</string>
+	<string>This app uses Bluetooth to connect to receipt printers for seamless transaction printing when user makes a sale or when user want to print a receipt that had been sold before</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Need BLE permission</string>
+	<string>Bluetooth access is required to discover and communicate with nearby receipt printers used in sales transactions.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -38,16 +38,12 @@
 	<string>Main</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires access to your camera to take product photos and scan QR codes.</string>
-
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to your photo library to upload images for products and receipts.</string>
-
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app requires your location to suggest nearby shops and for delivery features.</string>
-
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app requires your location to enable continuous tracking for delivery management and shop services.</string>
-
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

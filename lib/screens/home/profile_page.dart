@@ -27,208 +27,185 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          userController.currentUser.value?.usertype == "admin"
-              ? null
-              : AppBar(
-                titleSpacing: 0.0,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                leading: InkWell(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: const Icon(Icons.clear, color: AppColors.mainColor),
-                ),
+      appBar: userController.currentUser.value?.usertype == "admin"
+          ? null
+          : AppBar(
+              titleSpacing: 0.0,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: InkWell(
+                onTap: () {
+                  Get.back();
+                },
+                child: const Icon(Icons.clear, color: AppColors.mainColor),
               ),
+            ),
       body: SafeArea(
         child: Obx(
-          () =>
-              userController.profileupdateLoading.value == true
-                  ? const Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen(context) ? 10 : 20,
-                        vertical: 10,
-                      ).copyWith(right: isSmallScreen(context) ? 10 : 50),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          majorTitle(
-                            title: "User Details",
-                            color: Colors.black,
-                            size: 18.0,
-                          ),
-                          const SizedBox(height: 10),
-                          Card(
-                            elevation: 3,
-                            child: Container(
-                              padding: const EdgeInsets.all(15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (userController.currentUser.value?.email !=
-                                          null &&
-                                      userController
-                                              .currentUser
-                                              .value
-                                              ?.usertype ==
-                                          "admin")
-                                    Obx(() {
-                                      return profileItems(
-                                        title: "Email",
-                                        subtitle:
-                                            userController
-                                                .currentUser
-                                                .value
-                                                ?.email,
-                                        icon: Icons.email,
-                                      );
-                                    }),
-                                  const SizedBox(height: 15),
-                                  if (userController
-                                          .currentUser
-                                          .value
-                                          ?.username !=
-                                      null)
-                                    Obx(() {
-                                      return profileItems(
-                                        title: "Username",
-                                        subtitle:
-                                            userController
-                                                .currentUser
-                                                .value
-                                                ?.username ??
-                                            "",
-                                        icon: Icons.person,
-                                      );
-                                    }),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          majorTitle(
-                            title: "Settings",
-                            color: Colors.black,
-                            size: 18.0,
-                          ),
-                          const SizedBox(height: 10),
-                          Card(
-                            elevation: 3,
+          () => userController.profileupdateLoading.value == true
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isSmallScreen(context) ? 10 : 20,
+                      vertical: 10,
+                    ).copyWith(right: isSmallScreen(context) ? 10 : 50),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        majorTitle(
+                          title: "User Details",
+                          color: Colors.black,
+                          size: 18.0,
+                        ),
+                        const SizedBox(height: 10),
+                        Card(
+                          elevation: 3,
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                accountCard(
-                                  title: "Edit Profile",
-                                  icon: Icons.edit,
-                                  onPressed: () {
-                                    if (isSmallScreen(context)) {
-                                      Get.to(() => ProfileUpdate());
-                                    } else {
-                                      Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = ProfileUpdate();
-                                    }
-                                  },
-                                ),
-                                accountCard(
-                                  title: "Password Settings",
-                                  icon: Icons.lock,
-                                  onPressed: () {
-                                    showPasswordResetDialog();
-                                  },
-                                ),
-                                if (userController
-                                        .currentUser
-                                        .value
-                                        ?.usertype ==
-                                    "admin")
-                                  accountCard(
-                                    showDivider: true,
-                                    title: "Delete Account",
-                                    icon: Icons.delete,
-                                    onPressed: () {
-                                      deleteDialog(
-                                        context: context,
-                                        message:
-                                            "This action will delete all products, customers, suppliers, sales, purchases and everything else related to your account, do you want to proceed?",
-                                        onPressed: () {
-                                          userController.deleteAccount();
-                                        },
-                                      );
-                                    },
-                                  ),
-                                if (userController
-                                        .currentUser
-                                        .value
-                                        ?.usertype ==
-                                    "admin")
-                                  accountCard(
-                                    showDivider: false,
-                                    title: "Connect BLE Printer",
-                                    icon: Icons.print,
-                                    onPressed: () async {
-                                      bool res = await askPermissions();
-                                      if (res) {
-                                        Get.to(
-                                          () => const BluetoothReceiptPrinter(),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                if (userController
-                                        .currentUser
-                                        .value
-                                        ?.usertype ==
-                                    "admin")
-                                  accountCard(
-                                    showDivider: false,
-                                    title: "Subscription Plans",
-                                    icon: Icons.subscriptions,
-                                    onPressed: () {
-                                      if (Platform.isIOS) {
-                                        Get.to(() => InAppPurchasesScreen());
-                                      } else {
-                                        Get.to(() => ExtendUsage());
-                                      }
-                                    },
-                                  ),
-                                accountCard(
-                                  showDivider: false,
-                                  title: "Check for Updates",
-                                  icon: Icons.refresh,
-                                  onPressed: () async {
-                                    LoadingDialog.showLoadingDialog(
-                                      context: context,
-                                      title: "Checking for updates",
-                                      key: GlobalKey<State>(),
+                                if (userController.currentUser.value?.email !=
+                                        null &&
+                                    userController
+                                            .currentUser.value?.usertype ==
+                                        "admin")
+                                  Obx(() {
+                                    return profileItems(
+                                      title: "Email",
+                                      subtitle: userController
+                                          .currentUser.value?.email,
+                                      icon: Icons.email,
                                     );
-                                    await authController.checkForUpdate();
-                                    Get.back();
-                                  },
-                                ),
+                                  }),
+                                const SizedBox(height: 15),
+                                if (userController
+                                        .currentUser.value?.username !=
+                                    null)
+                                  Obx(() {
+                                    return profileItems(
+                                      title: "Username",
+                                      subtitle: userController
+                                              .currentUser.value?.username ??
+                                          "",
+                                      icon: Icons.person,
+                                    );
+                                  }),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          if (isSmallScreen(context))
-                            Card(
-                              elevation: 3,
-                              child: accountCard(
-                                title: "Logout",
-                                icon: Icons.logout,
-                                showDivider: false,
+                        ),
+                        const SizedBox(height: 10),
+                        majorTitle(
+                          title: "Settings",
+                          color: Colors.black,
+                          size: 18.0,
+                        ),
+                        const SizedBox(height: 10),
+                        Card(
+                          elevation: 3,
+                          child: Column(
+                            children: [
+                              accountCard(
+                                title: "Edit Profile",
+                                icon: Icons.edit,
                                 onPressed: () {
-                                  logoutAccountDialog(context);
+                                  if (isSmallScreen(context)) {
+                                    Get.to(() => ProfileUpdate());
+                                  } else {
+                                    Get.find<HomeController>()
+                                        .selectedWidget
+                                        .value = ProfileUpdate();
+                                  }
                                 },
                               ),
+                              accountCard(
+                                title: "Password Settings",
+                                icon: Icons.lock,
+                                onPressed: () {
+                                  showPasswordResetDialog();
+                                },
+                              ),
+                              if (userController.currentUser.value?.usertype ==
+                                  "admin")
+                                accountCard(
+                                  showDivider: true,
+                                  title: "Delete Account",
+                                  icon: Icons.delete,
+                                  onPressed: () {
+                                    deleteDialog(
+                                      context: context,
+                                      message:
+                                          "This action will delete all products, customers, suppliers, sales, purchases and everything else related to your account, do you want to proceed?",
+                                      onPressed: () {
+                                        userController.deleteAccount();
+                                      },
+                                    );
+                                  },
+                                ),
+                              accountCard(
+                                showDivider: false,
+                                title: "Connect BLE Printer",
+                                icon: Icons.print,
+                                onPressed: () async {
+                                  bool res = await askPermissions();
+                                  if (res) {
+                                    Get.to(
+                                      () => const BluetoothReceiptPrinter(),
+                                    );
+                                  }
+                                },
+                              ),
+                              if (userController.currentUser.value?.usertype ==
+                                  "admin")
+                                accountCard(
+                                  showDivider: false,
+                                  title: "Subscription Plans",
+                                  icon: Icons.subscriptions,
+                                  onPressed: () {
+                                    if (Platform.isIOS) {
+                                      Get.to(() => InAppPurchasesScreen());
+                                    } else {
+                                      Get.to(() => ExtendUsage());
+                                    }
+                                  },
+                                ),
+                              accountCard(
+                                showDivider: false,
+                                title: "Check for Updates",
+                                icon: Icons.refresh,
+                                onPressed: () async {
+                                  LoadingDialog.showLoadingDialog(
+                                    context: context,
+                                    title: "Checking for updates",
+                                    key: GlobalKey<State>(),
+                                  );
+                                  await authController.checkForUpdate();
+                                  Get.back();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        if (isSmallScreen(context))
+                          Card(
+                            elevation: 3,
+                            child: accountCard(
+                              title: "Logout",
+                              icon: Icons.logout,
+                              showDivider: false,
+                              onPressed: () {
+                                logoutAccountDialog(context);
+                              },
                             ),
-                        ],
-                      ),
+                          ),
+                      ],
                     ),
                   ),
+                ),
         ),
       ),
     );
@@ -473,13 +450,12 @@ class ProfilePage extends StatelessWidget {
   askPermissions() async {
     var status = await Permission.location.status;
     if (status.isDenied) {
-      Map<Permission, PermissionStatus> statuses =
-          await [
-            Permission.location,
-            Permission.bluetoothScan,
-            Permission.bluetoothAdvertise,
-            Permission.bluetoothConnect,
-          ].request();
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.location,
+        Permission.bluetoothScan,
+        Permission.bluetoothAdvertise,
+        Permission.bluetoothConnect,
+      ].request();
       if (statuses[Permission.location]!.isGranted &&
           statuses[Permission.bluetoothScan]!.isGranted &&
           statuses[Permission.bluetoothAdvertise]!.isGranted &&

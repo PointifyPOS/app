@@ -361,7 +361,7 @@ class ProductReceiptsSales extends StatelessWidget {
                   ),
                   if (receiptItem.items!.isNotEmpty)
                     Text(
-                        'Qty ${receiptItem.items!.fold(0, (previousValue, element) => element.quantity! + previousValue)} @ ${receiptItem.items!.fold(0, (previousValue, element) => element.unitPrice! + previousValue)}'),
+                        'Qty ${receiptItem.items!.fold(0.0, (previousValue, element) => element.quantity! + previousValue)} @ ${receiptItem.items!.fold(0.0, (previousValue, element) => element.unitPrice! + previousValue)}'),
                   if (receiptItem.createdAt != null)
                     Text(
                         '${DateFormat("MMM dd, yyyy, hh:m a").format(DateTime.parse(receiptItem.createdAt!))} '),

@@ -19,8 +19,7 @@ class ReturnedReceipt extends StatelessWidget {
   final String? type;
   final String? from;
 
-  ReturnedReceipt({Key? key, this.saleRetuns, this.type = "", this.from = ""})
-      : super(key: key);
+  ReturnedReceipt({super.key, this.saleRetuns, this.type = "", this.from = ""});
 
   final ShopController shopController = Get.find<ShopController>();
   final SalesController salesController = Get.find<SalesController>();
@@ -149,6 +148,7 @@ class ReturnedReceipt extends StatelessWidget {
                           itemCount: saleRetuns!.items!.length,
                           itemBuilder: (BuildContext c, int i) {
                             Items receiptitem = saleRetuns!.items![i];
+                            print("receiptitem ${receiptitem.quantity}");
                             return Row(
                               children: [
                                 Expanded(
@@ -159,7 +159,7 @@ class ReturnedReceipt extends StatelessWidget {
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                       Text(
-                                        "${receiptitem.quantity!} @${htmlPrice(receiptitem.unitPrice ?? 0)}",
+                                        "${receiptitem.quantity ?? 0} @${htmlPrice(receiptitem.unitPrice ?? 0)}",
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                       Row(

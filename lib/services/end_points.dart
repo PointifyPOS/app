@@ -1,5 +1,5 @@
-const apiEndPoint = "http://192.168.100.3:1989/";
-// const apiEndPoint = "https://api.pointifypos.com/";
+// const apiEndPoint = "http://192.168.100.3:1989/";
+const apiEndPoint = "https://api.pointifypos.com/";
 const storeurl = "https://store.pointifypos.com/";
 
 class EndPoints {

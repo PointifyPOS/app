@@ -15,10 +15,7 @@ import '../../screens/sales/components/sales_rerurn_card.dart';
 
 class SalesReturnsReport extends StatefulWidget {
   final String? title;
-  const SalesReturnsReport({Key? key, this.title})
-      : super(
-          key: key,
-        );
+  const SalesReturnsReport({super.key, this.title});
 
   @override
   State<SalesReturnsReport> createState() => _SalesReturnsReportState();
@@ -164,9 +161,13 @@ class _SalesReturnsReportState extends State<SalesReturnsReport> {
                 Text(
                   salesController.allSalesReturns
                       .fold(
-                          0,
+                          0.0,
                           (previousValue, element) =>
-                              previousValue + element.items!.length)
+                              previousValue +
+                              element.items!.fold(
+                                  0.0,
+                                  (previousValue, element) =>
+                                      previousValue + element.quantity!))
                       .toString(),
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.bold),

@@ -263,8 +263,7 @@ Widget productCard(
                                         "Restock @ ${product.reorderLevel} ~ Qty: ${product.quantity?.toStringAsFixed(2)}",
                                     color: Colors.black,
                                     size: 11),
-                              if (product.manageByPrice == false &&
-                                  (product.reorderLevel == 0 ||
+                              if ((product.reorderLevel == 0 ||
                                       product.reorderLevel == null) &&
                                   type != "onlineorders")
                                 minorTitle(
@@ -284,31 +283,23 @@ Widget productCard(
                                     size: 11),
                             ],
                           ),
-                          if (product.manageByPrice == false ||
-                              (type == "all" && product.manageByPrice == false))
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (verifyPermission(
-                                    category: "stocks",
-                                    permission: "view_buying_price"))
-                                  Text(
-                                    "BP/= ${htmlPrice(product.getBuyingPrice())}",
-                                    style: const TextStyle(color: Colors.black),
-                                  ),
-                                const SizedBox(height: 5),
-                                minorTitle(
-                                    title:
-                                        "SP/= ${htmlPrice(product.sellingPrice?.toStringAsFixed(2))}",
-                                    color: Colors.black),
-                              ],
-                            ),
-                          if (type == "salemodule" &&
-                              product.manageByPrice == true)
-                            minorTitle(
-                                title:
-                                    " ${product.manageByPrice == false ? "SP/= ${htmlPrice(product.sellingPrice?.toStringAsFixed(2))}" : "Exp ${htmlPrice(product.sellingPrice?.toStringAsFixed(2))}"}",
-                                color: Colors.black)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (verifyPermission(
+                                  category: "stocks",
+                                  permission: "view_buying_price"))
+                                Text(
+                                  "BP/= ${htmlPrice(product.getBuyingPrice())}",
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              const SizedBox(height: 5),
+                              minorTitle(
+                                  title:
+                                      "SP/= ${htmlPrice(product.sellingPrice?.toStringAsFixed(2))}",
+                                  color: Colors.black),
+                            ],
+                          ),
                         ],
                       ),
                   ],
@@ -490,7 +481,7 @@ showProductModal(context, Product product) {
   return showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        return Column(
+        return ListView(
           children: [
             if (userController.currentUser.value?.usertype == "admin")
               ListTile(

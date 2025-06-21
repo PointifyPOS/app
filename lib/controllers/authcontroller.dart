@@ -168,8 +168,6 @@ class AuthController {
           chatsCheck();
           checkForUpdate();
           User().updateLastSeen();
-          print(
-              "userController.currentUser.value?.primaryShop?.warehouse ${userController.currentUser.value?.primaryShop?.warehouse}");
           if (userController.currentUser.value?.primaryShop?.warehouse ==
               true) {
             Get.find<WareHouseController>().getRequests(

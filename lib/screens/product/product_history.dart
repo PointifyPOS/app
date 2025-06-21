@@ -22,7 +22,7 @@ import '../../widgets/tab_view.dart';
 class ProductHistory extends StatelessWidget {
   final Product product;
 
-  ProductHistory({Key? key, required this.product}) : super(key: key);
+  ProductHistory({super.key, required this.product});
 
   final StockController stockController = Get.find<StockController>();
   final ShopController shopController = Get.find<ShopController>();

@@ -844,6 +844,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         'saleDiscount':
             saleDiscount.text.isEmpty ? 0.0 : double.parse(saleDiscount.text),
       };
+      print("sale $sale");
       Get.back();
       saveSaleLoad.value = true;
       LoadingDialog.showLoadingDialog(

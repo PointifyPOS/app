@@ -20,8 +20,11 @@
     <application
         android:label="Pointify"
         android:requestLegacyExternalStorage="true"
-        android:name="${applicationName}"
+        android:name=".Application"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
 
         <activity
             android:name=".MainActivity"

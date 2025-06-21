@@ -72,8 +72,8 @@ class SaleRetuns {
 
 class Items {
   Product? product;
-  int? quantity;
-  int? unitPrice;
+  double? quantity;
+  double? unitPrice;
   String? sId;
 
   Items({this.product, this.quantity, this.sId, this.unitPrice});
@@ -81,8 +81,12 @@ class Items {
   Items.fromJson(Map<String, dynamic> json) {
     product =
         json['product'] != null ? Product.fromJson(json['product']) : null;
-    quantity = json['quantity'];
-    unitPrice = json['unitPrice'];
+    quantity = json['quantity'] is int
+        ? json['quantity'].toDouble()
+        : json['quantity'];
+    unitPrice = json['unitPrice'] is int
+        ? json['unitPrice'].toDouble()
+        : json['unitPrice'];
     sId = json['_id'];
   }
 
