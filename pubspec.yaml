@@ -1,7 +1,7 @@
 name: pointify
 description: "Pointify Pos."
 publish_to: 'none'
-version: 2.0.154+176
+version: 2.0.159+179
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -50,6 +50,10 @@ dependencies:
   print_bluetooth_thermal: ^1.1.6
   bluetooth_print_plus: ^2.4.6
   uuid: ^4.4.0
+  cs50sdkupdate:
+    git:
+      url: https://github.com/freddysundowner/-cs50sdkupdate
+      ref: main
   flutter_chat_types:
   path:
   sunmi_printer_plus: ^2.1.3

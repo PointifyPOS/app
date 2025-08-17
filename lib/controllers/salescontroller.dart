@@ -33,6 +33,7 @@ import '../screens/customers/wallet_page.dart';
 import '../screens/receipts/pdf/sales/sales_receipt.dart';
 import '../screens/receipts/view/sales_receipt.dart';
 import '../services/sales_service.dart';
+import '../utils/cs50Setup.dart';
 import '../utils/sunmi.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
@@ -92,6 +93,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     'mpesa': 0,
     'bank': 0,
   });
+  RxString duesByDate = RxString("");
   RxList<SaleRetuns> allSalesReturns = RxList([]);
   RxList<OrderItem> orders = RxList([]);
   RxnInt allSalesTotal = RxnInt(0);
@@ -626,7 +628,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   }
 
   calculateAmount(index, {required double totalDiscount}) {
-    print("calculateAmount");
     receipt.value!.totalWithDiscount = 0;
     receipt.value!.outstandingBalance = 0;
 
@@ -769,7 +770,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   Future<void> saveReceipt({String? page, String? status}) async {
     SaleModel saleModel = receipt.value!;
     try {
-      // PrinterController printerController = Get.find<PrinterController>();
       cashPaid.text = cashPaid.text.isEmpty ? "0.0" : cashPaid.text;
       mpesaCashPaid.text =
           mpesaCashPaid.text.isEmpty ? "0.0" : mpesaCashPaid.text;
@@ -786,7 +786,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         }
         amountPaid.text = amountTotalPaid.toStringAsFixed(2);
       }
-      // getTotalCredit();
       SaleModel receiptData = receipt.value!;
       var sale = {
         "products": receiptData.items?.map((e) => e.toJson()).toList(),
@@ -844,7 +843,19 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         'saleDiscount':
             saleDiscount.text.isEmpty ? 0.0 : double.parse(saleDiscount.text),
       };
-      print("sale $sale");
+      if (sale["paymentTag"] == "split") {
+        if (receipt.value!.outstandingBalance! > 0) {
+          generalAlert(
+            title: "Error",
+            message:
+                "Split payment must be paid in full, balance is ${htmlPrice(receipt.value!.outstandingBalance)}",
+            function: () {
+              Get.back();
+            },
+          );
+          return;
+        }
+      }
       Get.back();
       saveSaleLoad.value = true;
       LoadingDialog.showLoadingDialog(
@@ -991,37 +1002,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
               onPressed: () async {
                 Get.back();
                 Get.back();
-                for (int i = 0;
-                    i < int.parse(receiptCoutController.text);
-                    i++) {
-                  Sunmi printer = Sunmi();
-                  printer.printReceipt(
-                    saleModel: saleModel,
-                    receiptTitle: "Cash Sale Receipt",
-                  );
-                  var items = saleModel.items!
-                      .map(
-                        (e) => {
-                          "name": e.product?.name,
-                          "qty": e.quantity,
-                          "price": e.totalLinePrice,
-                        },
-                      )
-                      .toList();
-                  List<int> ticket =
-                      await Get.find<PrinterController>().printSalesReceipt(
-                    items: items,
-                    storeName: saleModel.shopId?.name ?? "Pointify",
-                    phone: saleModel.shopId?.contact ?? "",
-                    email: saleModel.shopId?.receiptemail ?? "",
-                    address: saleModel.shopId?.addressReceipt ?? "",
-                    paybill: saleModel.shopId?.paybillTill ?? "",
-                    paybillAccount: saleModel.shopId?.paybillAccount ?? "",
-                    paymentType: saleModel.paymentType ?? "Cash",
-                    customer: saleModel.customerId?.name ?? "",
-                  );
-                  await PrintBluetoothThermal.writeBytes(ticket);
-                }
+                reprintReceipt(
+                  saleModel: saleModel,
+                );
               },
               child: Text(
                 "Yes print".toUpperCase(),
@@ -1224,6 +1207,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         "reason": "test",
         "deleteReceipt": deleteReceipt,
       };
+      print(returnData);
       var response = await SalesService.returnItem(returnData);
       if (currentReceipt.value != null) {
         var itemsQty = returnItems!.fold(
@@ -1436,6 +1420,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     String? fromDate = "",
     String? toDate = "",
     String? type,
+    String? duesales = "",
   }) async {
     if (type == "today") {
       fromDate = DateFormat("yyy-MM-dd").format(DateTime.now());
@@ -1445,6 +1430,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       fromDate: fromDate,
       toDate: toDate,
       shopId: userController.currentUser.value?.primaryShop?.id,
+      type: type,
+      duesales: duesales,
     );
     if (response["error"] != null) {
       showSnackBar(message: response["error"], color: Colors.red);
@@ -1662,5 +1649,52 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       orders.indexWhere((element) => element.sId == salesModel.sId),
     );
     await SalesService.deleteOrder(salesModel.sId!);
+  }
+
+  Future<void> reprintReceipt({required SaleModel saleModel}) async {
+    for (int i = 0; i < int.parse(receiptCoutController.text); i++) {
+      Sunmi printer = Sunmi();
+      printer.printReceipt(
+        saleModel: saleModel,
+        receiptTitle: "Cash Sale Receipt",
+      );
+
+      Cs50PrinterSetup().printReceipt(
+          saleModel: saleModel, receiptTitle: "Cash Sale Receipt");
+
+      var items = saleModel.items!
+          .map(
+            (e) => {
+              "name": "${e.product?.name} ${e.product?.measureUnit ?? ""}",
+              "qty": e.quantity,
+              "price": e.unitPrice,
+            },
+          )
+          .toList();
+      List<int> ticket = await Get.find<PrinterController>().printSalesReceipt(
+        items: items,
+        storeName: saleModel.shopId?.name ?? "Pointify",
+        phone: saleModel.shopId?.contact ?? "",
+        email: saleModel.shopId?.receiptemail ?? "",
+        address: saleModel.shopId?.addressReceipt ?? "",
+        paybill: saleModel.shopId?.paybillTill ?? "",
+        paybillAccount: saleModel.shopId?.paybillAccount ?? "",
+        paymentType: saleModel.paymentType ?? "Cash",
+        customer: saleModel.customerId?.name ?? "",
+      );
+      await PrintBluetoothThermal.writeBytes(ticket);
+    }
+  }
+
+  Future<void> getDuesByDate(
+      {required String shop, required String dueDate}) async {
+    var response =
+        await SalesService.getDuesByDate(shop: shop, dueDate: dueDate);
+    if (response["error"] != null) {
+      showSnackBar(message: response["error"], color: Colors.red);
+      return;
+    }
+    duesByDate.value = response["dues"];
+    duesByDate.refresh();
   }
 }

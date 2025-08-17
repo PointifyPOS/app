@@ -19,7 +19,7 @@ import '../../screens/receipts/pdf/sales/sales_summary_pdf.dart';
 import '../components/summarycard.dart';
 
 class SalesSummary extends StatelessWidget {
-  SalesSummary({Key? key}) : super(key: key) {
+  SalesSummary({super.key}) {
     reportsController.getSalesReport(
       startDate: reportsController.filterStartDate.value,
       toDate: reportsController.filterEndDate.value,
@@ -33,6 +33,7 @@ class SalesSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(reportsController.salesCard);
     return Helper(
       widget: Obx(() {
         return ListView(

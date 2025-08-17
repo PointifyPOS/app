@@ -173,6 +173,31 @@ class _HomeState extends State<Home> {
             elevation: 0.2,
             backgroundColor: Colors.white,
             actions: [
+              // if (userController.currentUser.value?.usertype == "admin")
+              //   Align(
+              //     alignment: Alignment.centerRight,
+              //     child: InkWell(
+              //       onTap: () async {
+              //         Get.to(() => AttendantsPage(type: "switch"));
+              //       },
+              //       child: const Row(
+              //         mainAxisAlignment: MainAxisAlignment.end,
+              //         children: [
+              //           Text(
+              //             "Switch User",
+              //             style: TextStyle(fontSize: 16),
+              //           ),
+              //           Icon(
+              //             Icons.repeat_sharp,
+              //             color: AppColors.mainColor,
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              SizedBox(
+                width: 10,
+              ),
               if (userController.currentUser.value?.usertype == "admin")
                 Align(
                   alignment: Alignment.centerRight,

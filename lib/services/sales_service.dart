@@ -79,12 +79,14 @@ class SalesService {
       {String? fromDate = "",
       String? toDate = "",
       String? shopId = "",
+      String? type = "",
+      String? duesales = "",
       String? attendant = ""}) async {
     if (userController.currentUser.value?.usertype == "attendant") {
       attendant = userController.currentUser.value?.attendantId?.sId;
     }
     var response = await DbBase().databaseRequest(
-        "${EndPoints.analysisnet}?fromDate=$fromDate&toDate=$toDate&shopId=$shopId&attendant=$attendant",
+        "${EndPoints.analysisnet}?fromDate=$fromDate&toDate=$toDate&shopId=$shopId&attendant=$attendant&type=$type&duesales=$duesales",
         DbBase().getRequestType);
     return response;
   }
@@ -201,6 +203,13 @@ class SalesService {
   static deleteOrder(String s) async {
     var response = await DbBase()
         .databaseRequest("${EndPoints.order}/$s", DbBase().deleteRequestType);
+    return response;
+  }
+
+  static getDuesByDate({required String shop, required String dueDate}) async {
+    var response = await DbBase().databaseRequest(
+        "${EndPoints.duesbydate}?shop=$shop&dueDate=$dueDate",
+        DbBase().getRequestType);
     return response;
   }
 }

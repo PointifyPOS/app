@@ -227,7 +227,6 @@ class CustomerController extends GetxController
         };
         var response = await CustomerService.updateCustomer(
             customerData, customerModel.sId!);
-        print(response);
         if (response['error'] != null) {
           generalAlert(title: "Error", message: response["error"]);
           return;

@@ -97,6 +97,7 @@ class EndPoints {
   static const voidreceipt = "${sales}void/sale";
   static const productsales = "${sales}products/reports";
   static const discountsales = "${sales}discount/reports";
+  static const duesbydate = "${sales}duesbydate/reports";
 
   //CUSTOMER
   static const customer = "${apiEndPoint}customers/";

@@ -13,7 +13,6 @@ import '../../services/end_points.dart';
 import '../../utils/colors.dart';
 import '../../utils/helper.dart';
 import '../../widgets/major_title.dart';
-import '../../widgets/minor_title.dart';
 import 'components/product_card.dart';
 
 class ProductPage extends StatelessWidget {
@@ -77,19 +76,14 @@ class ProductPage extends StatelessWidget {
         ],
         title: Padding(
           padding: const EdgeInsets.only(right: 10.0),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  majorTitle(
-                      title: "Products", color: Colors.black, size: 16.0),
-                  minorTitle(
-                      title:
-                          "${userController.currentUser.value?.primaryShop?.name}",
-                      color: Colors.grey)
-                ],
-              ),
+              majorTitle(title: "Products", color: Colors.black, size: 16.0),
+              Text(
+                "${userController.currentUser.value?.primaryShop?.name}",
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              )
             ],
           ),
         ),

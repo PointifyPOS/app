@@ -56,7 +56,7 @@ class StockController extends GetxController {
 
   void submitTranster({required Shop toShop, required context}) async {
     var transferData = {
-      "attendantId": userController.currentUser.value?.attendantId,
+      "attendantId": userController.currentUser.value?.attendantId?.sId,
       "fromShopId": userController.currentUser.value?.primaryShop?.id,
       "toShopId": toShop.id,
       "useWarehouse": (userController
@@ -68,6 +68,7 @@ class StockController extends GetxController {
               {"product": element["product"], "quantity": element["quantity"]})
           .toList(),
     };
+    print(transferData);
     try {
       isSavingingCount.value = true;
       var respose = await ProductService().transferProduct(transferData);

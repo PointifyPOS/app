@@ -150,18 +150,6 @@ class ReportsController extends GetxController {
         "amount": 0,
         "description": "All Sales made on cash"
       },
-      // {
-      //   "title": "Mpesa Sales",
-      //   "key": "mpesa",
-      //   "amount": 0,
-      //   "description": "All Sales made to mpesa account"
-      // },
-      // {
-      //   "title": "Banks Sales",
-      //   "key": "bank",
-      //   "amount": 0,
-      //   "description": "All Sales made to mpesa account"
-      // },
       {
         "title": "Credit Sales",
         "key": "credit",
@@ -170,7 +158,7 @@ class ReportsController extends GetxController {
       },
       {
         "title": "Collected Debt",
-        "key": "paid",
+        "key": "debtpaid",
         "amount": 0,
         "description": "Total credit paid by debtors"
       },
@@ -215,7 +203,7 @@ class ReportsController extends GetxController {
         salesCard.add(element);
         if (element["key"] == "cash" ||
             element["key"] == "credit" ||
-            element["key"] == "paid" ||
+            element["key"] == "debtpaid" ||
             element["key"] == "mpesa" ||
             element["key"] == "bank" ||
             element["key"] == "wallet") {

@@ -82,7 +82,7 @@ class PrinterController extends GetxController {
     bytes += generator.text('-' * 32);
 
     bytes += generator.text(
-      'Item        Qty  Price   Total',
+      'Item        Qty     Price     Total',
       styles: const PosStyles(align: PosAlign.left, bold: true),
     );
     bytes += generator.text('-' * 32);
@@ -93,18 +93,18 @@ class PrinterController extends GetxController {
       final name = item['name'] ?? '';
       final qty = item['qty'] ?? 0;
       final price = item['price'] ?? 0.0;
-      final total = qty * price;
+      final total = price * qty;
       subtotal += total;
 
-      // Format fields to exact widths
-      final nameStr = name.toString().padRight(12).substring(0, 12);
+      // print product name on its own line
+      bytes += generator.text(name.toString());
+
+      // pad so that qty is under Qty column
+      final indent = ' ' * 16;
       final qtyStr = qty.toString().padLeft(3);
       final priceStr = price.toStringAsFixed(2).padLeft(7);
       final totalStr = total.toStringAsFixed(2).padLeft(10);
-
-      // Concatenate with no extra spaces
-      final line = '$nameStr$qtyStr$priceStr$totalStr';
-      bytes += generator.text(line);
+      bytes += generator.text('$indent$qtyStr  $priceStr  $totalStr');
     }
 
     bytes += generator.text('-' * 32);

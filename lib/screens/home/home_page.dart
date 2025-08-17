@@ -643,11 +643,14 @@ class HomePage extends StatelessWidget {
                                               right: 20,
                                               child: Obx(
                                                 () => salesController.orders
-                                                    .map((e) => e.status)
-                                                    .where((element) => element == "pending")
-                                                    .toList()
-                                                    .length
-                                                    .toString().isEmpty
+                                                        .map((e) => e.status)
+                                                        .where((element) =>
+                                                            element ==
+                                                            "pending")
+                                                        .toList()
+                                                        .length
+                                                        .toString()
+                                                        .isEmpty
                                                     ? Container()
                                                     : Container(
                                                         width: 20,
@@ -660,9 +663,13 @@ class HomePage extends StatelessWidget {
                                                                         50)),
                                                         child: Center(
                                                           child: Text(
-                                                            salesController.orders
-                                                                .map((e) => e.status)
-                                                                .where((element) => element == "pending")
+                                                            salesController
+                                                                .orders
+                                                                .map((e) =>
+                                                                    e.status)
+                                                                .where((element) =>
+                                                                    element ==
+                                                                    "pending")
                                                                 .toList()
                                                                 .length
                                                                 .toString(),
@@ -1241,13 +1248,14 @@ class HomePage extends StatelessWidget {
           salesController.getNetAnalysis(
               fromDate: reportsController.filterStartDate.value,
               toDate: reportsController.filterEndDate.value,
-              shopId: userController.currentUser.value!.primaryShop!.id!);
+              shopId: userController.currentUser.value!.primaryShop!.id!,
+              duesales: 'true');
 
           Get.to(() => NetProfitReport(
               firstday: DateTime(DateTime.now().year, DateTime.now().month,
                   DateTime.now().day),
               lastday: DateTime.now()));
-        } else if ("sales" == "sales") {
+        } else if (homeCard.key == "sales") {
           if (verifyPermission(category: "sales", permission: "view_sales")) {
             Get.to(() => const AllSalesPage(page: "homepage"));
           } else {

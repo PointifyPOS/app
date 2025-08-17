@@ -1,3 +1,4 @@
+
 buildscript {
     repositories {
         google()
@@ -16,6 +17,15 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
+
+    repositories {
+        maven {
+            url = uri("${project(":cs50sdkupdate").projectDir}/build")
+        }
+        google()
+        mavenCentral()
+    }
+
 }
 subprojects {
     project.evaluationDependsOn(":app")

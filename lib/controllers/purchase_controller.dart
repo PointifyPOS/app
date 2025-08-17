@@ -196,6 +196,7 @@ class PurchaseController extends GetxController {
       "useWarehouse":
           userController.currentUser.value?.primaryShop?.useWarehouse ?? false
     };
+    print(invoiceData);
 
     var response = await PurchaseService.createPurchase(invoiceData);
     Get.back();

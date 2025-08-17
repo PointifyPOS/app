@@ -89,7 +89,7 @@ class SupplierInfoPage extends StatelessWidget {
                                 launchMessage(
                                     number: supplierModel.phoneNumber,
                                     message:
-                                        "A quick reminde that you owe our shop please pay your debt ");
+                                        "A quick reminder that you owe our shop please pay your debt ");
                               },
                               icon: const Icon(Icons.message),
                               color: Colors.white),

@@ -44,6 +44,11 @@ class SalesReceipt extends StatelessWidget {
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: (String value) {
+              if (value == 'Print') {
+                salesController.reprintReceipt(
+                  saleModel: salesController.currentReceipt.value!,
+                );
+              }
               if (value == 'Share') {
                 salesController.sharePdf(salesModel!);
               }
@@ -80,6 +85,10 @@ class SalesReceipt extends StatelessWidget {
                 const PopupMenuItem<String>(
                   value: 'Share',
                   child: Text('Share receipt'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Print',
+                  child: Text('Print receipt'),
                 ),
                 const PopupMenuItem<String>(
                   value: 'Delivery',
