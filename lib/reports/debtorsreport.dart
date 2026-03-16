@@ -21,7 +21,7 @@ class DebtorsReportScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title:  Text(
           "Debtors Report",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -46,7 +46,7 @@ class DebtorsReportScreen extends StatelessWidget {
                 String? filePath = await exportToExcel(data, "debtors");
                 await openFile(filePath!);
               },
-              icon: const Icon(
+              icon:  Icon(
                 Icons.print,
                 color: AppColors.mainColor,
               ))
@@ -55,7 +55,7 @@ class DebtorsReportScreen extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

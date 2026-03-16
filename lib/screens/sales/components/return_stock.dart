@@ -20,7 +20,7 @@ returnInvoiceItem({required SaleItem invoiceItem, SaleModel? invoice}) {
             child: TextFormField(
               controller: textEditingController,
               decoration: ThemeHelper()
-                  .textInputDecorationDesktop('Quantity', 'Enter quantity'),
+                  .textInputDecoration('Quantity', 'Enter quantity'),
             ),
           ),
           actions: [
@@ -30,7 +30,7 @@ returnInvoiceItem({required SaleItem invoiceItem, SaleModel? invoice}) {
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style:  TextStyle(color: AppColors.mainColor),
                 )),
             TextButton(
                 onPressed: () {
@@ -52,7 +52,7 @@ returnInvoiceItem({required SaleItem invoiceItem, SaleModel? invoice}) {
                 },
                 child: Text(
                   "Okay".toUpperCase(),
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style:  TextStyle(color: AppColors.mainColor),
                 ))
           ],
         );

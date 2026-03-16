@@ -51,11 +51,11 @@ class CreateSale extends StatelessWidget {
                             Get.back();
                             salesController.receipt.value = null;
                           },
-                          icon: const Icon(
+                          icon:  Icon(
                             Icons.clear,
                             color: AppColors.mainColor,
                           )),
-                      const Text(
+                       Text(
                         "Create sale",
                         style: TextStyle(
                             color: AppColors.mainColor,
@@ -161,7 +161,7 @@ class CreateSale extends StatelessWidget {
                                   ),
                                 ],
                               )),
-                          const Divider(
+                           Divider(
                             color: AppColors.mainColor,
                           ),
                         ],
@@ -215,11 +215,11 @@ class CreateSale extends StatelessWidget {
                                                     .selectedCustomerController
                                                     .text
                                                     .isEmpty
-                                                ? const Icon(
+                                                ?  Icon(
                                                     Icons.search,
                                                     color: AppColors.mainColor,
                                                   )
-                                                : const Icon(
+                                                :  Icon(
                                                     Icons.cancel,
                                                     color: AppColors.mainColor,
                                                   ),
@@ -459,7 +459,7 @@ class CreateSale extends StatelessWidget {
                                             salesController.addToCart(product);
                                           }));
                                     },
-                                    child: const Column(
+                                    child:  Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       mainAxisAlignment:

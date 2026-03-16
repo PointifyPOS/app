@@ -14,8 +14,12 @@ import 'package:pointify/controllers/suppliercontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/responsive/appbehaviour.dart';
 import 'package:pointify/screens/authentication/landing.dart';
+import 'package:pointify/services/end_points.dart';
+import 'package:pointify/services/settings.dart';
+import 'package:pointify/utils/app_config.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/utils/constants.dart';
+import 'package:pointify/utils/helper.dart';
 
 import 'controllers/cashflowcontroller.dart';
 import 'controllers/ordercontroller.dart';
@@ -30,15 +34,25 @@ UserController userController = Get.put<UserController>(UserController());
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  if (stripePublishKey.isNotEmpty) {
-    Stripe.publishableKey = stripePublishKey;
-    Stripe.merchantIdentifier = 'pointify';
-    await Stripe.instance.applySettings();
-  }
+  final data = await SettingsApi.getThemes();
+
+  AppConfig.app_logo =
+      apiEndPoint + (data['image']?.replaceFirst("/", "") ?? "");
+  AppConfig.app_name = data['APP_NAME'] ?? "Pointify";
+  AppConfig.app_slogan = data['APP_SLOGAN'] ?? "";
+
+  AppColors.mainColor = parseColor(data["PRIMARY_COLOR"]);
+  AppColors.button_color = parseColor(data["BUTTON_COLOR"]);
+  AppColors.text_color = parseColor(data["TEXT_COLOR"]);
+  AppColors.secondary_color = parseColor(data["SECONDARY_COLOR"]);
+
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -102,7 +116,7 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       scrollBehavior: AppScrollBehavior(),
       theme: ThemeData(
-        primarySwatch: AppColors.mainColor,
+        primaryColor: AppColors.mainColor,
         splashColor: Colors.transparent,
         hoverColor: Colors.transparent,
         highlightColor: Colors.transparent,

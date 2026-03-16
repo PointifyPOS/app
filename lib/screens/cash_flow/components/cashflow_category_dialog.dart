@@ -74,7 +74,7 @@ cashFlowCategoryDialog(context, {required CashFlowCategory cashflowCategory}) {
                                   child: Text(
                                     "Cancel".toUpperCase(),
                                     style:
-                                        const TextStyle(color: AppColors.mainColor),
+                                         TextStyle(color: AppColors.mainColor),
                                   )),
                               const SizedBox(
                                 width: 10,
@@ -93,7 +93,7 @@ cashFlowCategoryDialog(context, {required CashFlowCategory cashflowCategory}) {
                                   child: Text(
                                     "Save".toUpperCase(),
                                     style:
-                                        const TextStyle(color: AppColors.mainColor),
+                                         TextStyle(color: AppColors.mainColor),
                                   )),
                             ],
                           )

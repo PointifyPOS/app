@@ -172,7 +172,7 @@ class _GraphAnalysisState extends State<GraphAnalysis> {
             ),
             Text(
               "TOTAL PROFIT(net) ${htmlPrice(salesController.netProfit.value)}",
-              style: const TextStyle(
+              style:  TextStyle(
                   color: AppColors.mainColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
@@ -189,7 +189,7 @@ class _GraphAnalysisState extends State<GraphAnalysis> {
                     children: [
                       TabBar(
                         controller: DefaultTabController.of(context),
-                        tabs: const [
+                        tabs:  [
                           Tab(
                             child: Text(
                               "Graph View",

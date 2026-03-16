@@ -13,33 +13,7 @@ import '../../models/expensecategory.dart';
 import '../../utils/colors.dart';
 import '../../widgets/major_title.dart';
 
-enum ColorLabel {
-  blue('Blue', Colors.blue),
-  pink('Pink', Colors.pink),
-  green('Green', Colors.green),
-  yellow('Yellow', Colors.yellow),
-  grey('Grey', Colors.black);
 
-  const ColorLabel(this.label, this.color);
-
-  final String label;
-  final Color color;
-}
-
-enum IconLabel {
-  smile('Smile', Icons.sentiment_satisfied_outlined),
-  cloud(
-    'Cloud',
-    Icons.cloud_outlined,
-  ),
-  brush('Brush', Icons.brush_outlined),
-  heart('Heart', Icons.favorite);
-
-  const IconLabel(this.label, this.icon);
-
-  final String label;
-  final IconData icon;
-}
 
 class CreateExpense extends StatelessWidget {
 final String? from;
@@ -203,7 +177,7 @@ final String? from;
                           borderRadius: BorderRadius.circular(10),
                           border:
                               Border.all(color: AppColors.mainColor, width: 2)),
-                      child: const Text(
+                      child:  Text(
                         "+ Add",
                         style: TextStyle(color: AppColors.mainColor),
                       )),

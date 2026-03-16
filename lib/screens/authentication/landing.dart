@@ -1,12 +1,12 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/authcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 
-import '../../services/user.dart';
+import '../../utils/app_config.dart';
 import '../../utils/colors.dart';
-import '../../utils/constants.dart';
 import '../../widgets/textbutton.dart';
 import '../discover/shop_tags.dart';
 import 'admin/admin_login.dart';
@@ -37,18 +37,6 @@ class _LandingState extends State<Landing> {
   void initState() {
     super.initState();
     loadTasks();
-    User().getSettings().then((value) async {
-      if (value == null) {
-        return;
-      }
-      settingsData = value;
-      if (settingsData['offlineEnabled'] == false) {
-        userController.enableOffline.value = false;
-      } else {
-        userController.enableOffline.value = true;
-      }
-    });
-    // DynamicLinkService().handleDynamicLinks();
   }
 
   @override
@@ -79,11 +67,11 @@ class _LandingState extends State<Landing> {
                     padding: const EdgeInsets.only(left: 30.0, right: 30),
                     child: InkWell(
                       onTap: () {
-                        Get.to(AdminLogin());
+                        Get.to(()=>AdminLogin());
                       },
                       child: customButton(
                           onTap: () {
-                            Get.to(AdminLogin());
+                            Get.to(()=>AdminLogin());
                           },
                           color: Colors.white,
                           title: "Business Owner",
@@ -96,11 +84,11 @@ class _LandingState extends State<Landing> {
                     padding: const EdgeInsets.only(left: 30.0, right: 30),
                     child: InkWell(
                       onTap: () {
-                        Get.to(AttendantLogin());
+                        Get.to(()=>AttendantLogin());
                       },
                       child: customButton(
                           onTap: () {
-                            Get.to(AttendantLogin());
+                            Get.to(()=>AttendantLogin());
                           },
                           color: AppColors.mainColor,
                           title: "Attendant",
@@ -133,7 +121,7 @@ class _LandingState extends State<Landing> {
                               text: "Shop Around you",
                               bgColor: Colors.transparent,
                               fontSize: 12),
-                          const Icon(Icons.location_on,
+                           Icon(Icons.location_on,
                               color: AppColors.mainColor),
                         ],
                       ),
@@ -153,11 +141,9 @@ class _LandingState extends State<Landing> {
   Widget landingContent() {
     return Column(
       children: [
-        Image.asset(
-          "assets/images/logo2.png",
-          width: 250,
-        ),
-        loading ? const Text("") : const Text("An enterprise in your hands."),
+        if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250,),
+
+        loading ? const Text("") :  Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
         const SizedBox(
           height: 20,
         ),

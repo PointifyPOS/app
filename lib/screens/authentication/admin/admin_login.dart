@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:pointify/screens/authentication/admin/forgot_password.dart';
 import 'package:pointify/screens/authentication/admin/sign_up.dart';
 import 'package:pointify/screens/authentication/landing.dart';
 
+import '../../../utils/app_config.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/themer.dart';
 
@@ -46,11 +48,8 @@ class _AdminLoginState extends State<AdminLogin> {
             children: [
               Column(
                 children: [
-                  Image.asset(
-                    "assets/images/logo2.png",
-                    width: 250,
-                  ),
-                  const Text("An enterprise at your fingertips."),
+                  if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250,),
+                  Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
                   const SizedBox(
                     height: 40,
                   ),
@@ -115,10 +114,7 @@ class _AdminLoginState extends State<AdminLogin> {
                     return null;
                   },
                   keyboardType: TextInputType.emailAddress,
-                  decoration: isSmallScreen(context)
-                      ? ThemeHelper()
-                          .textInputDecoration('Email', 'Enter your email')
-                      : ThemeHelper().textInputDecorationDesktop(
+                  decoration:ThemeHelper().textInputDecoration(
                           'Email', 'Enter your email'),
                 ),
               ),
@@ -135,18 +131,15 @@ class _AdminLoginState extends State<AdminLogin> {
                       }
                       return null;
                     },
-                    decoration: isSmallScreen(context)
-                        ? ThemeHelper().textInputDecoration(
-                            'Password',
-                            'Enter your password',
-                            authController.showPassword.value
-                                ? Icons.visibility_off
-                                : Icons.visibility, () {
-                            authController.showPassword.value =
-                                !authController.showPassword.value;
-                          })
-                        : ThemeHelper().textInputDecorationDesktop(
-                            'Password', 'Enter your password'),
+                    decoration: ThemeHelper().textInputDecoration(
+                        'Password',
+                        'Enter your password',
+                        authController.showPassword.value
+                            ? Icons.visibility_off
+                            : Icons.visibility, () {
+                      authController.showPassword.value =
+                      !authController.showPassword.value;
+                    }),
                   ),
                 ),
               ),
@@ -158,7 +151,7 @@ class _AdminLoginState extends State<AdminLogin> {
                     authController.resetPassword.value = false;
                     Get.to(() => ForgotPassword());
                   },
-                  child: const Text(
+                  child:  Text(
                     "Forgot Password?",
                     style: TextStyle(
                         fontSize: 15,
@@ -199,7 +192,7 @@ class _AdminLoginState extends State<AdminLogin> {
                     text: 'Create',
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        Get.to(SignUp());
+                        Get.to(()=>SignUp());
                       },
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),

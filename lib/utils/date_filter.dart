@@ -53,7 +53,7 @@ class DateFilter extends StatelessWidget {
           selectionMode: DateRangePickerSelectionMode.range,
           maxDate: DateTime.now(),
           monthViewSettings: const DateRangePickerMonthViewSettings(),
-          headerStyle: const DateRangePickerHeaderStyle(
+          headerStyle:  DateRangePickerHeaderStyle(
               textAlign: TextAlign.center,
               textStyle: TextStyle(
                   fontWeight: FontWeight.bold,

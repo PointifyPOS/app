@@ -16,12 +16,14 @@ import 'ShopsRenew.dart';
 class ExtendUsage extends StatelessWidget {
   final Shop? shop;
   ExtendUsage({
-    Key? key,
+    super.key,
     this.shop,
-  }) : super(key: key) {
-    userController.phoneController.text =
-        userController.currentUser.value!.phone ?? "";
-    planController.getPlans();
+  }) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      userController.phoneController.text =
+          userController.currentUser.value!.phone ?? "";
+      planController.getPlans();
+    });
   }
 
   final ShopController shopController = Get.find<ShopController>();
@@ -36,11 +38,11 @@ class ExtendUsage extends StatelessWidget {
             onPressed: () {
               Get.back();
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.clear,
               color: AppColors.mainColor,
             )),
-        title: const Text(
+        title: Text(
           "Extend usage",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -178,7 +180,7 @@ class ExtendUsage extends StatelessWidget {
                                   "KES"
                               ? "USD"
                               : "@ ${htmlPrice('')}",
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 15, color: AppColors.mainColor),
                         ),
                         if (plan.discount! == 0)
@@ -188,7 +190,7 @@ class ExtendUsage extends StatelessWidget {
                                     "KES"
                                 ? "${plan.amountusd}"
                                 : plan.amount!.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 23,
                                 color: AppColors.mainColor),
@@ -203,7 +205,7 @@ class ExtendUsage extends StatelessWidget {
                                     "KES"
                                 ? "${plan.amountusd}"
                                 : plan.amount!.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 23,
                                 color: AppColors.mainColor),
@@ -224,7 +226,7 @@ class ExtendUsage extends StatelessWidget {
                               ),
                               Text(
                                 "${plan.discount}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 23,
                                     color: AppColors.mainColor),

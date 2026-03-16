@@ -25,12 +25,12 @@ class ImportProducts extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.arrow_back,
             color: AppColors.mainColor,
           ),
         ),
-        title: const Text(
+        title:  Text(
           "Import Products",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -140,7 +140,7 @@ class ImportProducts extends StatelessWidget {
                   await exportToExcel(productController.sampledata, "sample");
               await openFile(filePath!);
             },
-            child: const Text(
+            child:  Text(
               "Download sample template",
               style: TextStyle(
                   color: AppColors.mainColor, fontWeight: FontWeight.bold),

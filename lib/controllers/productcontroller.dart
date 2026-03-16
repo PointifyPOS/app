@@ -186,6 +186,21 @@ class ProductController extends GetxController {
   var filteredProducts = <Product>[].obs;
   ScrollController scrollController = ScrollController();
   RxBool loadingProducts = RxBool(false);
+  List<Product> get outOfStockProducts => filteredProducts
+      .where((p) =>
+          p.type != "service" &&
+          p.virtual == false &&
+          p.manageByPrice == false &&
+          (p.quantity ?? 0) <= 0)
+      .toList();
+
+  List<Product> get normalProducts => filteredProducts
+      .where((p) =>
+          p.type == "service" ||
+          p.virtual == true ||
+          p.manageByPrice == true ||
+          (p.quantity ?? 0) > 0)
+      .toList();
 
   RxMap<String, dynamic> productssPaginageSettings = RxMap({
     "page": 1,
@@ -219,6 +234,7 @@ class ProductController extends GetxController {
     getProductsBySort(
         type: "all",
         text: query,
+        sort: selectedSortOrderSearch.value,
         limit: 50,
         page: productssPaginageSettings['page'],
         showLoader: false,
@@ -647,7 +663,7 @@ class ProductController extends GetxController {
           } else {
             allImagesUpdated = false;
             ScaffoldMessenger.of(Get.context!).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
                   "error",
                   style: TextStyle(color: Colors.white),
@@ -796,6 +812,13 @@ class ProductController extends GetxController {
         }
       }
       filteredProducts.value = products;
+      if (sort != "outofstock" &&
+          normalProducts.isEmpty &&
+          outOfStockProducts.isNotEmpty &&
+          productssPaginageSettings['page'] <
+              productssPaginageSettings['totalPages']) {
+        _loadMoreData();
+      }
       Get.find<StockController>().productsCount.value = products;
       Get.find<WareHouseController>().productsCount.value = products;
       if (scanningFrom == "sale" && products.isNotEmpty) {

@@ -49,7 +49,7 @@ class FinancialPage extends StatelessWidget {
       "title": "Graphical Analysis",
       "subtitle": "Analyze shop performance in a graph",
       "icon": Icons.show_chart,
-      "color": Colors.purple.shade100,
+      "color": AppColors.mainColor.withOpacity(0.2),
       "showsummary": false,
     },
     {
@@ -98,14 +98,14 @@ class FinancialPage extends StatelessWidget {
             SfDateRangePicker(
                 onSelectionChanged: _onSelectionChanged,
                 selectionMode: DateRangePickerSelectionMode.range,
-                monthCellStyle: const DateRangePickerMonthCellStyle(
+                monthCellStyle:  DateRangePickerMonthCellStyle(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.mainColor,
                   ),
                 ),
                 monthViewSettings: const DateRangePickerMonthViewSettings(),
-                headerStyle: const DateRangePickerHeaderStyle(
+                headerStyle:  DateRangePickerHeaderStyle(
                     textAlign: TextAlign.center,
                     textStyle: TextStyle(
                         fontWeight: FontWeight.bold,

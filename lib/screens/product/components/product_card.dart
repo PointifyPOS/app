@@ -124,8 +124,8 @@ Widget productCard(
                                                 },
                                                 child: Text(
                                                   "Cancel".toUpperCase(),
-                                                  style: const TextStyle(
-                                                    color: Colors.purple,
+                                                  style:  TextStyle(
+                                                    color: AppColors.mainColor,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
@@ -136,8 +136,8 @@ Widget productCard(
                                                 },
                                                 child: Text(
                                                   "Okay".toUpperCase(),
-                                                  style: const TextStyle(
-                                                    color: Colors.purple,
+                                                  style:  TextStyle(
+                                                    color: AppColors.mainColor,
                                                     fontWeight: FontWeight.bold,
                                                   ),
                                                 ),

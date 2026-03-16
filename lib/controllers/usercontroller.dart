@@ -7,6 +7,7 @@ import '../main.dart';
 import '../models/usermodel.dart';
 import '../responsive/responsiveness.dart';
 import '../screens/home/attendant/attendants_page.dart';
+import '../utils/app_config.dart';
 import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
@@ -27,7 +28,7 @@ class UserController {
 
   Rxn<UserModel> switcheduser = Rxn(null);
   RxBool internetConected = RxBool(true);
-  RxBool enableOffline = RxBool(true);
+  RxBool enableOffline = RxBool(AppConfig.offline_mode);
   Rxn<UserModel> currentUser = Rxn(null);
   RxList<UserModel> attendants = RxList([]);
   RxString currentUserId = RxString('');

@@ -78,7 +78,7 @@ class NetProfitOverview extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.credit_card,
+                         Icon(Icons.credit_card,
                             color: AppColors.mainColor),
                         const SizedBox(width: 10),
                         Column(
@@ -88,12 +88,12 @@ class NetProfitOverview extends StatelessWidget {
                                       .analysis.value!.profitOnSales -
                                   salesController
                                       .analysis.value!.totalExpenses),
-                              style: const TextStyle(
+                              style:  TextStyle(
                                   color: AppColors.mainColor, fontSize: 21),
                             ),
                             Row(
                               children: [
-                                const Text(
+                                 Text(
                                   "after taxes ",
                                   style: TextStyle(
                                       color: AppColors.mainColor, fontSize: 12),
@@ -199,7 +199,7 @@ class NetProfitOverview extends StatelessWidget {
             width: 10,
           )
         ],
-        title: const Text(
+        title:  Text(
           "Net Profit Overview",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -207,7 +207,7 @@ class NetProfitOverview extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

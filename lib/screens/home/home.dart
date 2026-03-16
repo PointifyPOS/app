@@ -12,6 +12,8 @@ import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/sqlite/helper.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../controllers/homecontroller.dart';
@@ -46,6 +48,17 @@ class _HomeState extends State<Home> {
       initConnectivity();
       _connectivitySubscription =
           _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    }
+    _connectBLE();
+  }
+
+  _connectBLE() async {
+    final prefs = await SharedPreferences.getInstance();
+    String mac = prefs.getString('saved_printer_mac') ?? "";
+    if(mac.isNotEmpty) {
+       await PrintBluetoothThermal.connect(
+        macPrinterAddress: prefs.getString('saved_printer_mac')!,
+      );
     }
   }
 
@@ -133,7 +146,7 @@ class _HomeState extends State<Home> {
           }),
           appBar: AppBar(
             titleSpacing: 0.0,
-            leading: const Icon(
+            leading:  Icon(
               Icons.electric_bolt,
               color: AppColors.mainColor,
             ),
@@ -173,28 +186,6 @@ class _HomeState extends State<Home> {
             elevation: 0.2,
             backgroundColor: Colors.white,
             actions: [
-              // if (userController.currentUser.value?.usertype == "admin")
-              //   Align(
-              //     alignment: Alignment.centerRight,
-              //     child: InkWell(
-              //       onTap: () async {
-              //         Get.to(() => AttendantsPage(type: "switch"));
-              //       },
-              //       child: const Row(
-              //         mainAxisAlignment: MainAxisAlignment.end,
-              //         children: [
-              //           Text(
-              //             "Switch User",
-              //             style: TextStyle(fontSize: 16),
-              //           ),
-              //           Icon(
-              //             Icons.repeat_sharp,
-              //             color: AppColors.mainColor,
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
               SizedBox(
                 width: 10,
               ),
@@ -205,7 +196,7 @@ class _HomeState extends State<Home> {
                     onTap: () async {
                       Get.to(() => AttendantsPage(type: "switch"));
                     },
-                    child: const Row(
+                    child:  Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(

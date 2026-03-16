@@ -19,7 +19,7 @@ class LoadingDialog {
                   children: <Widget>[
                     Center(
                       child: Column(children: [
-                        const CircularProgressIndicator(
+                         CircularProgressIndicator(
                           backgroundColor: AppColors.mainColor,
                         ),
                         const SizedBox(

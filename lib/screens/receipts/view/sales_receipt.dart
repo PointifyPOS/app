@@ -23,8 +23,7 @@ class SalesReceipt extends StatelessWidget {
   final String? type;
   final String? from;
 
-  SalesReceipt({Key? key, this.salesModel, this.type = "", this.from = ""})
-      : super(key: key) {
+  SalesReceipt({super.key, this.salesModel, this.type = "", this.from = ""}) {
     salesController.currentReceipt.value = salesModel;
   }
 
@@ -343,34 +342,22 @@ class SalesReceipt extends StatelessWidget {
                   ),
                 if (salesController.currentReceipt.value!.customerId != null)
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Customer: ${salesController.currentReceipt.value!.customerId!.name!}",
-                        style: const TextStyle(fontSize: 13),
+                      Flexible(
+                        child: Text(
+                          "Customer:\n${salesController.currentReceipt.value!.customerId!.name!}",
+                          style: const TextStyle(fontSize: 12),
+                        ),
                       ),
-                      const Spacer(),
                       if (salesController
                                   .currentReceipt.value!.outstandingBalance! >
                               0 &&
                           salesController.currentReceipt.value!.dueDate != null)
-                        Row(
-                          children: [
-                            normalText(
-                                title: "Due Date:",
-                                color: Colors.black,
-                                size: 14.0),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            majorTitle(
-                                title: DateFormat("yyyy/MM/dd HH:mm").format(
-                                    DateTime.parse(salesController
-                                            .currentReceipt.value!.dueDate!)
-                                        .toLocal()),
-                                color: Colors.grey,
-                                size: 11.0)
-                          ],
-                        )
+                        Text(
+                          "Due Date:\n${DateFormat("yyyy/MM/dd HH:mm").format(DateTime.parse(salesController.currentReceipt.value!.dueDate!).toLocal())}",
+                          style: const TextStyle(fontSize: 12),
+                        ),
                     ],
                   ),
                 if (salesController.currentReceipt.value?.salesnote != null &&
@@ -816,7 +803,7 @@ returnReceiptItem({required SaleItem receiptItem, Product? product}) {
             child: TextFormField(
               controller: textEditingController,
               decoration: ThemeHelper()
-                  .textInputDecorationDesktop('Quantity', 'Enter quantity'),
+                  .textInputDecoration('Quantity', 'Enter quantity'),
             ),
           ),
           actions: [
@@ -826,7 +813,7 @@ returnReceiptItem({required SaleItem receiptItem, Product? product}) {
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style: TextStyle(color: AppColors.mainColor),
                 )),
             TextButton(
                 onPressed: () {
@@ -848,6 +835,7 @@ returnReceiptItem({required SaleItem receiptItem, Product? product}) {
                         .returnSale(saledId: receiptItem.sale, returnItems: [
                       {
                         "product": receiptItem.product?.sId,
+                        'name': receiptItem.product?.name,
                         "quantity": double.parse(textEditingController.text)
                       }
                     ]);
@@ -855,7 +843,7 @@ returnReceiptItem({required SaleItem receiptItem, Product? product}) {
                 },
                 child: Text(
                   "Okay".toUpperCase(),
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style: TextStyle(color: AppColors.mainColor),
                 ))
           ],
         );
@@ -994,8 +982,8 @@ showAmountDialog(SaleModel salesBody) {
               },
               child: Text(
                 "Cancel".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style: TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1043,8 +1031,8 @@ showAmountDialog(SaleModel salesBody) {
               },
               child: Text(
                 "Pay".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style: TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/homecontroller.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 
 import '../../../controllers/authcontroller.dart';
+import '../../../utils/app_config.dart';
 import '../../../utils/themer.dart';
 
 class ForgotPassword extends StatelessWidget {
@@ -31,11 +33,8 @@ class ForgotPassword extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  Image.asset(
-                    "assets/images/logo2.png",
-                    width: 250,
-                  ),
-                  const Text("An enterprise at your fingertips."),
+                 if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250,),
+                  Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
                   const SizedBox(
                     height: 40,
                   ),
@@ -86,10 +85,7 @@ class ForgotPassword extends StatelessWidget {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: isSmallScreen(context)
-                          ? ThemeHelper()
-                              .textInputDecoration('Email', 'Enter your email')
-                          : ThemeHelper().textInputDecorationDesktop(
+                      decoration: ThemeHelper().textInputDecoration(
                               'Email', 'Enter your email'),
                     ),
                   ),
@@ -125,10 +121,7 @@ class ForgotPassword extends StatelessWidget {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: isSmallScreen(context)
-                          ? ThemeHelper().textInputDecoration(
-                              'new password', 'Enter your new password')
-                          : ThemeHelper().textInputDecorationDesktop(
+                      decoration: ThemeHelper().textInputDecoration(
                               'new password', 'Enter your new password'),
                     ),
                   ),
@@ -149,10 +142,7 @@ class ForgotPassword extends StatelessWidget {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: isSmallScreen(context)
-                          ? ThemeHelper().textInputDecoration(
-                              'confirm password', 'Please confirm password')
-                          : ThemeHelper().textInputDecorationDesktop(
+                      decoration: ThemeHelper().textInputDecoration(
                               'confirm password', 'Please confirm password'),
                     ),
                   ),

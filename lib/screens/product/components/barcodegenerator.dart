@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -33,7 +31,7 @@ class BarcodeGenerator extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
             size: 30,
@@ -121,15 +119,13 @@ class BarcodeGenerator extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return Column(
                           children: [
-                            BarcodeWidget(
-                              barcode: Barcode.code128(escapes: true),
+                            pw.BarcodeWidget(
+                              barcode: pw.Barcode.code128(escapes: true),
                               data: product.barcode!,
                               drawText: true,
                               // width: 350,
                               height: 80,
-                              errorBuilder: (context, error) =>
-                                  Center(child: Text(error)),
-                            ),
+                            ) as Widget,
                           ],
                         );
                       }),
@@ -159,12 +155,9 @@ class BarcodeGenerator extends StatelessWidget {
       build: (pw.Context context) {
         return pw.Column(
           children: [
-            pw.Text('${product.name} Product Barcodes',
+            pw.Text('${product.name}',
                 style:
                     pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
-            pw.Text(
-                'as of today ${DateFormat('dd-MM-yyyy').format(DateTime.now())}',
-                style: const pw.TextStyle(fontSize: 16)),
             pw.SizedBox(height: 20),
             grid
           ],
@@ -184,7 +177,7 @@ class BarcodeGenerator extends StatelessWidget {
     return pw.Container(
         padding: const pw.EdgeInsets.symmetric(horizontal: 10),
         child: pw.BarcodeWidget(
-          barcode: Barcode.code128(escapes: true),
+          barcode: pw.Barcode.code128(escapes: true),
           data: product.barcode ?? product.name!,
           drawText: true,
           height: 80,

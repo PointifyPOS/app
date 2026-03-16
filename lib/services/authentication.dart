@@ -4,18 +4,13 @@ import 'package:pointify/services/end_points.dart';
 import 'client.dart';
 
 class Authentication {
-  static registerAdmin(Map<String, dynamic> data) async {
+  static registerUser(Map<String, dynamic> data) async {
     var response = await DbBase().databaseRequest(
         EndPoints.register, DbBase().postRequestType,
         body: data);
     return response;
   }
 
-  static loginAdmin(Map<String, dynamic> data) async {
-    var response = await DbBase()
-        .databaseRequest(EndPoints.login, DbBase().postRequestType, body: data);
-    return response;
-  }
 
   static requestPasswordReset(String email) async {
     var response = await DbBase().databaseRequest(
@@ -32,13 +27,13 @@ class Authentication {
     return response;
   }
 
-  static Future getAdmin(String userId) async {
+  static Future getUser(String userId) async {
     var response = await DbBase()
         .databaseRequest(EndPoints.admin + userId, DbBase().getRequestType);
     return response;
   }
 
-  static login(
+  static loginUser(
       {required String type,
       required String email,
       required String password}) async {

@@ -21,7 +21,7 @@ class ShareAndUse extends StatelessWidget {
     paymentController
         .getAwardTransactions(userController.currentUser.value!.id!);
 
-    Authentication.getAdmin(userController.currentUser.value!.id!)
+    Authentication.getUser(userController.currentUser.value!.id!)
         .then((value) {
       if (value["error"] != null) {
         return;
@@ -52,7 +52,7 @@ class ShareAndUse extends StatelessWidget {
             onTap: () {
               Get.back();
             },
-            child: const Icon(
+            child:  Icon(
               Icons.clear,
               color: AppColors.mainColor,
             ),
@@ -149,7 +149,7 @@ class ShareAndUse extends StatelessWidget {
                           border:
                               Border.all(width: 1, color: AppColors.mainColor),
                           color: Colors.white),
-                      child: const Row(
+                      child:  Row(
                         children: [
                           Icon(Icons.share, color: AppColors.mainColor),
                           SizedBox(
@@ -307,7 +307,7 @@ showShopModalBottomSheetUsage(context) {
                               child: TextFormField(
                                 controller: textEditingController,
                                 decoration: ThemeHelper()
-                                    .textInputDecorationDesktop(
+                                    .textInputDecoration(
                                         'Days', 'Enter days'),
                               ),
                             ),
@@ -318,7 +318,7 @@ showShopModalBottomSheetUsage(context) {
                                   },
                                   child: Text(
                                     "Cancel".toUpperCase(),
-                                    style: const TextStyle(
+                                    style:  TextStyle(
                                         color: AppColors.mainColor),
                                   )),
                               TextButton(
@@ -331,7 +331,7 @@ showShopModalBottomSheetUsage(context) {
                                   },
                                   child: Text(
                                     "Okay".toUpperCase(),
-                                    style: const TextStyle(
+                                    style:  TextStyle(
                                         color: AppColors.mainColor),
                                   ))
                             ],
@@ -372,7 +372,7 @@ showShopModalBottomSheetUsage(context) {
                                 ],
                               ),
                             ),
-                            const Text(
+                             Text(
                               "Redeem",
                               style: TextStyle(color: AppColors.mainColor),
                             )

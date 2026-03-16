@@ -190,6 +190,7 @@ class InappPurchasesController extends GetxController {
       // '65673711072fb2ad5957da39',
       // '6567373c072fb2ad5957da3c',
     }.toSet());
+    print(response.productDetails);
     if (response.error != null) {
       print('Error fetching subscription products: ${response.error}');
       return;

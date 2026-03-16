@@ -23,9 +23,6 @@ class CreateCustomer extends StatelessWidget {
       : super(key: key) {
     customersController.nameController.clear();
     customersController.phoneController.clear();
-    // if (customersController.importedCustomers.length == 0) {
-    //   customersController.importContacts();
-    // }
   }
 
   final CustomerController customersController = Get.find<CustomerController>();

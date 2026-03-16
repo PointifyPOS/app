@@ -13,6 +13,7 @@ import 'package:pointify/widgets/loading_dialog.dart';
 import '../models/product.dart';
 import '../models/shop.dart';
 import '../screens/stock/transfer_history.dart';
+import '../utils/colors.dart';
 
 class StockController extends GetxController {
   RxList<Map<String, dynamic>> selectedProducts = RxList([]);
@@ -131,8 +132,8 @@ class StockController extends GetxController {
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.purple,
+                  style:  TextStyle(
+                    color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -156,8 +157,8 @@ class StockController extends GetxController {
                 },
                 child: Text(
                   "Update".toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.purple,
+                  style:  TextStyle(
+                    color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

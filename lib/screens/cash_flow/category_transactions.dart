@@ -230,7 +230,7 @@ class CategoryTransactions extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              const CircleAvatar(
+               CircleAvatar(
                 backgroundColor: AppColors.mainColor,
                 child: Icon(Icons.check),
               ),

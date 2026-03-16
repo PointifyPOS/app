@@ -52,7 +52,7 @@ class StockTakeReport extends StatelessWidget {
                           ),
                         ));
                   },
-                  icon: const Icon(
+                  icon:  Icon(
                     Icons.picture_as_pdf,
                     color: AppColors.mainColor,
                   ))

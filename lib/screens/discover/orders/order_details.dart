@@ -48,14 +48,14 @@ class OrderDetails extends StatelessWidget {
                     onPressed: () {
                       Get.back();
                     },
-                    icon: const Icon(
+                    icon:  Icon(
                       Icons.clear,
                       color: AppColors.mainColor,
                     )),
                 Text(
                   "Order#${salesController.currentReceipt.value?.receiptNo}"
                       .toUpperCase(),
-                  style: const TextStyle(
+                  style:  TextStyle(
                       color: AppColors.mainColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
@@ -777,7 +777,7 @@ returnReceiptItem(
             child: TextFormField(
               controller: textEditingController,
               decoration: ThemeHelper()
-                  .textInputDecorationDesktop('Quantity', 'Enter quantity'),
+                  .textInputDecoration('Quantity', 'Enter quantity'),
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             ),
           ),
@@ -788,7 +788,7 @@ returnReceiptItem(
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style:  TextStyle(color: AppColors.mainColor),
                 )),
             TextButton(
                 onPressed: () {
@@ -817,7 +817,7 @@ returnReceiptItem(
                 },
                 child: Text(
                   "Okay".toUpperCase(),
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style:  TextStyle(color: AppColors.mainColor),
                 ))
           ],
         );
@@ -924,8 +924,8 @@ showAmountDialog(SaleModel salesBody) {
               },
               child: Text(
                 "Cancel".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style:  TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -973,8 +973,8 @@ showAmountDialog(SaleModel salesBody) {
               },
               child: Text(
                 "Pay".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style:  TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

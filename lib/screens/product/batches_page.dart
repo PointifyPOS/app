@@ -51,7 +51,7 @@ class BatchesPage extends StatelessWidget {
               onPressed: () async {
                 showBottomSheet(context);
               },
-              icon: const Icon(
+              icon:  Icon(
                 Icons.download,
                 color: AppColors.mainColor,
               )),
@@ -59,7 +59,7 @@ class BatchesPage extends StatelessWidget {
               onPressed: () async {
                 productController.getProductsBySort(type: "all");
               },
-              icon: const Icon(
+              icon:  Icon(
                 Icons.refresh,
                 color: AppColors.mainColor,
               ))

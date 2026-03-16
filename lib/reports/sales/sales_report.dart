@@ -23,10 +23,7 @@ import '../../widgets/textbutton.dart';
 class SalesReport extends StatefulWidget {
   final String? title;
   final String? keyFrom;
-  SalesReport({Key? key, this.title, this.keyFrom})
-      : super(
-          key: key,
-        ) {
+  SalesReport({super.key, this.title, this.keyFrom}) {
     SalesController salesController = Get.find<SalesController>();
     if (keyFrom == "dues") {
       salesController.getSalesByDate(
@@ -282,7 +279,7 @@ class _SalesReportState extends State<SalesReport> {
                                     child: Row(
                                       children: [
                                         Text(
-                                          "${salesController.cashsalesfilter[index]}:",
+                                          "${salesController.cashsalesfilter[index].replaceAll("_", " ")}:",
                                           style: TextStyle(
                                               color: salesController
                                                           .cashsalesfilterSelected

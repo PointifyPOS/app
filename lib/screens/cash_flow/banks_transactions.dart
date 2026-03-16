@@ -243,7 +243,7 @@ class BanksTransactions extends StatelessWidget {
                               bank: bankModel,
                             );
                     },
-                    child: const Text(
+                    child:  Text(
                       "View Bank Slips",
                       style: TextStyle(color: AppColors.mainColor),
                     ),
@@ -336,7 +336,7 @@ class BanksTransactions extends StatelessWidget {
                                           },
                                           child: Text(
                                             "Cancel".toUpperCase(),
-                                            style: const TextStyle(
+                                            style:  TextStyle(
                                                 color: AppColors.mainColor),
                                           )),
                                       const SizedBox(
@@ -350,7 +350,7 @@ class BanksTransactions extends StatelessWidget {
                                           },
                                           child: Text(
                                             "Save".toUpperCase(),
-                                            style: const TextStyle(
+                                            style:  TextStyle(
                                                 color: AppColors.mainColor),
                                           )),
                                     ],
@@ -453,7 +453,7 @@ class BanksTransactions extends StatelessWidget {
                                     child: Text(
                                       "Cancel".toUpperCase(),
                                       style:
-                                          const TextStyle(color: AppColors.mainColor),
+                                           TextStyle(color: AppColors.mainColor),
                                     )),
                                 const SizedBox(
                                   width: 10,
@@ -465,7 +465,7 @@ class BanksTransactions extends StatelessWidget {
                                     child: Text(
                                       "Save".toUpperCase(),
                                       style:
-                                          const TextStyle(color: AppColors.mainColor),
+                                           TextStyle(color: AppColors.mainColor),
                                     )),
                               ],
                             )

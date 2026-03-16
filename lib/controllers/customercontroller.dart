@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/services/customer.dart';
 import 'package:pointify/sqlite/helper.dart';
@@ -146,9 +147,10 @@ class CustomerController extends GetxController
     amountController.text = "";
   }
 
-  getTransactions(String type, String customerId, {String? reason = ""}) async {
+  getTransactions(String type, String customerId,
+      {String? reason = "", bool clear = false}) async {
     isLoadingcustomerPayments.value = true;
-    if (reason != "download") {
+    if (reason != "download" || clear == true) {
       deposits.clear();
     }
     List response =
@@ -158,6 +160,7 @@ class CustomerController extends GetxController
           response.map((e) => Payment.fromJson(e)).toList();
     } else {
       deposits.value = response.map((e) => Payment.fromJson(e)).toList();
+      deposits.refresh();
     }
     isLoadingcustomerPayments.value = false;
   }
@@ -223,7 +226,9 @@ class CustomerController extends GetxController
         var customerData = {
           "wallet": int.parse(amountController.text),
           "shopId": userController.currentUser.value!.primaryShop?.id,
-          "attendantId": userController.currentUser.value!.attendantId
+          "attendantId": userController.currentUser.value!.attendantId,
+          "payment_method": Get.find<SalesController>().paynowMethod.value,
+          "mpesaCode": Get.find<SalesController>().mpesaCode.text
         };
         var response = await CustomerService.updateCustomer(
             customerData, customerModel.sId!);
@@ -232,10 +237,14 @@ class CustomerController extends GetxController
           return;
         }
         currentCustomer.value = Customer.fromJson(response);
-        getTransactions("deposit", customerModel.sId!);
+        getTransactions("deposit", customerModel.sId!, clear: false);
       } catch (e) {
         debugPrintMessage(e);
         generalAlert(title: "Error", message: e.toString());
+      } finally {
+        Get.find<SalesController>().paynowMethod.value = "";
+        amountController.text = "";
+        Get.find<SalesController>().mpesaCode.text = "";
       }
     }
   }

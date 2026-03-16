@@ -1,5 +1,6 @@
 // const apiEndPoint = "http://192.168.100.3:1989/";
-const apiEndPoint = "https://api.pointifypos.com/";
+const apiEndPoint = "https://staging.pointifypos.com/";
+// const apiEndPoint = "http://192.168.100.32:1992/";
 const storeurl = "https://store.pointifypos.com/";
 
 class EndPoints {
@@ -25,7 +26,8 @@ class EndPoints {
   static const profile = "${apiEndPoint}admin/";
   static const lastseen = "${apiEndPoint}analysis/update/user/lastseen";
   static const sendverificationemail = "${profile}sendverificationemail";
-  static const setting = "${apiEndPoint}setting/global/all";
+  static const theme = "${apiEndPoint}themes";
+  static const setting = "${apiEndPoint}settings";
   static const attendants = "${apiEndPoint}attendants/";
   static const attendantsfilter = "${apiEndPoint}attendants/shop/filter";
   static const producttrasferhistory = "${apiEndPoint}transfer/product";
@@ -60,7 +62,7 @@ class EndPoints {
   static const analysismonthly = "${apiEndPoint}sales/product/month/analysis/";
   static const analysisproducts =
       "${apiEndPoint}sales/summary/month/analysis/product/";
-  static const salesreport = "${apiEndPoint}analysis/report/sales";
+  static const salesreport = "${apiEndPoint}analysis/sales/report";
   static const profitsummary = "${apiEndPoint}analysis/profits/summary";
   static const debtor = "${apiEndPoint}customers/customers/debtors";
   static const debtorexcel = "${apiEndPoint}customers/customers/debtors/excel";
@@ -92,6 +94,7 @@ class EndPoints {
   static const salereturn = "${apiEndPoint}salereturns/";
   static const salereturnsfilter = "${salereturn}filter";
   static const payments = "${apiEndPoint}payments";
+  static const paymentsmethods = "${apiEndPoint}payment-methods";
   static const deletepayments = "${apiEndPoint}customers/payments/delete";
   static const salepayment = "$payments/recordSalePayment";
   static const voidreceipt = "${sales}void/sale";
@@ -156,4 +159,6 @@ class EndPoints {
   //ORDERS
   static const order = "${apiEndPoint}sales/orders/sale/online";
   static const awardstransactions = "${apiEndPoint}payments/awards/";
+
+  static const checkpaymentstatus = "${apiEndPoint}payments/checkpaymentstatus";
 }

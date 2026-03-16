@@ -92,12 +92,6 @@ Widget orderCard({required OrderItem salesModel, String? from = ""}) {
     onTap: () {
       if (salesModel.status! == "pending") {
         showBottomSheet(Get.context!, salesModel);
-      } else {
-        // Get.to(() => OrderDetails(
-        //       salesModel: salesModel,
-        //       type: "",
-        //       from: from,
-        //     ));
       }
     },
     child: Container(

@@ -53,13 +53,13 @@ class CreateOrder extends StatelessWidget {
                             Get.back();
                             salesController.receipt.value = null;
                           },
-                          icon: const Icon(
+                          icon:  Icon(
                             Icons.clear,
                             color: AppColors.mainColor,
                           )),
                       Text(
                         "Order Items from\n${shop!.name!.capitalizeFirst}",
-                        style: const TextStyle(
+                        style:  TextStyle(
                             color: AppColors.mainColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 16),
@@ -147,7 +147,7 @@ class CreateOrder extends StatelessWidget {
                                             salesController.addToCart(product);
                                           }));
                                     },
-                                    child: const Column(
+                                    child:  Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       mainAxisAlignment:
@@ -292,7 +292,7 @@ class CreateOrder extends StatelessWidget {
                     onPressed: () {
                       salesController.decrementItem(index);
                     },
-                    icon: const Icon(Icons.remove_circle,
+                    icon:  Icon(Icons.remove_circle,
                         color: AppColors.mainColor, size: 25)),
                 Container(
                     padding: const EdgeInsets.only(
@@ -309,7 +309,7 @@ class CreateOrder extends StatelessWidget {
                     onPressed: () {
                       salesController.incrementItem(index);
                     },
-                    icon: const Icon(Icons.add_circle,
+                    icon:  Icon(Icons.add_circle,
                         color: AppColors.mainColor, size: 25)),
                 IconButton(
                   color: Colors.grey,

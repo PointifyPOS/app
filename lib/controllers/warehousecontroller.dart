@@ -16,6 +16,7 @@ import '../models/shop.dart';
 import '../models/warehouseitem.dart';
 import '../screens/receipts/pdf/sales/warehouse_invoice.dart';
 import '../services/product_service.dart';
+import '../utils/colors.dart';
 import '../widgets/loading_dialog.dart';
 
 class WareHouseController extends GetxController {
@@ -78,8 +79,8 @@ class WareHouseController extends GetxController {
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.purple,
+                  style:  TextStyle(
+                    color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -142,8 +143,8 @@ class WareHouseController extends GetxController {
                 },
                 child: Text(
                   "Update".toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.purple,
+                  style:  TextStyle(
+                    color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

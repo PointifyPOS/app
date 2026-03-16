@@ -18,7 +18,7 @@ import '../../widgets/textbutton.dart';
 class PurchasesReport extends StatelessWidget {
   final String? title;
   final String? type;
-  PurchasesReport({Key? key, this.title, this.type}) : super(key: key);
+  PurchasesReport({super.key, this.title, this.type});
 
   final ShopController shopController = Get.find<ShopController>();
   final PurchaseController purchaseController = Get.find<PurchaseController>();
@@ -36,14 +36,14 @@ class PurchasesReport extends StatelessWidget {
             onPressed: () {
               Get.back();
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.clear,
               color: AppColors.mainColor,
             ),
           ),
           title: Text(
             title!,
-            style: const TextStyle(color: AppColors.mainColor),
+            style: TextStyle(color: AppColors.mainColor),
           ),
           actions: [
             Center(
@@ -279,15 +279,36 @@ class PurchasesReport extends StatelessWidget {
                       : Expanded(
                           child: ListView.builder(
                               itemCount:
-                                  purchaseController.filteredInvoices.length,
+                                  purchaseController.filteredInvoices.length +
+                                      1,
                               physics: const ScrollPhysics(),
                               shrinkWrap: true,
                               itemBuilder: (context, index) {
-                                Invoice invoiceData = purchaseController
-                                    .filteredInvoices
-                                    .elementAt(index);
-                                return invoiceCard(
-                                    invoice: invoiceData, type: type ?? "");
+                                if (index <
+                                    purchaseController.invoices.length) {
+                                  return invoiceCard(
+                                    invoice: purchaseController.invoices[index],
+                                  );
+                                }
+                                if (!purchaseController.hasMore.value) {
+                                  return const SizedBox.shrink();
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: purchaseController.isLoadingMore.value
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : ElevatedButton(
+                                          onPressed: () {
+                                            purchaseController.getPurchases(
+                                              shopid: userController.currentUser
+                                                  .value!.primaryShop!.id,
+                                              loadMore: true,
+                                            );
+                                          },
+                                          child: const Text("Load More"),
+                                        ),
+                                );
                               }),
                         );
             }),

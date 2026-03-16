@@ -19,8 +19,7 @@ class ProductReceiptsSales extends StatelessWidget {
   final Product product;
   final int i;
 
-  ProductReceiptsSales({Key? key, required this.product, required this.i})
-      : super(key: key);
+  ProductReceiptsSales({super.key, required this.product, required this.i});
 
   final SalesController salesController = Get.find<SalesController>();
 

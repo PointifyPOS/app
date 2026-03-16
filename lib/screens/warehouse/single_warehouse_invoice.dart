@@ -230,7 +230,7 @@ class SingleWarehouseInvoice extends StatelessWidget {
                                                 ),
                                               );
                                             },
-                                            child: const Icon(
+                                            child:  Icon(
                                               Icons.info,
                                               color: AppColors.mainColor,
                                             ),
@@ -381,7 +381,7 @@ class SingleWarehouseInvoice extends StatelessWidget {
                                                       .symmetric(
                                                       horizontal: 3,
                                                       vertical: 4),
-                                                  child: const Text(
+                                                  child:  Text(
                                                     "Receive",
                                                     style: TextStyle(
                                                         color:

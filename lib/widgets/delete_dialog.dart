@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../utils/colors.dart';
+
 deleteDialog({required context, required onPressed, String? message}) {
   return showDialog(
       context: context,
@@ -21,8 +23,8 @@ deleteDialog({required context, required onPressed, String? message}) {
               },
               child: Text(
                 "Cancel".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style:  TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -35,8 +37,8 @@ deleteDialog({required context, required onPressed, String? message}) {
               },
               child: Text(
                 "Ok Delete".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style:  TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

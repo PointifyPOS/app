@@ -190,7 +190,7 @@ class ShopDetails extends StatelessWidget {
                                                       .requestFocus(
                                                           FocusNode());
                                                 },
-                                                child: const Text(
+                                                child:  Text(
                                                   "Update",
                                                   style: TextStyle(
                                                       color:
@@ -444,7 +444,7 @@ class ShopDetails extends StatelessWidget {
                                           Expanded(
                                             child: Column(
                                               children: [
-                                                const Text(
+                                                 Text(
                                                     "Pick Current location",
                                                     style: TextStyle(
                                                       fontSize: 13,
@@ -457,7 +457,7 @@ class ShopDetails extends StatelessWidget {
                                                 Text(
                                                     shopController
                                                         .shopLocation.value,
-                                                    style: const TextStyle(
+                                                    style:  TextStyle(
                                                       fontSize: 10,
                                                       color:
                                                           AppColors.mainColor,
@@ -745,18 +745,17 @@ class ShopDetails extends StatelessWidget {
       ),
       appBar: AppBar(
         titleSpacing: 0,
-        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
         title: Text(
           shopModel.name!,
-          style: const TextStyle(color: AppColors.mainColor),
+          style:  TextStyle(color: AppColors.mainColor),
         ),
         leading: IconButton(
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

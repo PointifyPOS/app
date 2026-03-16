@@ -159,7 +159,7 @@ class CreateShop extends StatelessWidget {
               });
             }
           },
-          decoration: ThemeHelper().textInputDecorationDesktop(
+          decoration: ThemeHelper().textInputDecoration(
               // 'Shop Address',
               // 'Enter your shop address',
               ),
@@ -235,7 +235,7 @@ class CreateShop extends StatelessWidget {
                 onChange: (value) {
                   shopController.allowOnlineSelling.value = value;
                 },
-                onColor: Colors.purple,
+                onColor: AppColors.mainColor,
                 value: shopController.allowOnlineSelling.value,
                 offColor: Colors.grey)
           ],

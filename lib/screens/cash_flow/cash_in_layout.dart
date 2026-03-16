@@ -211,7 +211,7 @@ class CashInLayout extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                   color: AppColors.mainColor, width: 2)),
-                          child: const Text(
+                          child:  Text(
                             "+ Add",
                             style: TextStyle(color: AppColors.mainColor),
                           )),

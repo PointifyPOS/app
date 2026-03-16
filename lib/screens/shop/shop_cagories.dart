@@ -101,7 +101,7 @@ class ShopCategories extends StatelessWidget {
                     ),
                   ),
                 )
-              : const SizedBox(
+              :  SizedBox(
                   child: Center(
                       child: CircularProgressIndicator(
                   color: AppColors.mainColor,

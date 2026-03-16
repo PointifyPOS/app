@@ -17,6 +17,7 @@ import '../services/client.dart';
 import '../services/end_points.dart';
 import '../services/shop_services.dart';
 import '../sqlite/helper.dart';
+import '../utils/app_config.dart';
 import '../utils/constants.dart';
 import '../utils/helper.dart';
 import '../widgets/alert.dart';
@@ -271,40 +272,35 @@ class ShopController {
         package.id;
   }
 
-  subscribe(Shop shop,
-      {required Package package, String type = "mpesa"}) async {
+  Future<String?> subscribe(
+    Shop shop, {
+    required Package package,
+    required String type,
+  }) async {
     try {
       subscribing.value = true;
 
-      var data = {
+      final data = {
         "userId": userController.currentUser.value!.id,
-        "shops": shopsRenew.map((element) => element.id).toList(),
+        "shops": shopsRenew.map((e) => e.id).toList(),
         "email": userController.currentUser.value!.email,
         "phonenumber": userController.phoneController.text,
         "package": package.id,
         "paymentType": type,
         "shop": shop.id,
-        "amount": package.amount
+        "amount": package.amount,
       };
-      var response = await ShopService().subscribe(data);
 
-      subscribing.value = false;
+      final response = await ShopService().subscribe(data);
+
       if (response["status"] != 200) {
-        generalAlert(
-          title: "Error",
-          message: response["message"],
-        );
-      } else {
-        Get.back();
-        if (type == "mpesa") {
-          var subscriptionid = response['subscriptionid'];
-          await paymentCall(subscriptionid, shop: shop);
-        } else {
-          await openStripe(response, Get.context!);
-        }
+        return null;
       }
-      subscribing.value = false;
+
+      return response["subscriptionid"];
     } catch (e) {
+      return null;
+    } finally {
       subscribing.value = false;
     }
   }
@@ -355,17 +351,17 @@ class ShopController {
 
   openStripe(var response, context) async {
     try {
-      stripe.Stripe.publishableKey = stripePublishKey;
+      stripe.Stripe.publishableKey = AppConfig.stripePublishKey;
       stripe.Stripe.setReturnUrlSchemeOnAndroid = true;
       await stripe.Stripe.instance.initPaymentSheet(
           paymentSheetParameters: stripe.SetupPaymentSheetParameters(
         paymentIntentClientSecret: response['client_secret'],
-        googlePay: const PaymentSheetGooglePay(
-          merchantCountryCode: 'US',
+        googlePay: PaymentSheetGooglePay(
+          merchantCountryCode: AppConfig.country_code,
           testEnv: false,
         ),
         style: ThemeMode.light,
-        merchantDisplayName: 'Pay',
+        merchantDisplayName: 'Pay ${AppConfig.app_name}',
       ));
       await stripe.Stripe.instance.presentPaymentSheet();
       await checkStripeStatus(response['client_secret'],
@@ -620,5 +616,14 @@ class ShopController {
       title: "Usage",
       message: response["message"],
     );
+  }
+
+  Future<dynamic> checkPaymentStatus(String reference) async {
+    try {
+      var response = await ShopService().checkPaymentStatus(reference);
+      return response["status"];
+    } catch (e) {
+      return null;
+    }
   }
 }

@@ -71,7 +71,7 @@ class CreatePurchase extends StatelessWidget {
                     decoration: BoxDecoration(
                         border: Border.all(color: AppColors.mainColor),
                         borderRadius: BorderRadius.circular(5)),
-                    child: const Text(
+                    child:  Text(
                       "Create Purchase",
                       style: TextStyle(color: AppColors.mainColor),
                     ),
@@ -157,7 +157,7 @@ class CreatePurchase extends StatelessWidget {
                                           ));
                                     }
                                   },
-                                  icon: const Icon(
+                                  icon:  Icon(
                                     Icons.cancel,
                                     color: AppColors.mainColor,
                                   ),
@@ -189,7 +189,7 @@ class CreatePurchase extends StatelessWidget {
                           onTap: () {
                             _addItems(context);
                           },
-                          child: const Column(
+                          child:  Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

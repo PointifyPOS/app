@@ -303,7 +303,7 @@ class Customers extends StatelessWidget {
                                       page: "customersPage",
                                     ));
                               },
-                              child: const Column(
+                              child:  Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

@@ -61,6 +61,13 @@ class PurchaseController extends GetxController {
   Rx bankTotal = 0.obs;
   Rx cashTotal = 0.obs;
   RxString selectedItem = 'cash'.obs;
+
+  RxInt page = 1.obs;
+  final int limit = 20;
+
+  RxBool hasMore = true.obs;
+  RxBool isLoadingMore = false.obs;
+
   getfilterTotals() {
     totals["cash"] = invoices
         .where((element) => element.paymentType == "cash")
@@ -221,23 +228,45 @@ class PurchaseController extends GetxController {
     textEditingControllerAmount.clear();
   }
 
-  //
-  getPurchases(
-      {String? supplier = "",
-      bool? onCredit,
-      String? fromDate = "",
-      String? shopid = "",
-      String? toDate = ""}) async {
-    // invoices.clear();
-    isLoadingPurchases.value = true;
-    List<dynamic> response = await PurchaseService.getPurchases(
-        fromDate: fromDate,
-        toDate: toDate,
-        shopId: shopid,
-        supplier: supplier,
-        paymentType: onCredit == true ? "credit" : "cash");
-    isLoadingPurchases.value = false;
-    invoices.value = response.map((e) => Invoice.fromJson(e)).toList();
+  getPurchases({
+    String? supplier = "",
+    bool? onCredit,
+    String? fromDate = "",
+    String? shopid = "",
+    String? toDate = "",
+    bool loadMore = false,
+  }) async {
+    if (isLoadingMore.value || !hasMore.value) return;
+
+    if (!loadMore) {
+      page.value = 1;
+      hasMore.value = true;
+      invoices.clear();
+      isLoadingPurchases.value = true;
+    } else {
+      isLoadingMore.value = true;
+    }
+
+    var response = await PurchaseService.getPurchases(
+      fromDate: fromDate,
+      toDate: toDate,
+      shopId: shopid,
+      supplier: supplier,
+      paymentType: onCredit == true ? "credit" : "cash",
+      page: page.value,
+      limit: limit,
+    );
+
+    List<dynamic> purchasesresponse = response['purchases'];
+
+    if (purchasesresponse.length < limit) {
+      hasMore.value = false;
+    }
+
+    invoices.addAll(
+      purchasesresponse.map((e) => Invoice.fromJson(e)).toList(),
+    );
+
     if (onCredit == true) {
       filteredInvoices.value = invoices;
     } else {
@@ -246,6 +275,11 @@ class PurchaseController extends GetxController {
       getfilterTotals();
       selectedItem.value = 'cash';
     }
+
+    page.value++;
+
+    isLoadingPurchases.value = false;
+    isLoadingMore.value = false;
   }
 
   //

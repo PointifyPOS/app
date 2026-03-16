@@ -17,6 +17,7 @@ import 'package:pointify/models/cashflow.dart';
 import 'package:pointify/models/order.dart';
 import 'package:pointify/models/payment.dart';
 import 'package:pointify/models/salereturn.dart';
+import 'package:pointify/screens/sales/onholdsales.dart';
 import 'package:pointify/sqlite/helper.dart';
 import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -33,6 +34,7 @@ import '../screens/customers/wallet_page.dart';
 import '../screens/receipts/pdf/sales/sales_receipt.dart';
 import '../screens/receipts/view/sales_receipt.dart';
 import '../services/sales_service.dart';
+import '../utils/colors.dart';
 import '../utils/cs50Setup.dart';
 import '../utils/sunmi.dart';
 import '../widgets/alert.dart';
@@ -168,7 +170,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     "Bank",
   ]);
   RxList customerType = RxList(["Retail", "Wholesale", "Dealer"]);
-  RxList receiptpaymentMethods = RxList(["Cash", "Wallet", "Mpesa"]);
+  RxList receiptpaymentMethods = RxList(["Cash", "Wallet", "Mpesa", "Bank"]);
   Rxn<SaleModel> receipt = Rxn(SaleModel(items: []));
   RxList<SalesData> salesdata = RxList([]);
   RxList<ChartData> dailySales = RxList([]);
@@ -230,7 +232,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     var response = await SalesService.getOrders(
       fromDate: fromDate,
       toDate: toDate,
-      shop: userController.currentUser.value?.primaryShop!.id,
+      shop: userController.currentUser.value?.primaryShop?.id,
     );
     if (response == null || response["data"] == null) {
       return;
@@ -898,7 +900,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         );
         return;
       }
-      saleModel = SaleModel.fromJson(response["sale"]);
 
       if (status == "hold") {
         showSnackBar(message: "sale put on hold", color: Colors.green);
@@ -906,56 +907,49 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
           shop: userController.currentUser.value!.primaryShop!.id!,
           status: "hold",
         );
+        Get.to(() => OnHoldSales());
         refresh();
       } else {
-        // if (printerController.device?.value != null ||
-        //     printerController.connected.value != false) {
-        //   printerController.printSaleReceipt(
-        //     title: "${chechPayment(saleModel, "")} RECEIPT",
-        //     salesModel: saleModel,
-        //   );
-        // }
-
-        Get.to(
-          () => SalesReceipt(salesModel: saleModel, from: "sales", type: ""),
-        );
-
-        getSalesByDate(
-          type: "today",
-          shop: userController.currentUser.value!.primaryShop!.id!,
-        );
-
-        getNetAnalysis(
-          type: "today",
-          shopId: userController.currentUser.value!.primaryShop!.id!,
-        );
+        Get.back();
       }
       receipt.value = null;
-      Get.back();
-      currentCustomer.value = null;
-      receipt.value?.items = [];
-      saleDiscount.clear();
-      paymentType.value = "Cash";
-      mpesaCashPaid.clear();
-      bankCashPaid.clear();
-      creditAmount.clear();
-      textEditingSellingPrice.clear();
-      cashPaid.clear();
-      selectedCustomerType.value = "Retail";
-      salesnote.clear();
-      amountPaid.clear();
-      receipt.refresh();
-      selectedCustomerController.clear();
+      _clearAfterSale();
     } catch (e) {
       showSnackBar(message: e.toString(), color: Colors.red);
       saveSaleLoad.value = false;
     } finally {
+      getSalesByDate(
+        type: "today",
+        shop: userController.currentUser.value!.primaryShop!.id!,
+      );
+
+      getNetAnalysis(
+        type: "today",
+        shopId: userController.currentUser.value!.primaryShop!.id!,
+      );
       if (saleModel.sId != null) {
         _printReceipt(saleModel);
       }
       Get.find<ProductController>().getProductsBySort(type: 'all');
       sellingDate.value = null;
     }
+  }
+
+  void _clearAfterSale() {
+    currentCustomer.value = null;
+    receipt.value?.items = [];
+    saleDiscount.clear();
+    paymentType.value = "Cash";
+    mpesaCashPaid.clear();
+    bankCashPaid.clear();
+    creditAmount.clear();
+    textEditingSellingPrice.clear();
+    cashPaid.clear();
+    selectedCustomerType.value = "Retail";
+    salesnote.clear();
+    amountPaid.clear();
+    receipt.refresh();
+    selectedCustomerController.clear();
   }
 
   _printReceipt(SaleModel saleModel) {
@@ -992,8 +986,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
               },
               child: Text(
                 "No".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style: TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1008,8 +1002,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
               },
               child: Text(
                 "Yes print".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style: TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1093,8 +1087,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
                   },
                   child: Text(
                     "Cancel".toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.purple,
+                    style: TextStyle(
+                      color: AppColors.mainColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1118,8 +1112,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
                   },
                   child: Text(
                     "Ok".toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.purple,
+                    style: TextStyle(
+                      color: AppColors.mainColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -1201,7 +1195,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       }
       var returnData = {
         "saleid": saledId,
-        "attendantId": userController.currentUser.value?.attendantId,
+        "attendantId": userController.currentUser.value?.attendantId?.sId,
         "shopId": userController.currentUser.value?.primaryShop?.id,
         "items": returnItems,
         "reason": "test",
@@ -1446,7 +1440,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
           total: double.parse(data['totalSales'].toString()),
           name: "Today Sales",
           key: 'sales',
-          color: const Color(0xffbe741f),
+          color: AppColors.secondary_color,
           iconData: Icons.auto_graph_rounded,
         ),
       );
@@ -1457,7 +1451,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
                 double.parse(response['totalTaxes'].toStringAsFixed(2))),
             name: "Today Profit",
             key: 'profit',
-            color: const Color(0xff08a52c),
+            color: AppColors.button_color,
             iconData: Icons.auto_graph_rounded,
           ),
         );
@@ -1467,7 +1461,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
           total: double.parse(response['creditTotals'].toString()),
           name: "Today Dues",
           key: 'dues',
-          color: const Color(0xffbe741f),
+          color: AppColors.mainColor,
           iconData: Icons.auto_graph_rounded,
         ),
       );
@@ -1477,7 +1471,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
             total: double.parse(expensedata['totalExpenses'].toString()),
             name: "Today Expenses",
             key: 'expenses',
-            color: const Color(0xff3a3055),
+            color: AppColors.secondary_color,
             iconData: Icons.auto_graph_rounded,
           ),
         );
@@ -1672,16 +1666,17 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
           )
           .toList();
       List<int> ticket = await Get.find<PrinterController>().printSalesReceipt(
-        items: items,
-        storeName: saleModel.shopId?.name ?? "Pointify",
-        phone: saleModel.shopId?.contact ?? "",
-        email: saleModel.shopId?.receiptemail ?? "",
-        address: saleModel.shopId?.addressReceipt ?? "",
-        paybill: saleModel.shopId?.paybillTill ?? "",
-        paybillAccount: saleModel.shopId?.paybillAccount ?? "",
-        paymentType: saleModel.paymentType ?? "Cash",
-        customer: saleModel.customerId?.name ?? "",
-      );
+          items: items,
+          storeName: saleModel.shopId?.name ?? "Pointify",
+          phone: saleModel.shopId?.contact ?? "",
+          email: saleModel.shopId?.receiptemail ?? "",
+          address: saleModel.shopId?.addressReceipt ?? "",
+          paybill: saleModel.shopId?.paybillTill ?? "",
+          paybillAccount: saleModel.shopId?.paybillAccount ?? "",
+          paymentType: saleModel.paymentType ?? "Cash",
+          customer: saleModel.customerId?.name ?? "",
+          date: saleModel.createdAt ?? "",
+          receiptUrl: "https://store.pointifypos.com");
       await PrintBluetoothThermal.writeBytes(ticket);
     }
   }

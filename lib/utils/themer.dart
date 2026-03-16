@@ -3,53 +3,36 @@ import 'package:pointify/utils/colors.dart';
 
 class ThemeHelper {
   InputDecoration textInputDecoration(
-      [String lableText = "", String hintText = "", iconData, Function? function]) {
+      [String lableText = "",
+      String hintText = "",
+      iconData,
+      Function? function]) {
     return InputDecoration(
       labelText: lableText,
       hintText: hintText,
+      labelStyle: const TextStyle(color: Colors.grey),
       fillColor: Colors.white,
       filled: true,
-      suffix: iconData !=null ? InkWell(child: Icon(iconData), onTap: (){
-        function!();
-      },) : null,
+      suffix: iconData != null
+          ? InkWell(
+              child: Icon(iconData),
+              onTap: () {
+                function!();
+              },
+            )
+          : null,
       contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(100.0),
+          borderRadius: BorderRadius.circular(10.0),
           borderSide: const BorderSide(color: Colors.grey)),
       enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(100.0),
+          borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide(color: Colors.grey.shade400)),
       errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(100.0),
+          borderRadius: BorderRadius.circular(10.0),
           borderSide: const BorderSide(color: Colors.red, width: 2.0)),
       focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(100.0),
-          borderSide: const BorderSide(color: Colors.red, width: 2.0)),
-    );
-  }
-
-  InputDecoration textInputDecorationDesktop(
-      [String lableText = "", String hintText = "", iconData, Function? function]) {
-    return InputDecoration(
-      labelText: lableText,
-      hintText: hintText,
-      fillColor: Colors.white,
-      filled: true,
-      suffix: iconData !=null ? InkWell(child: Icon(iconData), onTap: (){
-        function!();
-      },) : null,
-      contentPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(color: Colors.grey)),
-      enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.grey.shade400)),
-      errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(color: Colors.red, width: 2.0)),
-      focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(10.0),
           borderSide: const BorderSide(color: Colors.red, width: 2.0)),
     );
   }

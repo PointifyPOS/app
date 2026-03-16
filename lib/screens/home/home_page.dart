@@ -24,7 +24,6 @@ import '../../models/wahoureinvoice.dart';
 import '../../reports/net_profit_report.dart';
 import '../../reports/reports.dart';
 import '../../reports/sales/sales_report.dart';
-import '../../support/support.dart';
 import '../../utils/colors.dart';
 import '../../utils/helper.dart';
 import '../../widgets/major_title.dart';
@@ -108,7 +107,6 @@ class HomePage extends StatelessWidget {
         "icon": Icons.request_quote_outlined,
         "category": "accounts"
       },
-      {"title": "Support", "icon": Icons.help, "category": "support"},
     ];
     if (userController.currentUser.value?.usertype == "admin") {
       if (userController.currentUser.value?.primaryShop?.warehouse == true ||
@@ -162,7 +160,7 @@ class HomePage extends StatelessWidget {
               ? null
               : AppBar(
                   titleSpacing: 0.0,
-                  leading: const Icon(
+                  leading:  Icon(
                     Icons.electric_bolt,
                     color: AppColors.mainColor,
                   ),
@@ -180,7 +178,7 @@ class HomePage extends StatelessWidget {
                         onTap: () async {
                           Get.to(() => ProfilePage());
                         },
-                        child: const Icon(
+                        child:  Icon(
                           Icons.account_circle_rounded,
                           color: AppColors.mainColor,
                           size: 30,
@@ -577,7 +575,7 @@ class HomePage extends StatelessWidget {
                                         title: "Discover Shops Around You",
                                         color: Colors.black,
                                         size: 16.0),
-                                    const Icon(
+                                     Icon(
                                       Icons.location_on_outlined,
                                       size: 30,
                                       color: AppColors.mainColor,
@@ -684,41 +682,6 @@ class HomePage extends StatelessWidget {
                                                       ),
                                               ),
                                             ),
-                                          if (e['category'] == "support")
-                                            Positioned(
-                                              top: 10,
-                                              right: 20,
-                                              child: Obx(
-                                                () => userController
-                                                            .messagesCount
-                                                            .value ==
-                                                        "0"
-                                                    ? Container()
-                                                    : Container(
-                                                        width: 20,
-                                                        height: 20,
-                                                        decoration: BoxDecoration(
-                                                            color: Colors.red,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        50)),
-                                                        child: Center(
-                                                          child: Text(
-                                                            userController
-                                                                .messagesCount
-                                                                .value,
-                                                            style: const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                              ),
-                                            )
                                         ],
                                       );
                                     },
@@ -942,7 +905,7 @@ class HomePage extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("Latest Invoices",
+                                   Text("Latest Invoices",
                                       style: TextStyle(
                                           color: AppColors.mainColor,
                                           fontSize: 20,
@@ -1025,7 +988,7 @@ class HomePage extends StatelessWidget {
                                         ),
                                       );
                                     },
-                                    child: const Row(
+                                    child:  Row(
                                       children: [
                                         Text("Filter ",
                                             style: TextStyle(
@@ -1050,7 +1013,7 @@ class HomePage extends StatelessWidget {
                             Container(
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 10),
-                              child: const Divider(
+                              child:  Divider(
                                 color: AppColors.mainColor,
                               ),
                             ),
@@ -1148,7 +1111,7 @@ class HomePage extends StatelessWidget {
               title,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 12,
+                fontSize: 11,
                 color: shopController.checkSubscription() == false
                     ? Colors.grey
                     : isSmallScreen
@@ -1216,11 +1179,6 @@ class HomePage extends StatelessWidget {
       case "reports":
         {
           Get.to(() => Reports());
-        }
-        break;
-      case "support":
-        {
-          Get.to(() => const Support());
         }
         break;
     }

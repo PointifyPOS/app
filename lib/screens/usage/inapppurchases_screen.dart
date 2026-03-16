@@ -19,9 +19,11 @@ class InAppPurchasesScreen extends StatelessWidget {
     super.key,
     this.shop,
   }) {
-    userController.phoneController.text =
-        userController.currentUser.value!.phone ?? "";
-    inappPurchasesController.fetchSubscriptions();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      userController.phoneController.text =
+          userController.currentUser.value!.phone ?? "";
+      inappPurchasesController.fetchSubscriptions();
+    });
   }
 
   final ShopController shopController = Get.find<ShopController>();
@@ -36,13 +38,13 @@ class InAppPurchasesScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
             onPressed: () {
-              Get.back();
+              Navigator.of(context).pop();
             },
-            icon: const Icon(
+            icon:  Icon(
               Icons.clear,
               color: AppColors.mainColor,
             )),
-        title: const Text(
+        title:  Text(
           "Extend usage",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -118,13 +120,9 @@ class InAppPurchasesScreen extends StatelessWidget {
                 ),
           ElevatedButton(
             onPressed: () async {
-              Get.snackbar('Restore', 'Restoring purchases...');
 
               await InappPurchasesController.inAppPurchaseUtilsInstance
                   .restorePurchases();
-
-              // Optionally show confirmation:
-              Get.snackbar('Restore', 'Restore process completed.');
             },
             child: Text('Restore Purchases'),
           ),
@@ -183,7 +181,7 @@ class InAppPurchasesScreen extends StatelessWidget {
                         title: plan.title, color: Colors.black, size: 18.0),
                     Text(
                       plan.displayprice!,
-                      style: const TextStyle(
+                      style:  TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 23,
                           color: AppColors.mainColor),

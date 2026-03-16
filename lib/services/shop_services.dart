@@ -118,4 +118,15 @@ class ShopService {
         .databaseRequest(url, DbBase().postRequestType, body: {"days": days});
     return response;
   }
+
+  Future<dynamic> checkPaymentStatus(String reference) async {
+    try {
+      var response = await DbBase().databaseRequest(
+          "${EndPoints.checkpaymentstatus}?reference=$reference",
+          DbBase().getRequestType);
+      return response;
+    } catch (e) {
+      return null;
+    }
+  }
 }

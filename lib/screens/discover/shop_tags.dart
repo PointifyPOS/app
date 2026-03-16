@@ -38,7 +38,7 @@ class ShopTags extends StatelessWidget {
         iconTheme: const IconThemeData(
           color: Colors.black, //change your color here
         ),
-        title: const Text(
+        title:  Text(
           "Explore",
           style: TextStyle(
               color: AppColors.mainColor,
@@ -82,7 +82,7 @@ class ShopTags extends StatelessWidget {
           children: [
             Column(
               children: [
-                const Text(
+                 Text(
                     'Enter your Customer number to track Previous Orders',
                     style: TextStyle(
                       fontSize: 12,
@@ -105,7 +105,7 @@ class ShopTags extends StatelessWidget {
                             orderController.trackingNumber.text,
                             to: "");
                       },
-                      child: const Icon(
+                      child:  Icon(
                         Icons.search,
                         color: AppColors.mainColor,
                       ),
@@ -130,7 +130,7 @@ class ShopTags extends StatelessWidget {
                 ),
               ],
             ),
-            const Center(
+             Center(
               child: Text('Pick categories and\nDiscover Shops Around you',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -148,7 +148,7 @@ class ShopTags extends StatelessWidget {
                       direction: Axis.horizontal,
                       children: listMyWidgets(),
                     )
-                  : const SizedBox(
+                  :  SizedBox(
                       child: Center(
                           child: CircularProgressIndicator(
                       color: AppColors.mainColor,
@@ -218,7 +218,7 @@ class ShopTags extends StatelessWidget {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
                         color: Colors.white),
-                    child: const Icon(
+                    child:  Icon(
                       Icons.check,
                       size: 10,
                       color: AppColors.mainColor,

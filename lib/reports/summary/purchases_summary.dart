@@ -172,7 +172,7 @@ class PurchasesSummary extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title:  Text(
           "Purchases Report",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -190,7 +190,7 @@ class PurchasesSummary extends StatelessWidget {
                       ),
                     ));
               },
-              icon: const Icon(
+              icon:  Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               ))
@@ -199,7 +199,7 @@ class PurchasesSummary extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

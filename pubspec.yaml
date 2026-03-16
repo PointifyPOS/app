@@ -1,7 +1,7 @@
 name: pointify
 description: "Pointify Pos."
 publish_to: 'none'
-version: 2.0.159+179
+version: 2.0.162+182
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -23,7 +23,7 @@ dependencies:
   #  flutter_barcode_scanner:
   #    git:
   #      url: https://github.com/freddysundowner/flutter_barcode_scanner
-  barcode_widget: ^2.0.3
+  barcode_widget: ^2.0.4
   syncfusion_flutter_charts: ^29.1.35
   url_launcher: ^6.1.10
   syncfusion_flutter_datepicker: ^29.1.35
@@ -61,6 +61,7 @@ dependencies:
   in_app_review: ^2.0.10
   flutter_chat_bubble: ^2.0.2
   in_app_purchase: ^3.2.0
+  flutter_paystack_plus: ^2.3.0
 
 dev_dependencies:
   flutter_test:

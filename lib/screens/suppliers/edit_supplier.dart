@@ -5,6 +5,7 @@ import 'package:pointify/screens/suppliers/supplier_info_page.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/suppliercontroller.dart';
+import '../../utils/colors.dart';
 
 class EditSupplier extends StatelessWidget {
   final String? userType;
@@ -57,8 +58,8 @@ class EditSupplier extends StatelessWidget {
                         .updateSupplier(supplierController.supplier.value!);
                   },
                   child: Text("Save Changes".toUpperCase(),
-                      style: const TextStyle(
-                          color: Colors.purple, fontWeight: FontWeight.bold))),
+                      style:  TextStyle(
+                          color: AppColors.mainColor, fontWeight: FontWeight.bold))),
             )
         ],
       ),
@@ -125,8 +126,8 @@ class EditSupplier extends StatelessWidget {
                     },
                     child: Text(
                       "Cancel".toUpperCase(),
-                      style: const TextStyle(
-                          color: Colors.purple, fontWeight: FontWeight.bold),
+                      style:  TextStyle(
+                          color: AppColors.mainColor, fontWeight: FontWeight.bold),
                     ),
                   ),
                   TextButton(
@@ -135,8 +136,8 @@ class EditSupplier extends StatelessWidget {
                             .updateSupplier(supplierController.supplier.value!);
                       },
                       child: Text("Save Changes".toUpperCase(),
-                          style: const TextStyle(
-                              color: Colors.purple,
+                          style:  TextStyle(
+                              color: AppColors.mainColor,
                               fontWeight: FontWeight.bold)))
                 ],
               )

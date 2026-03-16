@@ -43,7 +43,7 @@ Widget createPurchaseCard({required InvoiceItem invoiceItem, required index}) {
                       onPressed: () {
                         purchaseController.decrementItem(index);
                       },
-                      icon: const Icon(Icons.remove_circle,
+                      icon:  Icon(Icons.remove_circle,
                           color: AppColors.mainColor, size: 25)),
                   SizedBox(
                       width: 60,
@@ -76,7 +76,7 @@ Widget createPurchaseCard({required InvoiceItem invoiceItem, required index}) {
                       onPressed: () {
                         purchaseController.incrementItem(index);
                       },
-                      icon: const Icon(Icons.add_circle,
+                      icon:  Icon(Icons.add_circle,
                           color: AppColors.mainColor, size: 25)),
                   IconButton(
                     color: Colors.grey,
@@ -118,7 +118,7 @@ Widget createPurchaseCard({required InvoiceItem invoiceItem, required index}) {
                                       keyboardType: TextInputType.number,
                                       controller: buyingProceController,
                                       decoration: ThemeHelper()
-                                          .textInputDecorationDesktop(
+                                          .textInputDecoration(
                                               'Buying Price',
                                               'Enter buyinng price'),
                                     ),
@@ -137,7 +137,7 @@ Widget createPurchaseCard({required InvoiceItem invoiceItem, required index}) {
                                       keyboardType: TextInputType.number,
                                       controller: sellingPriceController,
                                       decoration: ThemeHelper()
-                                          .textInputDecorationDesktop(
+                                          .textInputDecoration(
                                               'Selling Price',
                                               'Enter selling price'),
                                     ),
@@ -151,7 +151,7 @@ Widget createPurchaseCard({required InvoiceItem invoiceItem, required index}) {
                                     },
                                     child: Text(
                                       "Cancel".toUpperCase(),
-                                      style: const TextStyle(
+                                      style:  TextStyle(
                                           color: AppColors.mainColor),
                                     )),
                                 TextButton(
@@ -184,7 +184,7 @@ Widget createPurchaseCard({required InvoiceItem invoiceItem, required index}) {
                                     },
                                     child: Text(
                                       "Update".toUpperCase(),
-                                      style: const TextStyle(
+                                      style:  TextStyle(
                                           color: AppColors.mainColor),
                                     ))
                               ],

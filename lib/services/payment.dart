@@ -52,4 +52,10 @@ class PaymentService {
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }
+
+  static  getPaymentMethods  () async {
+    String url = EndPoints.paymentsmethods;
+    var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
+    return response;
+  }
 }

@@ -53,7 +53,7 @@ class EditShopDetails extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0.3,
         leading: IconButton(
           onPressed: () {
@@ -83,7 +83,7 @@ class EditShopDetails extends StatelessWidget {
                 decoration: BoxDecoration(
                     border: Border.all(color: AppColors.mainColor),
                     borderRadius: BorderRadius.circular(5)),
-                child: const Text(
+                child:  Text(
                   "Update Shop",
                   style: TextStyle(
                     color: AppColors.mainColor,
@@ -109,7 +109,7 @@ class EditShopDetails extends StatelessWidget {
               const SizedBox(height: 10),
               TextFormField(
                 controller: shopController.warehouseemail,
-                decoration: ThemeHelper().textInputDecorationDesktop(
+                decoration: ThemeHelper().textInputDecoration(
                     // 'Shop Address',
                     // 'Enter your shop address',
                     ),
@@ -124,7 +124,7 @@ class EditShopDetails extends StatelessWidget {
                   controller: shopController.tax,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  decoration: ThemeHelper().textInputDecorationDesktop(
+                  decoration: ThemeHelper().textInputDecoration(
                       // 'Shop Address',
                       // 'Enter your shop address',
                       ),
@@ -219,7 +219,7 @@ class EditShopDetails extends StatelessWidget {
                       });
                     }
                   },
-                  decoration: ThemeHelper().textInputDecorationDesktop(
+                  decoration: ThemeHelper().textInputDecoration(
                       // 'Shop Address',
                       // 'Enter your shop address',
                       ),
@@ -341,7 +341,7 @@ class EditShopDetails extends StatelessWidget {
                                 onChange: (value) {
                                   shopController.useWarehouse.value = value;
                                 },
-                                onColor: Colors.purple,
+                                onColor:AppColors.mainColor,
                                 value: shopController.useWarehouse.value,
                                 offColor: Colors.grey)
                           ],

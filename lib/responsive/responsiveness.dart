@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 bool isSmallScreen(context) => MediaQuery.of(context).size.width < 768;
 
-bool isDesktop(BuildContext context) =>
-    MediaQuery.of(context).size.width >= 768;
 
 class ResponsiveWidget extends StatelessWidget {
   final Widget largeScreen;

@@ -52,7 +52,7 @@ class CustomerSignUp extends StatelessWidget {
                                 orderController.trackingNumber.text,
                                 to: toPage);
                           },
-                          child: const Icon(
+                          child:  Icon(
                             Icons.search,
                             color: AppColors.mainColor,
                           ),
@@ -144,10 +144,7 @@ class CustomerSignUp extends StatelessWidget {
                                   return null;
                                 },
                                 keyboardType: TextInputType.text,
-                                decoration: isSmallScreen(context)
-                                    ? ThemeHelper().textInputDecoration(
-                                        'Full Names*', 'Enter your full names')
-                                    : ThemeHelper().textInputDecorationDesktop(
+                                decoration: ThemeHelper().textInputDecoration(
                                         'Full Names*', 'Enter your full names'),
                               ),
                             ),
@@ -157,10 +154,7 @@ class CustomerSignUp extends StatelessWidget {
                                   ThemeHelper().inputBoxDecorationShaddow(),
                               child: TextFormField(
                                 controller: orderController.emailController,
-                                decoration: isSmallScreen(context)
-                                    ? ThemeHelper().textInputDecoration(
-                                        "E-mail address*", "Enter your email")
-                                    : ThemeHelper().textInputDecorationDesktop(
+                                decoration: ThemeHelper().textInputDecoration(
                                         "E-mail address*", "Enter your email"),
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (value) {
@@ -181,13 +175,9 @@ class CustomerSignUp extends StatelessWidget {
                                   ThemeHelper().inputBoxDecorationShaddow(),
                               child: TextFormField(
                                 controller: orderController.phoneController,
-                                decoration: isSmallScreen(context)
-                                    ? ThemeHelper().textInputDecoration(
-                                        "Mobile Number*",
-                                        "Enter your mobile number")
-                                    : ThemeHelper().textInputDecorationDesktop(
-                                        "Mobile Number*",
-                                        "Enter your mobile number"),
+                                decoration: ThemeHelper().textInputDecoration(
+                                    "Mobile Number*",
+                                    "Enter your mobile number"),
                                 keyboardType: TextInputType.phone,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {

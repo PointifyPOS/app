@@ -77,7 +77,7 @@ Widget invoiceTable({required context, required Supplier supplierModel}) {
                           from: "SupplierInfoPage",
                         );
                       },
-                      child: const Text(
+                      child:  Text(
                         "View",
                         style: TextStyle(color: AppColors.mainColor),
                       )),

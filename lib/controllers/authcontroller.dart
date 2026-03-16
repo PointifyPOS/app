@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' show Platform;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
@@ -29,8 +31,10 @@ import '../screens/home/home_page.dart';
 import '../screens/shop/create_shop.dart';
 import '../services/authentication.dart';
 import '../services/preference_manager.dart';
+import '../services/settings.dart';
 import '../services/user.dart';
 import '../sqlite/helper.dart';
+import '../utils/app_config.dart';
 import '../utils/constants.dart';
 import '../utils/helper.dart';
 import '../widgets/alert.dart';
@@ -79,7 +83,7 @@ class AuthController {
         var usertype = await prefs.getString('user_type');
         var response;
         if (usertype == "admin") {
-          response = await Authentication.getAdmin(
+          response = await Authentication.getUser(
             userController.currentUserId.value,
           );
           if (response["error"] != null) {
@@ -126,11 +130,11 @@ class AuthController {
           int days = DateTime.parse(
             userController.currentUser.value!.emailVerificationDate!,
           ).difference(DateTime(now.year, now.month, now.day)).inDays;
-          if (days <= 0 &&
-              userController.currentUser.value!.emailVerified == false) {
-            Get.off(() => EmailVerificationPage());
-            return;
-          }
+          // if (days <= 0 &&
+          //     userController.currentUser.value!.emailVerified == false) {
+          //   Get.off(() => EmailVerificationPage());
+          //   return;
+          // }
           if (userController.currentUser.value?.primaryShop != null) {
             if (type == "auth") {
               Get.offAll(() => const Home());
@@ -146,6 +150,32 @@ class AuthController {
       print("Error: $e");
       debugPrintMessage(e);
     } finally {
+
+      SettingsApi.getSettings().then((data) async {
+        var app = data['APP_CONFIG'];
+        var themes = data['theme'];
+        var general = data['GENERAL_CONFIG'];
+        var stripe = data['STRIPE_CONFIG'];
+        AppConfig.country_code = general ==null ? "KES" : general['country_code'] ?? "US";
+        AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
+        if (AppConfig.stripePublishKey.isNotEmpty) {
+          Stripe.publishableKey = AppConfig.stripePublishKey;
+          Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
+          await Stripe.instance.applySettings();
+        }
+        if(app !=null) {
+          AppConfig.offline_mode = app['offlineEnabled'] ?? false;
+          AppConfig.androidLink = app['androidLink'] ?? "";
+          AppConfig.demo_mode = app['demoEnabled'] ?? false;
+          AppConfig.iosLink = app['iosLink'] ?? "";
+        }
+        if (AppConfig.offline_mode == false) {
+          userController.enableOffline.value = false;
+        } else {
+          userController.enableOffline.value = true;
+        }
+        checkForUpdate(app);
+      });
       if (await isConnected()) {
         if (userController.currentUser.value != null &&
             userController.currentUser.value!.primaryShop != null) {
@@ -165,8 +195,6 @@ class AuthController {
             toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
             shop: userController.currentUser.value?.primaryShop!.id!,
           );
-          chatsCheck();
-          checkForUpdate();
           User().updateLastSeen();
           if (userController.currentUser.value?.primaryShop?.warehouse ==
               true) {
@@ -175,7 +203,9 @@ class AuthController {
             );
           }
         }
-        rateApp();
+        if(userController.currentUser.value?.primaryShop !=null) {
+          rateApp();
+        }
         Get.find<ShopController>().getShops();
       }
 
@@ -209,7 +239,7 @@ class AuthController {
         await inAppReview.requestReview();
       } else {
         // Optionally, you can redirect the user to the app store page
-        await inAppReview.openStoreListing(appStoreId: appstoreId);
+        await inAppReview.openStoreListing(appStoreId: AppConfig.appstoreId);
       }
       if (userController.currentUser.value!.usertype == "admin") {
         userController.profileUpdate(
@@ -227,68 +257,34 @@ class AuthController {
     }
   }
 
-  chatsCheck() {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    DocumentReference docReference = firebaseFirestore
-        .collection("chats/")
-        .doc(userController.currentUser.value!.id);
-    docReference.snapshots().listen((DocumentSnapshot snapshot) async {
-      if (snapshot.exists) {
-        Map<String, dynamic> users = snapshot.data() as Map<String, dynamic>;
-        if (users["author"] == null) {
-          docReference.update({
-            "author": {
-              "name": userController.currentUser.value!.username,
-              "id": userController.currentUser.value!.id,
-            },
-          });
-        }
-        List unreadUsers = users["unreadUsers"] ?? [];
-        var count = users[userController.currentUser.value!.id!];
 
-        if (users["unreadUsers"] != null &&
-            unreadUsers.contains(userController.currentUser.value!.id)) {
-          userController.messagesCount.value = count.toString();
-          userController.messagesCount.refresh();
-        } else {
-          userController.messagesCount.value = '0';
-          userController.messagesCount.refresh();
-        }
-      } else {
-        docReference.set({
-          "author": {
-            "name": userController.currentUser.value!.username,
-            "id": userController.currentUser.value!.id,
-            "unreadUsers": [userController.currentUser.value!.id],
-            userController.currentUser.value!.id!: 0,
-          },
-        });
-      }
-    });
-  }
-
-  Future<void> checkForUpdate({String? app}) async {
-    User().getSettings().then((value) async {
+  Future<void> checkForUpdate(var value) async {
+    print("checkForUpdate $value");
+    if(value == null){
+      var response = await SettingsApi.getSettings(type: "APP_CONFIG");
+      value = response;
+    }
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      String latestVersion = value['android_version'];
+      int latestVersion = value['android_version'] ==null ? 0 :int.parse(value['android_version'] ?? 0);
       String buildNumber = packageInfo.buildNumber;
       settingsData = value;
       if (Platform.isAndroid) {
-        if (int.parse(latestVersion) > int.parse(buildNumber) &&
+        if (latestVersion > int.parse(buildNumber) &&
             showingUpdateAlert.isFalse) {
           showingUpdateAlert.value = true;
           showUpdateAlert(value['forceUpdate']);
+        }else{
+          showingUpdateAlert.value = false;
         }
       } else if (Platform.isIOS) {
-        String latestVersion = value['ios_version'];
+        int latestVersion = value['ios_version'] == null ? 0: int.parse(value['ios_version'] ?? 0);
         String buildNumber = packageInfo.buildNumber;
-        if (int.parse(latestVersion) > int.parse(buildNumber) &&
+        if (latestVersion > int.parse(buildNumber) &&
             showingUpdateAlert.isFalse) {
           showingUpdateAlert.value = true;
           showUpdateAlert(value['forceUpdate']);
         }
       }
-    });
   }
 
   void showUpdateAlert(bool forceUpdate) {
@@ -327,9 +323,9 @@ class AuthController {
   void launchStore() async {
     String appPackageName = '';
     if (Platform.isAndroid) {
-      appPackageName = androidLink;
+      appPackageName = AppConfig.androidLink ;
     } else if (Platform.isIOS) {
-      appPackageName = iosLink;
+      appPackageName = AppConfig.iosLink;
     }
 
     if (await canLaunchUrl(Uri.parse(appPackageName))) {
@@ -407,7 +403,7 @@ class AuthController {
         "referal": await getReferer(),
         "affliate": referalController.text,
       };
-      var adminResponse = await Authentication.registerAdmin(response);
+      var adminResponse = await Authentication.registerUser(response);
 
       if (adminResponse["status"] == false) {
         signuserLoad.value = false;
@@ -423,7 +419,6 @@ class AuthController {
       await prefs.saveString('id', userController.currentUser.value!.id!);
       userController.currentUser.refresh();
       await initUser();
-      authChat();
       clearDataFromTextFields();
       if (userController.currentUser.value?.primaryShop == null) {
         if (isSmallScreen(context)) {
@@ -441,44 +436,6 @@ class AuthController {
       );
       signuserLoad.value = false;
     }
-  }
-
-  authChat() {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-
-    final user = types.User(id: userController.currentUser.value!.id!);
-
-    firebaseFirestore
-        .collection("chats")
-        .doc(userController.currentUser.value!.id)
-        .collection("messages")
-        .add(
-          types.TextMessage(
-            author: user,
-            createdAt: DateTime.now().millisecondsSinceEpoch,
-            id: const Uuid().v4(),
-            text: "Welcome ${userController.currentUser.value!.username}",
-          ).toJson(),
-        );
-    firebaseFirestore
-        .collection("chats")
-        .doc(userController.currentUser.value!.id)
-        .collection("messages")
-        .add(
-          types.TextMessage(
-            author: user,
-            createdAt: DateTime.now().millisecondsSinceEpoch,
-            id: const Uuid().v4(),
-            text: "${settingsData["demolink"]}",
-          ).toJson(),
-        );
-    firebaseFirestore
-        .collection("chats")
-        .doc(userController.currentUser.value!.id)
-        .set({
-      "unreadUsers": [userController.currentUser.value!.id],
-      userController.currentUser.value!.id!: 1,
-    });
   }
 
   Future<void> logOut() async {
@@ -557,10 +514,8 @@ class AuthController {
     bool connected = await isConnected();
     var response;
 
-    // Handle offline login
-
     if (connected) {
-      response = await Authentication.login(
+      response = await Authentication.loginUser(
         type: "admin",
         email: emailController.text,
         password: passwordController.text,
@@ -569,7 +524,6 @@ class AuthController {
         loginuserLoad.value = false;
         return;
       }
-      print(response);
       if (response["error"] != null) {
         loginuserLoad.value = false;
         showSnackBar(message: response["error"], color: Colors.red);

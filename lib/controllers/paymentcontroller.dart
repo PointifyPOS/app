@@ -6,10 +6,12 @@ import 'package:pointify/services/payment.dart';
 
 import '../models/awards.dart';
 import '../models/payment.dart';
+import '../models/payment_methods.dart';
 
 class PaymentController extends GetxController {
   RxBool isPaymentLoading = false.obs;
   RxList<Payment> payments = RxList([]);
+  RxList<PaymentMethods> paymentmethods = RxList([]);
   RxList<Awards> awardpayments = RxList([]);
 
   getSalesPaymentByPurchaseId(String id) async {
@@ -77,6 +79,15 @@ class PaymentController extends GetxController {
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();
     payments.assignAll(paymentData);
+    isPaymentLoading.value = false;
+  }
+
+  getPaymentMethods()async {
+    isPaymentLoading.value = true;
+    List<dynamic> response = await PaymentService.getPaymentMethods();
+    List<PaymentMethods> paymentData =
+    response.map((e) => PaymentMethods.fromJson(e)).toList();
+    paymentmethods.assignAll(paymentData);
     isPaymentLoading.value = false;
   }
 }

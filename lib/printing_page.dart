@@ -150,15 +150,9 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
 
   Future<void> checkPrinterConnection() async {
     final bool? isConnected = await PrintBluetoothThermal.connectionStatus;
-    var bluetooths = await PrintBluetoothThermal.pairedBluetooths;
-    for (var bluetooth in bluetooths) {
-      print(bluetooth.name);
-    }
+   await PrintBluetoothThermal.pairedBluetooths;
     if (isConnected == true) {
       connected = true;
-      print("Printer is connected.");
-    } else {
-      print("Printer is not connected.");
     }
   }
 
@@ -211,11 +205,6 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
     final List<BluetoothInfo> listResult =
         await PrintBluetoothThermal.pairedBluetooths;
 
-    /*await Future.forEach(listResult, (BluetoothInfo bluetooth) {
-      String name = bluetooth.name;
-      String mac = bluetooth.macAdress;
-    });*/
-
     setState(() {
       _progress = false;
     });
@@ -246,7 +235,6 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
 
     if (result) {
       connected = true;
-      // ✅ Save to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('saved_printer_mac', mac);
     }
@@ -267,13 +255,8 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
   }
 
   Future<void> printTest() async {
-    /*if (kDebugMode) {
-      bool result = await PrintBluetoothThermalWindows.writeBytes(bytes: "Hello \n".codeUnits);
-      return;
-    }*/
 
     bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
-    //print("connection status: $conexionStatus");
     if (conexionStatus) {
       bool result = false;
       List<int> ticket = await testTicket(
@@ -284,35 +267,10 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
         ],
       );
       result = await PrintBluetoothThermal.writeBytes(ticket);
-      print("print test result:  $result");
     } else {
-      print("print test conexionStatus: $conexionStatus");
       setState(() {
         disconnect();
       });
-      //throw Exception("Not device connected");
-    }
-  }
-
-  Future<void> printString() async {
-    bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
-    if (conexionStatus) {
-      String enter = '\n';
-      await PrintBluetoothThermal.writeBytes(enter.codeUnits);
-      //size of 1-5
-      String text = "Hello";
-      await PrintBluetoothThermal.writeString(
-        printText: PrintTextSize(size: 1, text: text),
-      );
-      await PrintBluetoothThermal.writeString(
-        printText: PrintTextSize(size: 2, text: "$text size 2"),
-      );
-      await PrintBluetoothThermal.writeString(
-        printText: PrintTextSize(size: 3, text: "$text size 3"),
-      );
-    } else {
-      //desconectado
-      print("desconectado bluetooth $conexionStatus");
     }
   }
 
@@ -407,7 +365,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       styles: const PosStyles(align: PosAlign.center, bold: true),
     );
     bytes += generator.text(
-      'System by Pointify,\ncontacts: 0720044055',
+      'System by Pointify,\ncontacts: 0791 334 234',
       styles: const PosStyles(align: PosAlign.center),
     );
     bytes += generator.cut();

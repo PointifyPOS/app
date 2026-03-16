@@ -395,7 +395,7 @@ actionsBottomSheet({required context, ExpenseCategory? expenseCategory}) {
                                         },
                                         child: Text(
                                           "Cancel".toUpperCase(),
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                               color: AppColors.mainColor),
                                         )),
                                     const SizedBox(
@@ -415,7 +415,7 @@ actionsBottomSheet({required context, ExpenseCategory? expenseCategory}) {
                                         },
                                         child: Text(
                                           "Save".toUpperCase(),
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                               color: AppColors.mainColor),
                                         )),
                                   ],

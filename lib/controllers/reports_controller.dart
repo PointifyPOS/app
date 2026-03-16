@@ -190,7 +190,7 @@ class ReportsController extends GetxController {
     for (var element in Get.find<SalesController>().cashsalesfilter) {
       if (element == 'cash') {
         Get.find<SalesController>().cashsalesfilterTotals['cash'] =
-            respose['cashtransactions'];
+            respose['cash_sales'];
       } else {
         Get.find<SalesController>().cashsalesfilterTotals[element] =
             respose[element];

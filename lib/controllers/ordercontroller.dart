@@ -208,7 +208,7 @@ class OrderController extends GetxController {
                     },
                     child: Container(
                       padding: const EdgeInsets.all(10),
-                      child: const Text(
+                      child:  Text(
                         "Confirm Otp",
                         style: TextStyle(color: AppColors.mainColor),
                       ),
@@ -222,7 +222,7 @@ class OrderController extends GetxController {
                     },
                     child: Container(
                       padding: const EdgeInsets.all(10),
-                      child: const Text(
+                      child:  Text(
                         "Cancel",
                         style: TextStyle(color: AppColors.mainColor),
                       ),

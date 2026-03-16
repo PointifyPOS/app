@@ -55,7 +55,7 @@ class CashReceipt extends StatelessWidget {
                               cashReceiptPdf([receipt!], "CASH RECEIPT")),
                     ));
               },
-              icon: const Icon(
+              icon:  Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               )),

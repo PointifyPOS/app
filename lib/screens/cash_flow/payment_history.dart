@@ -16,8 +16,7 @@ class PaymentHistory extends StatelessWidget {
   final String? type;
   final Customer? customerModel;
 
-  PaymentHistory({Key? key, this.id, this.customerModel, this.type})
-      : super(key: key);
+  PaymentHistory({super.key, this.id, this.customerModel, this.type});
   final ShopController shopController = Get.find<ShopController>();
   final PaymentController paymentController = Get.find<PaymentController>();
 

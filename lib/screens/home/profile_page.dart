@@ -7,6 +7,7 @@ import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/screens/usage/extend_usage.dart';
+import 'package:pointify/utils/app_config.dart';
 import 'package:pointify/widgets/loading_dialog.dart';
 
 import '../../controllers/homecontroller.dart';
@@ -37,7 +38,7 @@ class ProfilePage extends StatelessWidget {
                 onTap: () {
                   Get.back();
                 },
-                child: const Icon(Icons.clear, color: AppColors.mainColor),
+                child:  Icon(Icons.clear, color: AppColors.mainColor),
               ),
             ),
       body: SafeArea(
@@ -165,11 +166,11 @@ class ProfilePage extends StatelessWidget {
                                   title: "Subscription Plans",
                                   icon: Icons.subscriptions,
                                   onPressed: () {
-                                    if (Platform.isIOS) {
-                                      Get.to(() => InAppPurchasesScreen());
-                                    } else {
+                                    // if (Platform.isIOS && AppConfig.demo_mode == false ) {
+                                    //   Get.to(() => InAppPurchasesScreen());
+                                    // } else {
                                       Get.to(() => ExtendUsage());
-                                    }
+                                    // }
                                   },
                                 ),
                               accountCard(
@@ -182,7 +183,7 @@ class ProfilePage extends StatelessWidget {
                                     title: "Checking for updates",
                                     key: GlobalKey<State>(),
                                   );
-                                  await authController.checkForUpdate();
+                                  await authController.checkForUpdate(null);
                                   Get.back();
                                 },
                               ),

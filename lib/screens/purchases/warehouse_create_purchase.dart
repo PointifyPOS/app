@@ -120,7 +120,7 @@ class WarehouseCreatePurchase extends StatelessWidget {
                           shop: shop!.id!,
                         );
                       },
-                      child: const Icon(Icons.refresh,
+                      child:  Icon(Icons.refresh,
                           color: AppColors.mainColor))),
             ],
           ),
@@ -450,8 +450,8 @@ class WarehouseCreatePurchase extends StatelessWidget {
                                             },
                                             child: Text(
                                               "Cancel".toUpperCase(),
-                                              style: const TextStyle(
-                                                color: Colors.purple,
+                                              style:  TextStyle(
+                                                color: AppColors.mainColor,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
@@ -462,8 +462,8 @@ class WarehouseCreatePurchase extends StatelessWidget {
                                             },
                                             child: Text(
                                               "Okay".toUpperCase(),
-                                              style: const TextStyle(
-                                                color: Colors.purple,
+                                              style:  TextStyle(
+                                                color: AppColors.mainColor,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),

@@ -54,7 +54,7 @@ Widget salesContainer(
                                 onPressed: () {
                                   salesController.decrementItem(index);
                                 },
-                                icon: const Icon(Icons.remove_circle,
+                                icon:  Icon(Icons.remove_circle,
                                     color: AppColors.mainColor, size: 25)),
                             InkWell(
                               onTap: () {
@@ -82,7 +82,7 @@ Widget salesContainer(
                                 onPressed: () {
                                   salesController.incrementItem(index);
                                 },
-                                icon: const Icon(Icons.add_circle,
+                                icon:  Icon(Icons.add_circle,
                                     color: AppColors.mainColor, size: 25)),
                             IconButton(
                               color: Colors.grey,

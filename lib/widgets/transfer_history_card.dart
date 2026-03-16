@@ -20,46 +20,47 @@ Widget transferHistoryCard(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (typeKey == 'in')
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (typeKey == 'in')
+                  Text(
+                    "Products Received from ${stockTransferHistory.fromShop?.name} Shop ",
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
+                  ),
+                if (typeKey == 'out')
+                  Text(
+                    "Products Transferred to ${stockTransferHistory.toShop?.name} Shop ",
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
+                  ),
                 Text(
-                  "Products Received from ${stockTransferHistory.fromShop?.name} Shop ",
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
-                ),
-              if (typeKey == 'out')
-                Text(
-                  "Products Transferred to ${stockTransferHistory.toShop?.name} Shop ",
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
-                ),
-              Text(
-                "Total Items ${stockTransferHistory.transferItems?.length}",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                ),
-              ),
-              if (stockTransferHistory.createdAt != null)
-                Text(
-                  DateFormat("dd/MM/yyyy hh:mm a").format(
-                      DateTime.parse(stockTransferHistory.createdAt!)
-                          .toLocal()),
+                  "Total Items ${stockTransferHistory.transferItems?.length}",
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 14,
                   ),
                 ),
-              const Divider()
-            ],
+                if (stockTransferHistory.createdAt != null)
+                  Text(
+                    DateFormat("dd/MM/yyyy hh:mm a").format(
+                        DateTime.parse(stockTransferHistory.createdAt!)
+                            .toLocal()),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                    ),
+                  ),
+                const Divider()
+              ],
+            ),
           ),
-          const Spacer(),
           Text("By ~ ${stockTransferHistory.attendant?.username}")
         ],
       ),

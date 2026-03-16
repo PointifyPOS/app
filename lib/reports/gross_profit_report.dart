@@ -77,7 +77,7 @@ class GrossProfitReport extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.credit_card,
+                         Icon(Icons.credit_card,
                             color: AppColors.mainColor),
                         const SizedBox(width: 10),
                         Column(
@@ -87,7 +87,7 @@ class GrossProfitReport extends StatelessWidget {
                                   salesController.analysis.value!.totalSales -
                                       salesController
                                           .analysis.value!.totalPurchases),
-                              style: const TextStyle(
+                              style:  TextStyle(
                                   color: AppColors.mainColor, fontSize: 21),
                             ),
                           ],
@@ -147,7 +147,7 @@ class GrossProfitReport extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
-        title: const Text(
+        title:  Text(
           "Gross Profit Overview",
           style: TextStyle(color: AppColors.mainColor, fontSize: 18),
         ),
@@ -180,7 +180,7 @@ class GrossProfitReport extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

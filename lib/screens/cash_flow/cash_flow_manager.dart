@@ -109,42 +109,44 @@ class CashFlowManager extends StatelessWidget {
               icon: const Icon(Icons.download))
         ],
       ),
-      body: Obx(
-        () => Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            cashInHandWidget(context, "small"),
-            cashFlowCategory(context),
-            if (cashFlowController.isLoadingCashflow.isTrue)
-              const Center(child: CircularProgressIndicator()),
-            if (cashFlowController.isLoadingCashflow.isFalse)
-              Expanded(
-                child: Obx(
-                  () => DataTable2(
-                      columnSpacing: 5,
-                      horizontalMargin: 5,
-                      minWidth: 400,
-                      columns: const [
-                        // Set the name of the colum
-                        DataColumn(
-                          label: Text('Date'),
-                        ),
-                        DataColumn(
-                          label: Text('Name'),
-                        ),
-                        DataColumn(
-                          label: Text('In'),
-                        ),
-                        DataColumn(
-                          label: Text('Out'),
-                        ),
-                      ],
-                      rows: cashFlowController.cashFlowCategoriesPreviewList
-                          .map((element) => element)
-                          .toList()),
+      body: SafeArea(
+        child: Obx(
+          () => Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              cashInHandWidget(context, "small"),
+              cashFlowCategory(context),
+              if (cashFlowController.isLoadingCashflow.isTrue)
+                const Center(child: CircularProgressIndicator()),
+              if (cashFlowController.isLoadingCashflow.isFalse)
+                Expanded(
+                  child: Obx(
+                    () => DataTable2(
+                        columnSpacing: 5,
+                        horizontalMargin: 5,
+                        minWidth: 400,
+                        columns: const [
+                          // Set the name of the colum
+                          DataColumn(
+                            label: Text('Date'),
+                          ),
+                          DataColumn(
+                            label: Text('Name'),
+                          ),
+                          DataColumn(
+                            label: Text('In'),
+                          ),
+                          DataColumn(
+                            label: Text('Out'),
+                          ),
+                        ],
+                        rows: cashFlowController.cashFlowCategoriesPreviewList
+                            .map((element) => element)
+                            .toList()),
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -250,7 +252,7 @@ class CashFlowManager extends StatelessWidget {
                             width: 30,
                           ),
                           InkWell(
-                            child: const Icon(
+                            child:  Icon(
                               Icons.filter_list,
                               size: 30,
                               color: AppColors.mainColor,
@@ -275,7 +277,7 @@ class CashFlowManager extends StatelessWidget {
                         ),
                       ),
               ),
-              const Divider(
+               Divider(
                 color: AppColors.mainColor,
               )
             ],

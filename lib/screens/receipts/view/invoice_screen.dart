@@ -50,7 +50,7 @@ class InvoiceScreen extends StatelessWidget {
             onPressed: () {
               _printReceipt();
             },
-            icon: const Icon(Icons.picture_as_pdf, color: AppColors.mainColor),
+            icon:  Icon(Icons.picture_as_pdf, color: AppColors.mainColor),
           ),
           if (verifyPermission(
             category: "stocks",
@@ -510,7 +510,7 @@ void _dialog({
             decoration: ThemeHelper().inputBoxDecorationShaddow(),
             child: TextFormField(
               controller: textEditingController,
-              decoration: ThemeHelper().textInputDecorationDesktop(
+              decoration: ThemeHelper().textInputDecoration(
                 'Quantity',
                 'Enter quantity',
               ),
@@ -523,7 +523,7 @@ void _dialog({
               },
               child: Text(
                 "Cancel".toUpperCase(),
-                style: const TextStyle(color: AppColors.mainColor),
+                style:  TextStyle(color: AppColors.mainColor),
               ),
             ),
             TextButton(
@@ -560,7 +560,7 @@ void _dialog({
               },
               child: Text(
                 "Okay".toUpperCase(),
-                style: const TextStyle(color: AppColors.mainColor),
+                style:  TextStyle(color: AppColors.mainColor),
               ),
             ),
           ],
@@ -602,8 +602,8 @@ showAmountDialog(Invoice invoice) {
             },
             child: Text(
               "Cancel".toUpperCase(),
-              style: const TextStyle(
-                color: Colors.purple,
+              style:  TextStyle(
+                color: AppColors.mainColor,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -618,8 +618,8 @@ showAmountDialog(Invoice invoice) {
             },
             child: Text(
               "Pay".toUpperCase(),
-              style: const TextStyle(
-                color: Colors.purple,
+              style:  TextStyle(
+                color: AppColors.mainColor,
                 fontWeight: FontWeight.bold,
               ),
             ),

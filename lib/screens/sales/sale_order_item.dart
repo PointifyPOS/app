@@ -26,7 +26,6 @@ class SaleOrderItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // salesController.getSalesBySaleId(uid: id);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -130,7 +129,7 @@ class SaleOrderItem extends StatelessWidget {
                                       //       saleItem: saleOrderItemModel);
                                       // }
                                     },
-                                    child: const Text(
+                                    child:  Text(
                                       "Return to stock",
                                       style:
                                           TextStyle(color: AppColors.mainColor),

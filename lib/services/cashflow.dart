@@ -12,13 +12,6 @@ class CashFlowServices {
     return response;
   }
 
-  static Future createExpensesCategory(var data) async {
-    String url = EndPoints.cashflowcategory;
-    var response = await DbBase()
-        .databaseRequest(url, DbBase().postRequestType, body: data);
-    return response;
-  }
-
   static createCashFlow(var data) async {
     String url = EndPoints.cashflow;
     var response = await DbBase()

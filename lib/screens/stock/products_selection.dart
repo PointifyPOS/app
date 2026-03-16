@@ -55,6 +55,75 @@ class ProductSelections extends StatelessWidget {
       ),
     );
   }
+  List<Product> get outOfStockProducts =>
+      productController.products
+          .where((p) => p.type == 'product' && (p.quantity ?? 0) <= 0)
+          .toList();
+
+  List<Product> get availableProducts =>
+      productController.products
+          .where((p) => p.type == 'service' || (p.quantity ?? 0) > 0)
+          .toList();
+  Widget productTile(Product productBody) {
+    return InkWell(
+      onTap: () {
+        if (productBody.quantity! > 0 || productBody.type == 'service') {
+          stockTransferController.addToList(productBody);
+        } else {
+          showSnackBar(
+            message: "You cannot transfer product that is out of stock",
+            color: Colors.red,
+          );
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10)),
+          elevation: 4,
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(productBody.name ?? ""),
+                      const SizedBox(height: 10),
+                      if (productBody.productCategoryId != null)
+                        minorTitle(
+                          title:
+                          "Category: ${productBody.productCategoryId?.name}",
+                          color: Colors.grey,
+                        ),
+                      if (productBody.type == 'product') ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          "Qty Available: ${productBody.quantity}",
+                          style: const TextStyle(
+                              color: Colors.grey, fontSize: 16),
+                        ),
+                      ]
+                    ],
+                  ),
+                ),
+                Checkbox(
+                  value: stockTransferController.selectedProducts
+                      .indexWhere((e) =>
+                  e['product'] == productBody.sId) !=
+                      -1,
+                  onChanged: (_) {},
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,85 +163,47 @@ class ProductSelections extends StatelessWidget {
                   child: searchWidget()),
               Expanded(
                 child: Obx(() {
-                  return productController.products.isEmpty
-                      ? const Center(
-                          child: Text("no products to transfer"),
-                        )
-                      : ListView.builder(
-                          itemCount: productController.products.length,
-                          itemBuilder: (context, index) {
-                            Product productBody =
-                                productController.products.elementAt(index);
-                            return InkWell(
-                              onTap: () {
-                                if (productBody.quantity! > 0 ||
-                                    productBody.type == 'service') {
-                                  stockTransferController
-                                      .addToList(productBody);
-                                } else {
-                                  showSnackBar(
-                                      message:
-                                          "You cannot transfer product that is out of stock",
-                                      color: Colors.red);
-                                }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  elevation: 4,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            majorTitle(
-                                                title: "${productBody.name}",
-                                                color: Colors.black,
-                                                size: 16.0),
-                                            const SizedBox(height: 10),
-                                            if (productBody.productCategoryId !=
-                                                null)
-                                              minorTitle(
-                                                  title:
-                                                      "Category: ${productBody.productCategoryId?.name}",
-                                                  color: Colors.grey),
-                                            if (productBody.type == 'product')
-                                              const SizedBox(height: 10),
-                                            if (productBody.type == 'product')
-                                              Text(
-                                                  "Qty Available: ${productBody.quantity}",
-                                                  style: const TextStyle(
-                                                      color: Colors.grey,
-                                                      fontSize: 16))
-                                          ],
-                                        ),
-                                        Checkbox(
-                                            value: stockTransferController
-                                                        .selectedProducts
-                                                        .indexWhere((element) =>
-                                                            element[
-                                                                'product'] ==
-                                                            productBody.sId) !=
-                                                    -1
-                                                ? true
-                                                : false,
-                                            onChanged: (value) {})
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                  if (productController.products.isEmpty) {
+                    return const Center(child: Text("no products to transfer"));
+                  }
+
+                  return ListView(
+                    children: [
+                      /// 🔴 COLLAPSIBLE OUT-OF-STOCK PRODUCTS
+                      if (outOfStockProducts.isNotEmpty)
+                        Card(
+                          margin: const EdgeInsets.all(8),
+                          child: ExpansionTile(
+                            initiallyExpanded: false,
+                            leading: const Icon(Icons.warning, color: Colors.red),
+                            title: const Text(
+                              "Out of Stock",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Container(
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            );
-                          });
+                              child: Text(
+                                outOfStockProducts.length.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            children:
+                            outOfStockProducts.map(productTile).toList(),
+                          ),
+                        ),
+
+                      /// ✅ AVAILABLE PRODUCTS
+                      ...availableProducts.map(productTile).toList(),
+                    ],
+                  );
                 }),
               ),
+
             ],
           ),
           bottomNavigationBar: Obx(() => BottomAppBar(

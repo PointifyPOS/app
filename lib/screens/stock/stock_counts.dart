@@ -133,7 +133,7 @@ class StockCount extends StatelessWidget {
                       onTap: () {
                         productController.getProductsBySort(type: 'all');
                       },
-                      child: const Icon(Icons.refresh,
+                      child:  Icon(Icons.refresh,
                           color: AppColors.mainColor))),
             ],
           ),
@@ -327,9 +327,9 @@ class StockCount extends StatelessWidget {
         children: [
           Obx(() {
             return Text(productController.selectedSortOrderCount.value,
-                style: const TextStyle(color: AppColors.mainColor));
+                style:  TextStyle(color: AppColors.mainColor));
           }),
-          const Icon(
+           Icon(
             Icons.keyboard_arrow_down,
             color: AppColors.mainColor,
           )

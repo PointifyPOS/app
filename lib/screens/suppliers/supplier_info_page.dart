@@ -571,8 +571,8 @@ showAmountDialog(context, SaleModel salesBody) {
               },
               child: Text(
                 "Cancel".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style:  TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -590,8 +590,8 @@ showAmountDialog(context, SaleModel salesBody) {
               },
               child: Text(
                 "Save".toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.purple,
+                style:  TextStyle(
+                  color: AppColors.mainColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),

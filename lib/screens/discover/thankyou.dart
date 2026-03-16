@@ -28,7 +28,7 @@ class ThankYouPage extends StatelessWidget {
             Container(
               height: 170,
               padding: const EdgeInsets.all(35),
-              decoration: const BoxDecoration(
+              decoration:  BoxDecoration(
                 color: AppColors.mainColor,
                 shape: BoxShape.circle,
               ),
@@ -38,7 +38,7 @@ class ThankYouPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-            const Text(
+             Text(
               "Customer No.",
               style: TextStyle(
                 color: AppColors.mainColor,
@@ -104,7 +104,7 @@ class ThankYouPage extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  const Text(
+                   Text(
                     "This is the number that you will use to track your quote status",
                     style: TextStyle(
                       color: AppColors.mainColor,
@@ -121,14 +121,14 @@ class ThankYouPage extends StatelessWidget {
                 // Get.to(() => OrderReceipt(order!));
                 Get.to(() => Scaffold(
                       appBar: AppBar(
-                          title: const Text("Quotation",
+                          title:  Text("Quotation",
                               style: TextStyle(
                                 color: AppColors.mainColor,
                               )),
                           backgroundColor: Colors.transparent,
                           elevation: 0,
                           leading: IconButton(
-                              icon: const Icon(
+                              icon:  Icon(
                                 Icons.clear,
                                 color: AppColors.mainColor,
                               ),
@@ -162,7 +162,7 @@ class ThankYouPage extends StatelessWidget {
                     confirm: false,
                     to: "");
               },
-              child: const Text(
+              child:  Text(
                 "<< Back",
                 style: TextStyle(
                   color: AppColors.mainColor,

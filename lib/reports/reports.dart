@@ -20,7 +20,7 @@ import '../screens/finance/product_comparison.dart';
 import 'debtorsreport.dart';
 
 class Reports extends StatelessWidget {
-  Reports({Key? key}) : super(key: key);
+  Reports({super.key});
 
   final List<Map<String, dynamic>> operations = [
     {

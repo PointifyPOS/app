@@ -15,6 +15,7 @@ import '../../utils/helper.dart';
 import '../../widgets/major_title.dart';
 import 'components/product_card.dart';
 
+// ignore: must_be_immutable
 class ProductPage extends StatelessWidget {
   final Function? function;
   String? type;
@@ -24,8 +25,51 @@ class ProductPage extends StatelessWidget {
 
   final ShopController createShopController = Get.find<ShopController>();
   final ProductController productController = Get.find<ProductController>();
+
+  Widget outOfStockCollapsible({
+    required ProductController controller,
+    String? type,
+    Function? function,
+  }) {
+    return Obx(() {
+      final items = controller.outOfStockProducts;
+
+      if (items.isEmpty) return const SizedBox.shrink();
+
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: ExpansionTile(
+          leading: const Icon(Icons.warning, color: Colors.red),
+          title: const Text(
+            "Out of Stock",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          trailing: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              items.length.toString(),
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          ),
+          children: items.map((product) {
+            return productCard(
+              product: product,
+              type: type,
+              function: function,
+            );
+          }).toList(),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // print(productController.normalProducts.length);
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
@@ -49,7 +93,7 @@ class ProductPage extends StatelessWidget {
               onPressed: () async {
                 showBottomSheet(context);
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.download,
                 color: AppColors.mainColor,
               )),
@@ -57,7 +101,7 @@ class ProductPage extends StatelessWidget {
               onPressed: () async {
                 productController.getProductsBySort(type: "all");
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.refresh,
                 color: AppColors.mainColor,
               )),
@@ -69,7 +113,7 @@ class ProductPage extends StatelessWidget {
                   sharePositionOrigin: Rect.fromLTWH(0, 0, 0, 0),
                 );
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.share,
                 color: AppColors.mainColor,
               ))
@@ -199,10 +243,9 @@ class ProductPage extends StatelessWidget {
                       children: [
                         Obx(() {
                           return Text(productController.selectedSortOrder.value,
-                              style:
-                                  const TextStyle(color: AppColors.mainColor));
+                              style: TextStyle(color: AppColors.mainColor));
                         }),
-                        const Icon(
+                        Icon(
                           Icons.keyboard_arrow_down,
                           color: AppColors.mainColor,
                         )
@@ -254,10 +297,9 @@ class ProductPage extends StatelessWidget {
                       children: [
                         Obx(() {
                           return Text(productController.selectedSortOrder.value,
-                              style:
-                                  const TextStyle(color: AppColors.mainColor));
+                              style: TextStyle(color: AppColors.mainColor));
                         }),
-                        const Icon(
+                        Icon(
                           Icons.keyboard_arrow_down,
                           color: AppColors.mainColor,
                         )
@@ -270,35 +312,57 @@ class ProductPage extends StatelessWidget {
           const SizedBox(height: 10),
           Expanded(
             child: Obx(() {
-              return productController.loadingproducts.value
-                  ? const Center(child: CircularProgressIndicator())
-                  : productController.filteredProducts.isEmpty
-                      ? noItemsFound(context, true)
-                      : ListView.builder(
-                          itemCount: productController.filteredProducts.length,
-                          controller: productController.scrollController,
-                          itemBuilder: ((context, index) {
-                            Product productModel = productController
-                                .filteredProducts
-                                .elementAt(index);
-                            if (productModel.type == "service") {
-                              return serviceCard(
-                                  type: type,
-                                  product: productModel,
-                                  function: (Product product) {
-                                    return function!(product);
-                                  });
-                            }
-                            return productCard(
-                                product: productModel,
-                                type: type,
-                                function: function != null
-                                    ? (Product product) {
-                                        return function!(product);
-                                      }
-                                    : null);
-                          }),
-                        );
+              if (productController.loadingproducts.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (productController.filteredProducts.isEmpty) {
+                return noItemsFound(context, true);
+              }
+
+              return ListView(
+                controller: productController.scrollController,
+                children: [
+                  if (productController.selectedSortOrderSearch.value ==
+                      "outofstock")
+                    ...productController.outOfStockProducts.map((productModel) {
+                      return productCard(
+                        product: productModel,
+                        type: type,
+                        function: function != null
+                            ? (Product p) => function!(p)
+                            : null,
+                      );
+                    }).toList(),
+
+                  // 🔴 COLLAPSIBLE OUT-OF-STOCK SECTION
+                  if (productController.selectedSortOrderSearch.value !=
+                      "outofstock")
+                    outOfStockCollapsible(
+                      controller: productController,
+                      type: type,
+                      function: function,
+                    ),
+
+                  // ✅ NORMAL PRODUCTS
+                  ...productController.normalProducts.map((productModel) {
+                    if (productModel.type == "service") {
+                      return serviceCard(
+                        type: type,
+                        product: productModel,
+                        function: (Product p) => function!(p),
+                      );
+                    }
+
+                    return productCard(
+                      product: productModel,
+                      type: type,
+                      function:
+                          function != null ? (Product p) => function!(p) : null,
+                    );
+                  }).toList(),
+                ],
+              );
             }),
           ),
           Obx(() => productController.loadingMoreProducts.isTrue

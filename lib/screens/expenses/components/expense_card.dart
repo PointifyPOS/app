@@ -5,6 +5,7 @@ import 'package:pointify/controllers/expensecontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/expense.dart';
 
+import '../../../utils/colors.dart';
 import '../../../widgets/delete_dialog.dart';
 import '../create_expense.dart';
 
@@ -30,7 +31,7 @@ Widget expenseCard({required context, required ExpenseModel expense}) {
                     height: 40,
                     width: 40,
                     decoration: BoxDecoration(
-                      color: Colors.purple.shade100,
+                      color: AppColors.mainColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Icon(Icons.show_chart, color: Colors.white),

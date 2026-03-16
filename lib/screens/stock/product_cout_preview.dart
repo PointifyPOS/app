@@ -25,7 +25,7 @@ class ProductCountPreview extends StatelessWidget {
                 child: Text(
                   'Products Counted ${stockController.productsCountCart.length}',
                   style:
-                      const TextStyle(color: AppColors.mainColor, fontSize: 16),
+                       TextStyle(color: AppColors.mainColor, fontSize: 16),
                 ),
               ),
               Expanded(

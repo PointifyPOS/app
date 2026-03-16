@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:pointify/responsive/responsiveness.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../controllers/authcontroller.dart';
+import '../../../utils/app_config.dart';
 import '../../../utils/themer.dart';
 
 class SignUp extends StatelessWidget {
@@ -35,11 +37,8 @@ class SignUp extends StatelessWidget {
           children: [
             Column(
               children: [
-                Image.asset(
-                  "assets/images/logo2.png",
-                  width: 250,
-                ),
-                const Text("An enterprise in your hands"),
+                if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250,),
+                Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
                 const SizedBox(
                   height: 40,
                 ),
@@ -59,7 +58,7 @@ class SignUp extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.only(left: 20.0, right: 20),
           child: Text(
-            "Create Business Owner Account",
+            "Create Business Account",
             style: TextStyle(
                 color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
           ),
@@ -82,10 +81,7 @@ class SignUp extends StatelessWidget {
                     return null;
                   },
                   keyboardType: TextInputType.text,
-                  decoration: isSmallScreen(context)
-                      ? ThemeHelper().textInputDecoration(
-                          'Username*', 'Enter your username')
-                      : ThemeHelper().textInputDecorationDesktop(
+                  decoration: ThemeHelper().textInputDecoration(
                           'Username*', 'Enter your username'),
                 ),
               ),
@@ -94,10 +90,7 @@ class SignUp extends StatelessWidget {
                 decoration: ThemeHelper().inputBoxDecorationShaddow(),
                 child: TextFormField(
                   controller: authController.emailController,
-                  decoration: isSmallScreen(context)
-                      ? ThemeHelper().textInputDecoration(
-                          "E-mail address*", "Enter your email")
-                      : ThemeHelper().textInputDecorationDesktop(
+                  decoration: ThemeHelper().textInputDecoration(
                           "E-mail address*", "Enter your email"),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -162,7 +155,7 @@ class SignUp extends StatelessWidget {
                             authController.showPassword.value =
                                 !authController.showPassword.value;
                           })
-                        : ThemeHelper().textInputDecorationDesktop(
+                        : ThemeHelper().textInputDecoration(
                             "Password*",
                             "Enter your password",
                             authController.showPassword.value
@@ -232,7 +225,7 @@ class SignUp extends StatelessWidget {
                         text: 'terms and conditions and privacy policy',
                         recognizer: TapGestureRecognizer()
                           ..onTap = () async {
-                            String url = "https://pointifypos.com/privacy";
+                            String url = AppConfig.privacy_policy;
                             await launchUrl(Uri.parse(url));
                           },
                         style: const TextStyle(fontWeight: FontWeight.bold),

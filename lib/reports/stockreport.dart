@@ -22,7 +22,7 @@ class StockReportScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title:  Text(
           "Stock Report",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -39,7 +39,7 @@ class StockReportScreen extends StatelessWidget {
                       ),
                     ));
               },
-              icon: const Icon(
+              icon:  Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               ))
@@ -48,7 +48,7 @@ class StockReportScreen extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

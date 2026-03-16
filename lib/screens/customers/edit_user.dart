@@ -6,6 +6,7 @@ import 'package:pointify/screens/customers/customer_info_page.dart';
 
 import '../../controllers/customercontroller.dart';
 import '../../controllers/homecontroller.dart';
+import '../../utils/colors.dart';
 
 class EditCustomer extends StatelessWidget {
   final String? userType;
@@ -52,8 +53,8 @@ class EditCustomer extends StatelessWidget {
                       context, customersController.currentCustomer.value!);
                 },
                 child: Text("Save Changes".toUpperCase(),
-                    style: const TextStyle(
-                        color: Colors.purple, fontWeight: FontWeight.bold)))
+                    style:  TextStyle(
+                        color: AppColors.mainColor, fontWeight: FontWeight.bold)))
         ],
       ),
       body: Container(
@@ -127,8 +128,8 @@ class EditCustomer extends StatelessWidget {
                   },
                   child: Text(
                     "Cancel".toUpperCase(),
-                    style: const TextStyle(
-                        color: Colors.purple, fontWeight: FontWeight.bold),
+                    style:  TextStyle(
+                        color: AppColors.mainColor, fontWeight: FontWeight.bold),
                   ),
                 ),
                 TextButton(
@@ -138,8 +139,8 @@ class EditCustomer extends StatelessWidget {
                           context, customersController.currentCustomer.value!);
                     },
                     child: Text("Save Changes".toUpperCase(),
-                        style: const TextStyle(
-                            color: Colors.purple, fontWeight: FontWeight.bold)))
+                        style:  TextStyle(
+                            color: AppColors.mainColor, fontWeight: FontWeight.bold)))
               ],
             )
           ],

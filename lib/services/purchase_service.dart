@@ -30,10 +30,22 @@ class PurchaseService {
     String? paymentType = "",
     String? customerId = "",
     String? supplier = "",
+    int page = 1,
+    int limit = 20,
   }) async {
-    String url =
-        "${EndPoints.purchase}?start=$fromDate&end=$toDate&shopId=$shopId&attendantId=$attendantId&paymentType=$paymentType&customerId=$customerId&supplierId=$supplier";
+    String url = "${EndPoints.purchase}"
+        "?start=$fromDate"
+        "&end=$toDate"
+        "&shopId=$shopId"
+        "&attendantId=$attendantId"
+        "&paymentType=$paymentType"
+        "&customerId=$customerId"
+        "&supplierId=$supplier"
+        "&page=$page"
+        "&limit=$limit";
+
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
+
     return response;
   }
 

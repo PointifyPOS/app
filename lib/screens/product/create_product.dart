@@ -1492,18 +1492,18 @@ class CreateProduct extends StatelessWidget {
       collapsedIconColor: AppColors.mainColor,
       title: Text(
         productController.isProduct() ? "Product Images" : "Service Images",
-        style: const TextStyle(
+        style:  TextStyle(
             color: AppColors.mainColor,
             fontSize: 18,
             fontWeight: FontWeight.w600),
       ),
-      leading: const Icon(Icons.image, color: AppColors.mainColor),
+      leading:  Icon(Icons.image, color: AppColors.mainColor),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: IconButton(
-              icon: const Icon(Icons.add_a_photo, color: AppColors.mainColor),
+              icon:  Icon(Icons.add_a_photo, color: AppColors.mainColor),
               color: AppColors.lightDeepPurple,
               onPressed: () {
                 addImageButtonCallback(context);

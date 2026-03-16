@@ -6,6 +6,7 @@ import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/screens/purchases/create_purchase.dart';
 import 'package:pointify/screens/usage/extend_usage.dart';
+import 'package:pointify/utils/colors.dart';
 
 import '../controllers/homecontroller.dart';
 import '../main.dart';
@@ -30,6 +31,12 @@ missingValueDialog(context, message) {
           ],
         );
       });
+}
+Color parseColor(String? hex) {
+  if (hex == null || hex.isEmpty) return Colors.grey; // fallback
+  hex = hex.replaceAll('#', '');
+  if (hex.length == 6) hex = 'FF$hex'; // add opacity if missing
+  return Color(int.parse('0x$hex'));
 }
 
 class Helper extends StatelessWidget {
@@ -80,6 +87,7 @@ class Helper extends StatelessWidget {
                       true
               ? null
               : FloatingActionButton(
+                  backgroundColor: AppColors.secondary_color,
                   onPressed: () {
                     showShortCutBottomSheet(context: context);
                   },
@@ -264,9 +272,9 @@ generateReportAlert(BuildContext context, String type) {
                     reportStatus: type,
                     email: productController.backupemail);
               },
-              child: const Text(
+              child:  Text(
                 'Send',
-                style: TextStyle(color: Colors.purple, fontSize: 18.0),
+                style: TextStyle(color: AppColors.mainColor, fontSize: 18.0),
               ))
         ],
       ),

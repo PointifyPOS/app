@@ -33,7 +33,6 @@ class SalesSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(reportsController.salesCard);
     return Helper(
       widget: Obx(() {
         return ListView(
@@ -193,7 +192,7 @@ class SalesSummary extends StatelessWidget {
                                                 title: "Sales returns",
                                               ));
                                         }
-                                        if (key == "paid") {
+                                        if (key == "debtpaid") {
                                           paymentController
                                               .getPaymentsByShopAndDate(
                                                   userController.currentUser
@@ -217,7 +216,7 @@ class SalesSummary extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "Sales Report",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -235,7 +234,7 @@ class SalesSummary extends StatelessWidget {
                       ),
                     ));
               },
-              icon: const Icon(
+              icon: Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               ))
@@ -244,7 +243,7 @@ class SalesSummary extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon: const Icon(
+          icon: Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

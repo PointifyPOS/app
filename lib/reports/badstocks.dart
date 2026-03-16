@@ -139,7 +139,7 @@ class BadStockPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.credit_card,
+                         Icon(Icons.credit_card,
                             color: AppColors.mainColor),
                         const SizedBox(width: 10),
                         Column(
@@ -150,7 +150,7 @@ class BadStockPage extends StatelessWidget {
                                   (previousValue, element) =>
                                       previousValue +
                                       element.quantity! * element.unitPrice!)),
-                              style: const TextStyle(
+                              style:  TextStyle(
                                   color: AppColors.mainColor, fontSize: 21),
                             ),
                           ],

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:pointify/main.dart';
 
 class PrinterController extends GetxController {
   Future<List<int>> printSalesReceipt({
@@ -12,6 +14,7 @@ class PrinterController extends GetxController {
     String currency = "KES",
     String email = "",
     String paybill = "",
+    String date = "",
     String paybillAccount = "",
     String paymentType = "",
     String receiptUrl = "",
@@ -28,8 +31,8 @@ class PrinterController extends GetxController {
       styles: const PosStyles(
         align: PosAlign.center,
         bold: true,
-        height: PosTextSize.size2,
-        width: PosTextSize.size2,
+        height: PosTextSize.size1,
+        width: PosTextSize.size1,
       ),
     );
 
@@ -76,16 +79,18 @@ class PrinterController extends GetxController {
       );
     }
     bytes += generator.text(
-      'Date: ${DateTime.now().toLocal()}',
+      'Date: ${DateFormat("MMM dd yyyy hh:mm a").format(DateTime.parse(date).toUtc())}',
       styles: const PosStyles(align: PosAlign.center),
     );
     bytes += generator.text('-' * 32);
 
-    bytes += generator.text(
-      'Item        Qty     Price     Total',
-      styles: const PosStyles(align: PosAlign.left, bold: true),
-    );
-    bytes += generator.text('-' * 32);
+    bytes += generator.row([
+      PosColumn(text: "Item", width: 6),
+      PosColumn(text: "Qty", width: 2),
+      PosColumn(text: "Cost", width: 2),
+      PosColumn(text: "Total", width: 2),
+    ]);
+    bytes += generator.hr();
 
     double subtotal = 0;
 
@@ -96,15 +101,12 @@ class PrinterController extends GetxController {
       final total = price * qty;
       subtotal += total;
 
-      // print product name on its own line
-      bytes += generator.text(name.toString());
-
-      // pad so that qty is under Qty column
-      final indent = ' ' * 16;
-      final qtyStr = qty.toString().padLeft(3);
-      final priceStr = price.toStringAsFixed(2).padLeft(7);
-      final totalStr = total.toStringAsFixed(2).padLeft(10);
-      bytes += generator.text('$indent$qtyStr  $priceStr  $totalStr');
+      bytes += generator.row([
+        PosColumn(text: name.length > 18 ? name.substring(0, 18) : name, width: 6),
+        PosColumn(text: "$qty", width: 2, styles: PosStyles(align: PosAlign.center)),
+        PosColumn(text: price.toStringAsFixed(0), width: 2, styles: PosStyles(align: PosAlign.right)),
+        PosColumn(text: total.toStringAsFixed(0), width: 2, styles: PosStyles(align: PosAlign.right)),
+      ]);
     }
 
     bytes += generator.text('-' * 32);
@@ -117,7 +119,7 @@ class PrinterController extends GetxController {
       styles: const PosStyles(align: PosAlign.right),
     );
     bytes += generator.text(
-      'VAT (16%):     $currency${vat.toStringAsFixed(2)}',
+      'VAT (${userController.currentUser.value?.primaryShop?.tax}%):     $currency${vat.toStringAsFixed(2)}',
       styles: const PosStyles(align: PosAlign.right),
     );
     bytes += generator.text(
@@ -127,15 +129,20 @@ class PrinterController extends GetxController {
 
     bytes += generator.text('Payment: $paymentType');
 
-    // QR Code
-    bytes += generator.qrcode(receiptUrl);
+    bytes += generator.qrcode(
+      receiptUrl,
+      size: QRSize.size5,           // bigger
+      cor: QRCorrection.H,             // high error correction
+    );
+    bytes += generator.feed(1);
+    bytes += generator.text(" ");
 
     bytes += generator.text(
       'Thank you!',
       styles: const PosStyles(align: PosAlign.center, bold: true),
     );
     bytes += generator.text(
-      'System by Pointify,\ncontacts: 0720044055',
+      'System by Pointify,\ncontacts: 0791 334 234',
       styles: const PosStyles(align: PosAlign.center),
     );
     bytes += generator.feed(1);

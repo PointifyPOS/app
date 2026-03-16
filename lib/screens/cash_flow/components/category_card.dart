@@ -143,7 +143,7 @@ actionsBottomSheet(
                                         },
                                         child: Text(
                                           "Cancel".toUpperCase(),
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                               color: AppColors.mainColor),
                                         )),
                                     const SizedBox(
@@ -163,7 +163,7 @@ actionsBottomSheet(
                                         },
                                         child: Text(
                                           "Save".toUpperCase(),
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                               color: AppColors.mainColor),
                                         )),
                                   ],

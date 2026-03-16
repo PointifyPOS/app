@@ -227,7 +227,7 @@ class CashFlowController extends GetxController {
         }),
         DataCell(Text(
           list[i]['in'].toString(),
-          style: const TextStyle(
+          style:  TextStyle(
               color: AppColors.mainColor, fontWeight: FontWeight.bold),
         )),
         DataCell(Text(list[i]['out'].toString())),

@@ -90,7 +90,7 @@ class CreateWarehouse extends StatelessWidget {
         const SizedBox(height: 10),
         TextFormField(
           controller: shopController.warehouseemail,
-          decoration: ThemeHelper().textInputDecorationDesktop(
+          decoration: ThemeHelper().textInputDecoration(
               // 'Shop Address',
               // 'Enter your shop address',
               ),
@@ -118,7 +118,7 @@ class CreateWarehouse extends StatelessWidget {
                 onChange: (value) {
                   shopController.productionEnabled.value = value;
                 },
-                onColor: Colors.purple,
+                onColor: AppColors.mainColor,
                 value: shopController.productionEnabled.value,
                 offColor: Colors.grey)
           ],

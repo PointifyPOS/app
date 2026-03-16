@@ -109,10 +109,7 @@ class AttendantLogin extends StatelessWidget {
                     return null;
                   },
                   keyboardType: TextInputType.number,
-                  decoration: isSmallScreen(context)
-                      ? ThemeHelper()
-                          .textInputDecoration('User Id', 'Enter your UserID')
-                      : ThemeHelper().textInputDecorationDesktop(
+                  decoration: ThemeHelper().textInputDecoration(
                           'UserId', 'Enter your UserID'),
                 ),
               ),
@@ -128,10 +125,7 @@ class AttendantLogin extends StatelessWidget {
                     }
                     return null;
                   },
-                  decoration: isSmallScreen(context)
-                      ? ThemeHelper().textInputDecoration(
-                          'Password', 'Enter your password')
-                      : ThemeHelper().textInputDecorationDesktop(
+                  decoration: ThemeHelper().textInputDecoration(
                           'Password', 'Enter your password'),
                 ),
               ),

@@ -1,431 +1,562 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_paystack_plus/flutter_paystack_plus.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/inapp_purchases.dart';
+import 'package:pointify/controllers/authcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
+import 'package:pointify/controllers/paymentcontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/package.dart';
 import 'package:pointify/models/shop.dart';
-import 'package:pointify/widgets/major_title.dart';
-
-import '../../functions/functions.dart';
+import '../../models/payment_methods.dart';
 import '../../utils/colors.dart';
-import '../../utils/themer.dart';
-import '../../widgets/alert.dart';
-import '../../widgets/minor_title.dart';
 
 class ShopsToRenew extends StatelessWidget {
-  Package plan;
-  Shop? shop;
+  final Package plan;
+  final Shop? shop;
+
   ShopsToRenew({super.key, required this.plan, this.shop});
-  ShopController shopController = Get.find<ShopController>();
-  InappPurchasesController inappPurchasesController =
-      Get.find<InappPurchasesController>();
+
+  final ShopController shopController = Get.find();
+  final PaymentController paymentController = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Choose Shops/Branches To Renew',
-            style: TextStyle(color: Colors.black, fontSize: 20),
+      backgroundColor: const Color(0xffF7F8FA),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        title: const Text(
+          "Select shops to renew",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
           ),
         ),
-        body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Column(children: [
-            Expanded(
-              child: Obx(() {
-                return shopController.gettingShopsLoad.isTrue
-                    ? const Center(child: CircularProgressIndicator())
-                    : shopController.expiredShops.isEmpty
-                        ? Center(
-                            child: majorTitle(
-                                title: "You do not have expired shops yet",
-                                color: Colors.black,
-                                size: 16.0),
-                          )
-                        : Column(
-                            children: [
-                              Center(
-                                child: Text(
-                                  "Maximum number of shops: ${plan.maxShops}",
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              Expanded(
-                                child: ListView.builder(
-                                    itemCount:
-                                        shopController.expiredShops.length,
-                                    itemBuilder: (context, index) {
-                                      Shop shopBody = shopController
-                                          .expiredShops
-                                          .elementAt(index);
-                                      return InkWell(
-                                        onTap: () {
-                                          if (shopController.shopsRenew
-                                                  .indexWhere((element) =>
-                                                      element.id ==
-                                                      shopBody.id) ==
-                                              -1) {
-                                            if (shopController
-                                                    .shopsRenew.length >=
-                                                plan.maxShops!) {
-                                              generalAlert(
-                                                title: "Error",
-                                                message:
-                                                    "Maximum number of shops reached",
-                                              );
-                                              return;
-                                            }
-                                            shopController.shopsRenew
-                                                .add(shopBody);
-                                          } else {
-                                            shopController.shopsRenew.removeAt(
-                                                shopController.shopsRenew
-                                                    .indexWhere((element) =>
-                                                        element.id ==
-                                                        shopBody.id));
-                                          }
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
-                                            elevation: 4,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(10),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        majorTitle(
-                                                            title:
-                                                                "${shopBody.name}",
-                                                            color: Colors.black,
-                                                            size: 16.0),
-                                                        const SizedBox(
-                                                            height: 10),
-                                                        Text(
-                                                          "Location: ${shopBody.location}",
-                                                          maxLines: 2,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Obx(
-                                                    () => Checkbox(
-                                                        value: shopController
-                                                                    .shopsRenew
-                                                                    .indexWhere((element) =>
-                                                                        element
-                                                                            .id ==
-                                                                        shopBody
-                                                                            .id) !=
-                                                                -1
-                                                            ? true
-                                                            : false,
-                                                        onChanged: (value) {}),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                              ),
-                            ],
-                          );
-              }),
-            )
-          ]),
-        ),
-        bottomNavigationBar: Obx(() => BottomAppBar(
-              color: Colors.white,
-              height: shopController.shopsRenew.isEmpty ||
-                      MediaQuery.of(context).size.width > 600
-                  ? 0
-                  : kBottomNavigationBarHeight * 1.8,
-              child: Obx(() {
-                return shopController.shopsRenew.isEmpty ||
-                        MediaQuery.of(context).size.width > 600
-                    ? Container(
-                        height: 0,
-                      )
-                    : Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        child: InkWell(
-                          splashColor: Colors.transparent,
-                          onTap: (shopController.isCurrentPackage(plan) &&
-                                  shopController.checkDaysRemaining(
-                                          shop: shop) >
-                                      0)
-                              ? null
-                              : () {
-                                  if (Platform.isIOS) {
-                                    inappPurchasesController
-                                        .buyNonConsumableProduct(plan.id!);
-                                  } else {
-                                    showModalBottomSheet(
-                                        context: Get.context!,
-                                        isScrollControlled: true,
-                                        backgroundColor: Colors.white,
-                                        builder: (context) => Padding(
-                                              padding: EdgeInsets.only(
-                                                  bottom: MediaQuery.of(context)
-                                                      .viewInsets
-                                                      .bottom),
-                                              child: Container(
-                                                color: Colors.white,
-                                                height: MediaQuery.of(context)
-                                                        .copyWith()
-                                                        .size
-                                                        .height *
-                                                    0.50,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 10),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Center(
-                                                      child: Text(
-                                                        "Pay to extend ${shop != null ? shop?.name : userController.currentUser.value!.primaryShop!.name} usage",
-                                                        style: const TextStyle(
-                                                            fontSize: 21),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 20,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Text(
-                                                          "Package details",
-                                                          style: TextStyle(
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Text(
-                                                          userController
-                                                                      .currentUser
-                                                                      .value
-                                                                      ?.primaryShop!
-                                                                      .currency !=
-                                                                  "KES"
-                                                              ? " Amount : USD ${plan.amountusd!}"
-                                                              : " Amount : ${htmlPrice(plan.amount)}",
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 14),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Text(
-                                                          "Duration : ${plan.durationValue} days",
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 14),
-                                                        ),
-                                                        if (userController
-                                                                .currentUser
-                                                                .value
-                                                                ?.primaryShop!
-                                                                .currency ==
-                                                            "KES")
-                                                          RadioListTile(
-                                                            contentPadding:
-                                                                EdgeInsets.zero,
-                                                            title: Row(
-                                                              children: [
-                                                                Image.asset(
-                                                                  "assets/images/mpesalogo.png",
-                                                                  width: 50,
-                                                                ),
-                                                                const Text(""),
-                                                              ],
-                                                            ),
-                                                            value: "mpesa",
-                                                            groupValue: "mpesa",
-                                                            onChanged:
-                                                                (value) {},
-                                                          ),
-                                                        if (userController
-                                                                .currentUser
-                                                                .value
-                                                                ?.primaryShop!
-                                                                .currency !=
-                                                            "KES")
-                                                          RadioListTile(
-                                                            contentPadding:
-                                                                EdgeInsets.zero,
-                                                            title: const Row(
-                                                              children: [
-                                                                Text(
-                                                                    "Pay with Stripe"),
-                                                                Text(""),
-                                                              ],
-                                                            ),
-                                                            value: "mpesa",
-                                                            groupValue: "mpesa",
-                                                            onChanged:
-                                                                (value) {},
-                                                          ),
-                                                        if (userController
-                                                                .currentUser
-                                                                .value
-                                                                ?.primaryShop!
-                                                                .currency ==
-                                                            "KES")
-                                                          TextFormField(
-                                                            controller:
-                                                                userController
-                                                                    .phoneController,
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return 'Please enter mpesa number';
-                                                              }
-                                                              return null;
-                                                            },
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .emailAddress,
-                                                            decoration: ThemeHelper()
-                                                                .textInputDecorationDesktop(
-                                                                    'Mpesa Phone Number',
-                                                                    'Enter mpesa number'),
-                                                          ),
-                                                        const SizedBox(
-                                                          height: 20,
-                                                        ),
-                                                        Center(
-                                                          child: Obx(
-                                                            () => shopController
-                                                                    .subscribing
-                                                                    .isTrue
-                                                                ? const Center(
-                                                                    child:
-                                                                        CircularProgressIndicator(),
-                                                                  )
-                                                                : InkWell(
-                                                                    onTap: () {
-                                                                      Shop? shopp = shop ??
-                                                                          userController
-                                                                              .currentUser
-                                                                              .value
-                                                                              ?.primaryShop;
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: Obx(() {
+        if (shopController.gettingShopsLoad.isTrue) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-                                                                      var currency = shopp?.currency ==
-                                                                              "KES"
-                                                                          ? "mpesa"
-                                                                          : "stripe";
-                                                                      shopController.subscribe(
-                                                                          shopp!,
-                                                                          package:
-                                                                              plan,
-                                                                          type:
-                                                                              currency);
-                                                                    },
-                                                                    child:
-                                                                        Container(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              25,
-                                                                          vertical:
-                                                                              8),
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: Colors
-                                                                            .amber,
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(50),
-                                                                        border: Border.all(
-                                                                            color:
-                                                                                Colors.amber,
-                                                                            width: 2),
-                                                                      ),
-                                                                      child: minorTitle(
-                                                                          title:
-                                                                              "Pay now",
-                                                                          color:
-                                                                              AppColors.mainColor),
-                                                                    )),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ));
-                                  }
-                                },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    width: 3, color: AppColors.mainColor),
-                                borderRadius: BorderRadius.circular(40)),
-                            child: Center(
-                              child: Platform.isIOS &&
-                                      inappPurchasesController.loading.isTrue
-                                  ? minorTitle(
-                                      title: "Please wait...",
-                                      color: AppColors.mainColor,
-                                      size: 18.0)
-                                  : Platform.isIOS &&
-                                          inappPurchasesController
-                                              .loading.isFalse
-                                      ? minorTitle(
-                                          title: "Proceed",
-                                          color: AppColors.mainColor,
-                                          size: 18.0)
-                                      : majorTitle(
-                                          title: "Proceed",
-                                          color: AppColors.mainColor,
-                                          size: 18.0),
-                            ),
-                          ),
-                        ),
-                      );
-              }),
-            )));
+        if (shopController.expiredShops.isEmpty) {
+          return _emptyState();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _selectionHeader(),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.only(bottom: 120),
+                itemCount: shopController.expiredShops.length,
+                itemBuilder: (_, index) =>
+                    _shopTile(shopController.expiredShops[index]),
+              ),
+            ),
+          ],
+        );
+      }),
+      bottomSheet: Obx(() => _bottomAction(context)),
+    );
+  }
+
+  // ================= HEADER =================
+
+  Widget _selectionHeader() {
+    final selected = shopController.shopsRenew.length;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Choose up to ${plan.maxShops} shop(s)",
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              _countChip(
+                "$selected selected",
+                selected > 0 ? AppColors.mainColor : Colors.grey,
+              ),
+              const SizedBox(width: 8),
+              _countChip(
+                "${plan.maxShops! - selected} remaining",
+                Colors.grey.shade700,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _countChip(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  // ================= SHOP TILE =================
+
+  Widget _shopTile(Shop shop) {
+    final selected = shopController.shopsRenew.any((e) => e.id == shop.id);
+
+    return GestureDetector(
+      onTap: () {
+        if (!selected) {
+          if (shopController.shopsRenew.length >= plan.maxShops!) {
+            ScaffoldMessenger.of(Get.context!).showSnackBar(
+              SnackBar(
+                content: Text(
+                  "You can only select ${plan.maxShops} shops",
+                ),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+
+            return;
+          }
+          shopController.shopsRenew.add(shop);
+        } else {
+          shopController.shopsRenew
+              .removeWhere((element) => element.id == shop.id);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: selected ? Colors.white : Colors.white.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? AppColors.mainColor : Colors.grey.shade300,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    shop.name ?? "",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    shop.location ?? "",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: selected
+                  ? const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      key: ValueKey("checked"),
+                    )
+                  : const Icon(
+                      Icons.radio_button_unchecked,
+                      color: Colors.grey,
+                      key: ValueKey("unchecked"),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================= BOTTOM ACTION =================
+
+  Widget _bottomAction(BuildContext context) {
+    if (shopController.shopsRenew.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                "${shopController.shopsRenew.length}/${plan.maxShops} selected",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainColor,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              onPressed: () => _paymentSheet(context),
+              child: const Text("Continue",
+                  style: TextStyle(fontSize: 15, color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================= PAYMENT =================
+  Widget _sheetHandle() {
+    return Center(
+      child: Container(
+        width: 40,
+        height: 4,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+    );
+  }
+
+  void _paymentSheet(BuildContext context) {
+    paymentController.getPaymentMethods();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Obx(
+        () => Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sheetHandle(),
+              const SizedBox(height: 16),
+              const Text(
+                "Choose payment method",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Complete your subscription renewal",
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ...paymentController.paymentmethods
+                  .map((m) => _paymentOption(context, m))
+                  .toList(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _paymentSubtitle(String name) {
+    switch (name) {
+      case "mpesa":
+        return "Pay using your mobile money";
+      case "paystack":
+        return "Card or bank transfer";
+      case "stripe":
+        return "Visa, Mastercard, Apple Pay";
+      default:
+        return "Fast and secure payment";
+    }
+  }
+
+  void _paywithMpesa(BuildContext context) async {
+    final Shop shopp = shop ?? userController.currentUser.value!.primaryShop!;
+
+    // 1️⃣ Start Mpesa (STK push)
+    final response = await shopController.subscribe(
+      shopp,
+      package: plan,
+      type: "mpesa",
+    );
+
+    if (response == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to initiate Mpesa payment")),
+      );
+      return;
+    }
+
+    // 2️⃣ NOW show waiting dialog (STK was sent)
+    showMpesaWaitingDialog(context);
+
+    // 3️⃣ Start polling
+    final reference = response; // or your reference
+    _listenForMpesaPayment(context, reference);
+  }
+
+  void showMpesaWaitingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 🔒 user CANNOT close
+      builder: (_) => WillPopScope(
+        onWillPop: () async => false, // 🔒 disable back button
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text(
+                  "Waiting for Mpesa payment",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Check your phone and enter your Mpesa PIN to complete payment.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _listenForMpesaPayment(
+    BuildContext context,
+    String reference,
+  ) async {
+    const int maxAttempts = 12; // ~1 minute
+    int attempts = 0;
+
+    while (attempts < maxAttempts) {
+      await Future.delayed(const Duration(seconds: 5));
+      final status = await shopController.checkPaymentStatus(reference);
+      if (status == "success") {
+        Navigator.pop(context); // close waiting sheet
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Payment successful"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await Get.find<AuthController>().initUser();
+        shopController.shopsRenew.clear();
+        return;
+      }
+
+      if (status == "failed") {
+        Navigator.pop(context);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Payment failed"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      attempts++;
+    }
+
+    // timeout
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Payment pending, we’ll notify you"),
+      ),
+    );
+  }
+
+  void _paywithStripe() {
+    Get.snackbar(
+      "Stripe",
+      "Stripe payment coming soon",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+
+  String _generateRef() {
+    return "ref_${DateTime.now().millisecondsSinceEpoch}";
+  }
+
+  Future<void> _paywithPaystack(
+      BuildContext context, PaymentMethods pay) async {
+    final String reference = _generateRef();
+    var amount = plan.amount!;
+    if (userController.currentUser.value?.primaryShop?.currency == "USD") {
+      amount = plan.amountusd!;
+    }
+    try {
+      await FlutterPaystackPlus.openPaystackPopup(
+        context: context,
+        publicKey: pay.settings!['publicKey'],
+        secretKey: pay.settings!['secretKey'],
+        customerEmail: userController.currentUser.value?.email ?? "",
+        amount: (amount * 100).toString(), // Paystack uses kobo/cents
+        currency: userController.currentUser.value?.primaryShop?.currency,
+        reference: reference,
+        callBackUrl: pay.settings!['callbackUrl'],
+        metadata: {
+          "packageId": plan.id,
+          "shops": shopController.shopsRenew.map((s) => s.id).toList(),
+          "userId": userController.currentUser.value?.id,
+          "shop": userController.currentUser.value?.primaryShop?.id
+        },
+        onSuccess: () async {
+          await Get.find<AuthController>().initUser();
+          debugPrint("Paystack payment successful");
+        },
+        onClosed: () {
+          debugPrint("Paystack payment closed");
+        },
+      );
+    } catch (e) {
+      debugPrint("Paystack error: $e");
+    }
+  }
+
+  Widget _paymentOption(BuildContext context, PaymentMethods method) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+
+        if (method.name == "mpesa") {
+          _paywithMpesa(context);
+        } else if (method.name == "paystack") {
+          _paywithPaystack(context, method);
+        } else if (method.name == "stripe") {
+          _paywithStripe();
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Image.asset(
+                "assets/images/${method.name}.png",
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    method.name!.capitalizeFirst!,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _paymentSubtitle(method.name!),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: Colors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _emptyState() {
+    return const Center(
+      child: Text("No expired shops"),
+    );
   }
 }

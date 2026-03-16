@@ -26,7 +26,7 @@ import 'components/sales_rerurn_card.dart';
 class AllSalesPage extends StatefulWidget {
   final String? page;
 
-  const AllSalesPage({Key? key, required this.page}) : super(key: key);
+  const AllSalesPage({super.key, required this.page});
 
   @override
   State<AllSalesPage> createState() => _AllSalesPageState();

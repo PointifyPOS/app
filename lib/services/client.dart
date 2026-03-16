@@ -38,7 +38,7 @@ class DbBase {
         'Content-Type': 'application/json',
         "Authorization": "Bearer ${await prefs.getString('user_token')}",
       };
-      debugPrintMessage(headers);
+      // debugPrintMessage(headers);
 
       int maxRetries = 3; // Maximum number of retry attempts
       int retryDelayInSeconds = 3; // Delay in seconds between retries

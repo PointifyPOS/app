@@ -26,7 +26,7 @@ class ProductStockinWarehousePreview extends StatelessWidget {
                 child: Text(
                   'Products ${wareHouseController.productsCountCart.length}',
                   style:
-                      const TextStyle(color: AppColors.mainColor, fontSize: 16),
+                       TextStyle(color: AppColors.mainColor, fontSize: 16),
                 ),
               ),
               Expanded(

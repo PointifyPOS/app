@@ -56,67 +56,64 @@ Widget filterByDates({required Function onFilter}) {
   );
 }
 
+DateTime startOfDay(DateTime d) => DateTime(d.year, d.month, d.day);
+
+DateTime endOfDay(DateTime d) =>
+    DateTime(d.year, d.month, d.day, 23, 59, 59, 999);
+
 Widget filterCard(
     {required Function onFilter, String title = "", String key = ""}) {
   return InkWell(
     onTap: () async {
-      DateTime from = DateTime.now();
-      DateTime to = DateTime.now();
-      if (key == "today") {
-        from = DateTime.now();
-        to = from;
+      final now = DateTime.now();
+      late DateTime from;
+      late DateTime to;
+
+      switch (key) {
+        case "today":
+          from = startOfDay(now);
+          to = endOfDay(now);
+          break;
+
+        case "yesterday":
+          final y = now.subtract(const Duration(days: 1));
+          from = startOfDay(y);
+          to = endOfDay(y);
+          break;
+
+        case "week":
+          // Monday is 1, Sunday is 7
+          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          from = startOfDay(startOfWeek);
+          to = endOfDay(startOfWeek.add(const Duration(days: 6)));
+          break;
+
+        case "month":
+          from = DateTime(now.year, now.month, 1);
+          to = endOfDay(DateTime(now.year, now.month + 1, 0));
+          break;
+
+        case "year":
+          from = DateTime(now.year, 1, 1);
+          to = endOfDay(DateTime(now.year, 12, 31));
+          break;
+
+        case "custom":
+          Get.to(() => DateRangerPicker(
+                function: (String fromm, String too) {
+                  from = startOfDay(DateTime.parse(fromm));
+                  to = endOfDay(DateTime.parse(too));
+                  Get.back();
+                  onFilter(from, to, key);
+                },
+              ));
+          return;
+
+        default:
+          return;
       }
 
-      if (key == "yesterday") {
-        from = DateTime.now().subtract(const Duration(days: 1));
-        to = from;
-      }
-
-      if (key == "week") {
-        from = DateTime.now().subtract(const Duration(days: 7));
-        to = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-        );
-      }
-
-      if (key == "month") {
-        from = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          1,
-        );
-        to = DateTime(
-          DateTime.now().year,
-          DateTime.now().month + 1,
-          0,
-        );
-      }
-
-      if (key == "year") {
-        from = DateTime(
-          DateTime.now().year,
-          1,
-          1,
-        );
-        to = DateTime(
-          DateTime.now().year,
-          DateTime.now().month + 1,
-          0,
-        );
-      }
-
-      if (key == "custom") {
-        Get.to(() => DateRangerPicker(function: (String fromm, String too) {
-              from = DateTime.parse(fromm);
-              to = DateTime.parse(too);
-              Get.back();
-              onFilter(from, to, key);
-            }));
-      } else {
-        onFilter(from, to, key);
-      }
+      onFilter(from, to, key);
     },
     child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

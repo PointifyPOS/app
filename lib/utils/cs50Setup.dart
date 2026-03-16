@@ -4,6 +4,7 @@ import 'package:cs50sdkupdate/cs50sdkupdate.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/utils/app_config.dart';
 
 import '../functions/functions.dart';
 import '../main.dart';
@@ -120,9 +121,9 @@ class Cs50PrinterSetup {
     await _cs50sdkupdatePlugin.printSetAlign(1);
     String url = "";
     if (Platform.isAndroid) {
-      url = androidLink;
+      url = AppConfig.androidLink;
     } else if (Platform.isIOS) {
-      url = iosLink;
+      url = AppConfig.iosLink;
     }
     if (url != "") {
       await _printQRCode(url);

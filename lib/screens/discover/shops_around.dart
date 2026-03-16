@@ -39,14 +39,14 @@ class ShopsAround extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-            icon: const Icon(Icons.clear, color: AppColors.mainColor),
+            icon:  Icon(Icons.clear, color: AppColors.mainColor),
             onPressed: () {
               Get.back();
             }),
         title: Obx(
           () => Text(
             "Shops Around (${shopController.shopsAround.length})",
-            style: const TextStyle(color: AppColors.mainColor, fontSize: 18),
+            style:  TextStyle(color: AppColors.mainColor, fontSize: 18),
           ),
         ),
       ),
@@ -91,7 +91,7 @@ class ShopsAround extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 15),
-                      child: const Row(
+                      child:  Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -177,7 +177,7 @@ class ShopsAround extends StatelessWidget {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
                                     color: Colors.white),
-                                child: const Icon(
+                                child:  Icon(
                                   Icons.clear,
                                   size: 13,
                                   color: AppColors.mainColor,
@@ -220,7 +220,7 @@ class ShopsAround extends StatelessWidget {
                                                     .substring(0, 1)
                                                     .toUpperCase()
                                                 : shop.name!,
-                                            style: const TextStyle(
+                                            style:  TextStyle(
                                               fontSize: 16,
                                               color: AppColors.mainColor,
                                               fontWeight: FontWeight.bold,

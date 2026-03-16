@@ -51,7 +51,7 @@ class ExpensePage extends StatelessWidget {
               Get.back();
             }
           },
-          icon: const Icon(
+          icon:  Icon(
             Icons.arrow_back_ios,
             color: AppColors.mainColor,
           ),
@@ -103,7 +103,7 @@ class ExpensePage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.credit_card,
+                           Icon(Icons.credit_card,
                               color: AppColors.mainColor),
                           const SizedBox(width: 10),
                           Obx(
@@ -112,7 +112,7 @@ class ExpensePage extends StatelessWidget {
                                   0,
                                   (previousValue, element) =>
                                       previousValue + element.amount!)),
-                              style: const TextStyle(
+                              style:  TextStyle(
                                   color: AppColors.mainColor, fontSize: 21),
                             ),
                           )

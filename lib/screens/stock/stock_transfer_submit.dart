@@ -239,7 +239,7 @@ class StockSubmit extends StatelessWidget {
                                         .refresh();
                                     productController.products.refresh();
                                   },
-                                  child: const Icon(
+                                  child:  Icon(
                                     Icons.clear,
                                     color: AppColors.mainColor,
                                   ),
@@ -259,7 +259,7 @@ class StockSubmit extends StatelessWidget {
                                   .refresh();
                               productController.products.refresh();
                             },
-                            child: const Icon(
+                            child:  Icon(
                               Icons.clear,
                               color: AppColors.mainColor,
                             ),

@@ -27,7 +27,7 @@ generalAlert(
                   },
                   child: Text(
                     negativeText,
-                    style: const TextStyle(color: AppColors.mainColor),
+                    style:  TextStyle(color: AppColors.mainColor),
                   )),
               TextButton(
                   onPressed: () {
@@ -36,7 +36,7 @@ generalAlert(
                   },
                   child: Text(
                     positiveText,
-                    style: const TextStyle(color: AppColors.mainColor),
+                    style:  TextStyle(color: AppColors.mainColor),
                   ))
             ],
           );
@@ -60,7 +60,7 @@ generateWarningAlert({
                 },
                 child: Text(
                   positiveText,
-                  style: const TextStyle(color: AppColors.mainColor),
+                  style:  TextStyle(color: AppColors.mainColor),
                 )),
           ],
         );

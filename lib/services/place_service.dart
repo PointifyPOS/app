@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:pointify/utils/app_config.dart';
 
-import '../utils/constants.dart';
 
 class Place {
   String? streetNumber;
@@ -40,7 +40,7 @@ class PlaceApiProvider {
   final client = Client();
   PlaceApiProvider(this.sessionToken);
   final String sessionToken;
-  final apiKey = Platform.isAndroid ? androidKey : iosKey;
+  final apiKey = Platform.isAndroid ? AppConfig.androidKey : AppConfig.androidKey ;
 
   Future<List<Suggestion>> fetchSuggestions(String input, String lang) async {
     final request =

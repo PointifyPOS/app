@@ -8,13 +8,13 @@ import 'client.dart';
 import 'end_points.dart';
 
 class User {
-  Future getSettings() async {
+  Future getSettings({String type = "APP_CONFIG"}) async {
     // try {
     if (!await isConnected()) {
       return await DatabaseHelper().getOfflineSettings();
     }
     var response = await DbBase()
-        .databaseRequest(EndPoints.setting, DbBase().getRequestType);
+        .databaseRequest("${EndPoints.setting}?type=$type", DbBase().getRequestType);
     return response;
     // } catch (e) {
     //   return null;

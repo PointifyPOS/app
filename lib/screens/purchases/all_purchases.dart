@@ -81,112 +81,15 @@ class AllPurchases extends StatelessWidget {
                 )
               : purchaseController.invoices.isEmpty
                   ? Center(child: noItemsFound(context, true))
-                  : isSmallScreen(context)
-                      ? ListView.builder(
-                          itemCount: purchaseController.invoices.length,
-                          physics: const ScrollPhysics(),
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            Invoice invoiceData =
-                                purchaseController.invoices.elementAt(index);
-                            return invoiceCard(invoice: invoiceData);
-                          })
-                      : Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 3),
-                          margin: const EdgeInsets.symmetric(horizontal: 10)
-                              .copyWith(top: 10),
-                          child: Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.grey),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.width,
-                                child: DataTable(
-                                  headingTextStyle: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                  dataTextStyle: const TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                    width: 1,
-                                    color: Colors.black,
-                                  )),
-                                  columnSpacing: 30.0,
-                                  columns: [
-                                    const DataColumn(
-                                        label: Text('Receipt Number',
-                                            textAlign: TextAlign.center)),
-                                    DataColumn(
-                                        label: Text(
-                                            'Amount(${userController.currentUser.value!.primaryShop?.currency})',
-                                            textAlign: TextAlign.center)),
-                                    const DataColumn(
-                                        label: Text('Products',
-                                            textAlign: TextAlign.center)),
-                                    const DataColumn(
-                                        label: Text('Status',
-                                            textAlign: TextAlign.center)),
-                                    const DataColumn(
-                                        label: Text('Date',
-                                            textAlign: TextAlign.center)),
-                                    const DataColumn(
-                                        label: Text('Actions',
-                                            textAlign: TextAlign.center)),
-                                  ],
-                                  rows: List.generate(
-                                      purchaseController.invoices.length,
-                                      (index) {
-                                    Invoice invoiceData = purchaseController
-                                        .invoices
-                                        .elementAt(index);
-
-                                    final y = invoiceData.purchaseNo;
-                                    const x = '';
-                                    final z =
-                                        invoiceData.items!.length.toString();
-                                    final w = invoiceData.createdAt;
-
-                                    return DataRow(cells: [
-                                      DataCell(Text("#${y!}".toUpperCase())),
-                                      const DataCell(Text(x)),
-                                      DataCell(Text(z)),
-                                      DataCell(Text(
-                                        chechPayment(invoiceData),
-                                        style: TextStyle(
-                                            color:
-                                                chechPaymentColor(invoiceData)),
-                                      )),
-                                      DataCell(Text(
-                                          DateFormat("yyyy-dd-MMM hh:mm a")
-                                              .format(DateTime.parse(w!)))),
-                                      DataCell(InkWell(
-                                        onTap: () {
-                                          Get.find<HomeController>()
-                                              .selectedWidget
-                                              .value = InvoiceScreen(
-                                            invoice: invoiceData,
-                                            type: "",
-                                            from: "AllPurchases",
-                                          );
-                                        },
-                                        child: const Text(
-                                          "View",
-                                          style: TextStyle(
-                                              color: AppColors.mainColor),
-                                        ),
-                                      )),
-                                    ]);
-                                  }),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
+                  : ListView.builder(
+                      itemCount: purchaseController.invoices.length,
+                      physics: const ScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        Invoice invoiceData =
+                            purchaseController.invoices.elementAt(index);
+                        return invoiceCard(invoice: invoiceData);
+                      });
         }));
   }
 }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/salemodel.dart';
+import 'package:pointify/utils/app_config.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
@@ -186,9 +187,9 @@ class Sunmi {
     await SunmiPrinter.line(ch: '-');
     String url = "";
     if (Platform.isAndroid) {
-      url = androidLink;
+      url = AppConfig.androidLink;
     } else if (Platform.isIOS) {
-      url = iosLink;
+      url = AppConfig.iosLink;
     }
     if (url != "") {
       await printQRCode(url);
