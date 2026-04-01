@@ -35,31 +35,33 @@ class ShopsToRenew extends StatelessWidget {
         ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Obx(() {
-        if (shopController.gettingShopsLoad.isTrue) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: SafeArea(
+        child: Obx(() {
+          if (shopController.gettingShopsLoad.isTrue) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (shopController.expiredShops.isEmpty) {
-          return _emptyState();
-        }
+          if (shopController.expiredShops.isEmpty) {
+            return _emptyState();
+          }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _selectionHeader(),
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.only(bottom: 120),
-                itemCount: shopController.expiredShops.length,
-                itemBuilder: (_, index) =>
-                    _shopTile(shopController.expiredShops[index]),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _selectionHeader(),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 120),
+                  itemCount: shopController.expiredShops.length,
+                  itemBuilder: (_, index) =>
+                      _shopTile(shopController.expiredShops[index]),
+                ),
               ),
-            ),
-          ],
-        );
-      }),
-      bottomSheet: Obx(() => _bottomAction(context)),
+            ],
+          );
+        }),
+      ),
+      bottomSheet: SafeArea(child: Obx(() => _bottomAction(context))),
     );
   }
 
@@ -211,6 +213,7 @@ class ShopsToRenew extends StatelessWidget {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: 50),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -275,6 +278,7 @@ class ShopsToRenew extends StatelessWidget {
       builder: (_) => Obx(
         () => Container(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          margin: EdgeInsets.only(bottom: 50),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(28)),

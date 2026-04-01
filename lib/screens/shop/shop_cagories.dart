@@ -66,26 +66,30 @@ class ShopCategories extends StatelessWidget {
               color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
-      bottomNavigationBar: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(10),
-        height: isSmallScreen(context) ? kToolbarHeight * 1.5 : 0.0,
-        decoration:
-            BoxDecoration(border: Border.all(width: 1, color: Colors.grey)),
-        child: InkWell(
-          splashColor: Colors.transparent,
-          onTap: () {
-            Get.back();
-          },
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            width: double.infinity,
-            decoration: BoxDecoration(
-                border: Border.all(width: 3, color: AppColors.mainColor),
-                borderRadius: BorderRadius.circular(40)),
-            child: Center(
-                child: majorTitle(
-                    title: "Continue", color: AppColors.mainColor, size: 18.0)),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(10),
+          height: isSmallScreen(context) ? kToolbarHeight * 1.5 : 0.0,
+          decoration:
+              BoxDecoration(border: Border.all(width: 1, color: Colors.grey)),
+          child: InkWell(
+            splashColor: Colors.transparent,
+            onTap: () {
+              Get.back();
+            },
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 3, color: AppColors.mainColor),
+                  borderRadius: BorderRadius.circular(40)),
+              child: Center(
+                  child: majorTitle(
+                      title: "Continue",
+                      color: AppColors.mainColor,
+                      size: 18.0)),
+            ),
           ),
         ),
       ),
@@ -101,7 +105,7 @@ class ShopCategories extends StatelessWidget {
                     ),
                   ),
                 )
-              :  SizedBox(
+              : SizedBox(
                   child: Center(
                       child: CircularProgressIndicator(
                   color: AppColors.mainColor,
