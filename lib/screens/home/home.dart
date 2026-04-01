@@ -138,9 +138,8 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveWidget(
-        largeScreen: Container(),
-        smallScreen: Helper(
+    return Scaffold(
+        body: Helper(
           widget: Obx(() {
             return homeControler.pages[homeControler.selectedIndex.value];
           }),
@@ -213,105 +212,107 @@ class _HomeState extends State<Home> {
                 ),
             ],
           ),
-          bottomNavigationBar: Obx(
-            () => userController.internetConected.isFalse
-                ? Container(
-                    height: 0,
-                  )
-                : Container(
-                    padding:
-                        const EdgeInsets.only(left: 20, right: 20, bottom: 10),
-                    decoration: BoxDecoration(
-                        color: AppColors.lightDeepPurple,
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              homeControler.selectedIndex.value = 0;
-                            },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Obx(
-                                  () => Icon(
-                                    Icons.home,
-                                    color:
-                                        homeControler.selectedIndex.value == 0
-                                            ? Colors.white
-                                            : Colors.black,
+          bottomNavigationBar: SafeArea(
+            child: Obx(
+              () => userController.internetConected.isFalse
+                  ? Container(
+                      height: 0,
+                    )
+                  : Container(
+                      padding:
+                          const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                      decoration: BoxDecoration(
+                          color: AppColors.lightDeepPurple,
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                homeControler.selectedIndex.value = 0;
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(
+                                    () => Icon(
+                                      Icons.home,
+                                      color:
+                                          homeControler.selectedIndex.value == 0
+                                              ? Colors.white
+                                              : Colors.black,
+                                    ),
                                   ),
-                                ),
-                                const Text("Home")
-                              ],
+                                  const Text("Home")
+                                ],
+                              ),
                             ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              homeControler.selectedIndex.value = 1;
-                              shopController.getShops();
-                            },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Obx(
-                                  () => Icon(Icons.shop,
-                                      color:
-                                          homeControler.selectedIndex.value == 1
-                                              ? Colors.white
-                                              : Colors.black),
-                                ),
-                                const Text("Shops")
-                              ],
+                            InkWell(
+                              onTap: () {
+                                homeControler.selectedIndex.value = 1;
+                                shopController.getShops();
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(
+                                    () => Icon(Icons.shop,
+                                        color:
+                                            homeControler.selectedIndex.value == 1
+                                                ? Colors.white
+                                                : Colors.black),
+                                  ),
+                                  const Text("Shops")
+                                ],
+                              ),
                             ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              homeControler.selectedIndex.value = 2;
-                              userController.getAttendants();
-                            },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Obx(
-                                  () => Icon(Icons.people,
-                                      color:
-                                          homeControler.selectedIndex.value == 2
-                                              ? Colors.white
-                                              : Colors.black),
-                                ),
-                                const Text("Attendants")
-                              ],
+                            InkWell(
+                              onTap: () {
+                                homeControler.selectedIndex.value = 2;
+                                userController.getAttendants();
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(
+                                    () => Icon(Icons.people,
+                                        color:
+                                            homeControler.selectedIndex.value == 2
+                                                ? Colors.white
+                                                : Colors.black),
+                                  ),
+                                  const Text("Attendants")
+                                ],
+                              ),
                             ),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              homeControler.selectedIndex.value = 3;
-                            },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Obx(
-                                  () => Icon(Icons.people,
-                                      color:
-                                          homeControler.selectedIndex.value == 3
-                                              ? Colors.white
-                                              : Colors.black),
-                                ),
-                                const Text("Profile")
-                              ],
-                            ),
-                          )
-                        ],
+                            InkWell(
+                              onTap: () {
+                                homeControler.selectedIndex.value = 3;
+                              },
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Obx(
+                                    () => Icon(Icons.people,
+                                        color:
+                                            homeControler.selectedIndex.value == 3
+                                                ? Colors.white
+                                                : Colors.black),
+                                  ),
+                                  const Text("Profile")
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+            ),
           ),
         ));
   }

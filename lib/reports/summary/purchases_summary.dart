@@ -18,7 +18,7 @@ import '../../screens/receipts/pdf/sales/sales_summary_pdf.dart';
 import '../components/summarycard.dart';
 
 class PurchasesSummary extends StatelessWidget {
-  PurchasesSummary({Key? key}) : super(key: key) {
+  PurchasesSummary({super.key}) {
     reportsController.getPurchasesReport(
       startDate: reportsController.filterStartDate.value,
       toDate: reportsController.filterEndDate.value,
@@ -27,8 +27,8 @@ class PurchasesSummary extends StatelessWidget {
   }
 
   final ReportsController reportsController = Get.find<ReportsController>();
-  final  PaymentController paymentController = Get.find<PaymentController>();
-  final  PurchaseController purchaseController = Get.find<PurchaseController>();
+  final PaymentController paymentController = Get.find<PaymentController>();
+  final PurchaseController purchaseController = Get.find<PurchaseController>();
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,6 @@ class PurchasesSummary extends StatelessWidget {
                                       key: reportsController.salesCard[index]
                                           ["key"],
                                       onPressed: (key) {
-
                                         if (key == "cash" || key == "credit") {
                                           purchaseController.getPurchases(
                                               shopid: userController.currentUser
@@ -172,7 +171,7 @@ class PurchasesSummary extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title:  Text(
+        title: Text(
           "Purchases Report",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -190,7 +189,7 @@ class PurchasesSummary extends StatelessWidget {
                       ),
                     ));
               },
-              icon:  Icon(
+              icon: Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               ))
@@ -199,7 +198,7 @@ class PurchasesSummary extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon:  Icon(
+          icon: Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

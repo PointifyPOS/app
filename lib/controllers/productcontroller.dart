@@ -128,6 +128,7 @@ class ProductController extends GetxController {
   RxString selectedSortOrderCount = RxString("All");
   RxString selectedSortOrderSearch = RxString("all");
   RxString selectedSortOrderCountSearch = RxString("all");
+  RxMap<String, dynamic> countHistoryData = RxMap({});
   RxString supplierName = RxString("None");
   Rxn<Supplier> supplierId = Rxn(null);
   Rxn<Map<String, dynamic>> productAnalysis =
@@ -208,9 +209,9 @@ class ProductController extends GetxController {
     "total": 0,
     "totalPages": 0,
   });
+
   @override
   void onInit() {
-    // TODO: implement onInit
     scrollController.addListener(_scrollListener);
     super.onInit();
   }
@@ -1016,6 +1017,12 @@ class ProductController extends GetxController {
         .map((e) => ProductCategory.fromJson(e))
         .toList());
     loadingproductCategories.value = false;
+  }
+
+  Future<void> getProductStats(String shop) async {
+    var productsHistory = await ProductService.getProductStats(shop);
+    print("productsHistory ${productsHistory}");
+    countHistoryData.value = productsHistory;
   }
 
   Future<void> getProductPurchaseHistory(Product? product,

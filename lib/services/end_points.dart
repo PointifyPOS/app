@@ -1,6 +1,4 @@
-// const apiEndPoint = "http://192.168.100.3:1989/";
-const apiEndPoint = "https://staging.pointifypos.com/";
-// const apiEndPoint = "http://192.168.100.32:1992/";
+const apiEndPoint = "https://api.pointifypos.com/";
 const storeurl = "https://store.pointifypos.com/";
 
 class EndPoints {
@@ -161,4 +159,6 @@ class EndPoints {
   static const awardstransactions = "${apiEndPoint}payments/awards/";
 
   static const checkpaymentstatus = "${apiEndPoint}payments/checkpaymentstatus";
+
+  static var productstats = "${apiEndPoint}product/stats/summary";
 }

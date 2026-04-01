@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
@@ -12,6 +13,7 @@ import 'package:pointify/main.dart';
 import 'package:pointify/reports/expenses/expense_page.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/screens/home/profile_page.dart';
+import 'package:pointify/screens/home/widgets/inventory_insights_section.dart';
 import 'package:pointify/screens/usage/inapppurchases_screen.dart';
 import 'package:pointify/screens/warehouse/invoices.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -51,6 +53,7 @@ class HomePage extends StatelessWidget {
   final ExpenseController expenseController = Get.put(ExpenseController());
   final UserController attendantController = Get.put(UserController());
   final AuthController authController = Get.find<AuthController>();
+  final ProductController productController = Get.find<ProductController>();
   final DateTime now = DateTime.now();
   WareHouseController wareHouseController = Get.put(WareHouseController());
 
@@ -150,6 +153,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    productController
+        .getProductStats(userController.currentUser.value!.primaryShop!.id!);
     return RefreshIndicator(
       onRefresh: () async {
         await shopController.getShops();
@@ -160,7 +165,7 @@ class HomePage extends StatelessWidget {
               ? null
               : AppBar(
                   titleSpacing: 0.0,
-                  leading:  Icon(
+                  leading: Icon(
                     Icons.electric_bolt,
                     color: AppColors.mainColor,
                   ),
@@ -178,7 +183,7 @@ class HomePage extends StatelessWidget {
                         onTap: () async {
                           Get.to(() => ProfilePage());
                         },
-                        child:  Icon(
+                        child: Icon(
                           Icons.account_circle_rounded,
                           color: AppColors.mainColor,
                           size: 30,
@@ -539,51 +544,20 @@ class HomePage extends StatelessWidget {
                                     );
                             },
                           ),
-                          if (userController.internetConected.isTrue &&
-                              userController.currentUser.value?.primaryShop
-                                      ?.warehouse ==
-                                  false)
-                            const SizedBox(height: 20),
-                          if (userController.internetConected.isTrue &&
-                              userController.currentUser.value?.primaryShop
-                                      ?.warehouse ==
-                                  false)
-                            InkWell(
-                              onTap: () {
-                                if (userController.internetConected.isFalse) {
-                                  showSnackBar(
-                                      message: "no internet connection",
-                                      color: Colors.red);
-                                  return;
-                                }
-                                shopController.selectedDiscoverCategories
-                                    .clear();
-                                Get.to(() => ShopTags());
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 10),
-                                decoration: BoxDecoration(
-                                    color: AppColors.lightDeepPurple
-                                        .withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    majorTitle(
-                                        title: "Discover Shops Around You",
-                                        color: Colors.black,
-                                        size: 16.0),
-                                     Icon(
-                                      Icons.location_on_outlined,
-                                      size: 30,
-                                      color: AppColors.mainColor,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
+                          InventoryInsightsMinimal(
+                            runningLow: productController
+                                    .countHistoryData['runningLow'] ??
+                                0,
+                            outOfStock: productController
+                                    .countHistoryData['outofstock'] ??
+                                0,
+                            fastMovingCount: productController
+                                    .countHistoryData['fastmoving']?.length ??
+                                0,
+                            dormant:
+                                productController.countHistoryData['dormant'] ??
+                                    0,
+                          ),
                           const SizedBox(height: 20),
                           majorTitle(
                               title: "Enterprise Operations",
@@ -905,7 +879,7 @@ class HomePage extends StatelessWidget {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                   Text("Latest Invoices",
+                                  Text("Latest Invoices",
                                       style: TextStyle(
                                           color: AppColors.mainColor,
                                           fontSize: 20,
@@ -988,7 +962,7 @@ class HomePage extends StatelessWidget {
                                         ),
                                       );
                                     },
-                                    child:  Row(
+                                    child: Row(
                                       children: [
                                         Text("Filter ",
                                             style: TextStyle(
@@ -1013,7 +987,7 @@ class HomePage extends StatelessWidget {
                             Container(
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 10),
-                              child:  Divider(
+                              child: Divider(
                                 color: AppColors.mainColor,
                               ),
                             ),

@@ -16,6 +16,8 @@ class Product {
   String? name;
   String? manufacturer;
   double? buyingPrice;
+  int? totalSoldQty;
+  int? salesCount;
   double? sellingPrice;
   double? wholesalePrice;
   double? dealerPrice;
@@ -49,6 +51,8 @@ class Product {
       this.expiryDate,
       this.manageByPrice,
       this.status,
+      this.totalSoldQty,
+      this.salesCount,
       this.taxable,
       this.batches,
       this.buyingPrice,
@@ -84,6 +88,12 @@ class Product {
             (x) => CustomImage(imgType: ImageType.network, path: x ?? "")));
     sId = json['_id'];
     type = json['productType'] ?? "product";
+    totalSoldQty = json['totalSoldQty'] is int
+        ? double.parse(json['totalSoldQty'].toString()).toInt()
+        : json['totalSoldQty'] ?? 0;
+    salesCount = json['salesCount'] is int
+        ? double.parse(json['salesCount'].toString()).toInt()
+        : json['salesCount'] ?? 0;
     batches = json['batches'] == null
         ? []
         : List<Batch>.from(json['batches'].map((x) => Batch.fromJson(x)));

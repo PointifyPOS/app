@@ -9,7 +9,6 @@ import 'package:printing/printing.dart';
 
 import '../../../controllers/purchase_controller.dart';
 import '../../../controllers/shopcontroller.dart';
-import '../../../models/invoice.dart';
 import '../../functions/functions.dart';
 import '../../screens/receipts/pdf/sales/purchases_report.dart';
 import '../../widgets/alert.dart';
@@ -304,6 +303,10 @@ class PurchasesReport extends StatelessWidget {
                                               shopid: userController.currentUser
                                                   .value!.primaryShop!.id,
                                               loadMore: true,
+                                              fromDate: reportsController
+                                                  .filterStartDate.value,
+                                              toDate: reportsController
+                                                  .filterEndDate.value,
                                             );
                                           },
                                           child: const Text("Load More"),

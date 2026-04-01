@@ -236,8 +236,6 @@ class PurchaseController extends GetxController {
     String? toDate = "",
     bool loadMore = false,
   }) async {
-    if (isLoadingMore.value || !hasMore.value) return;
-
     if (!loadMore) {
       page.value = 1;
       hasMore.value = true;
@@ -246,7 +244,7 @@ class PurchaseController extends GetxController {
     } else {
       isLoadingMore.value = true;
     }
-
+    if (!hasMore.value) return;
     var response = await PurchaseService.getPurchases(
       fromDate: fromDate,
       toDate: toDate,

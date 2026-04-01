@@ -927,9 +927,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         type: "today",
         shopId: userController.currentUser.value!.primaryShop!.id!,
       );
-      if (saleModel.sId != null) {
-        _printReceipt(saleModel);
-      }
+      // if (saleModel.sId != null) {
+      _printReceipt(saleModel);
+      // }
       Get.find<ProductController>().getProductsBySort(type: 'all');
       sellingDate.value = null;
     }

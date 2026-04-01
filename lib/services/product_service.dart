@@ -16,6 +16,20 @@ class ProductService {
     return response;
   }
 
+  static Future<dynamic> getProductStats(String shop) async {
+    try {
+      var response = await DbBase().databaseRequest(
+        "${EndPoints.productstats}?shopid=$shop",
+        DbBase().getRequestType,
+      );
+
+      return response;
+    } catch (e, s) {
+      print(s);
+      return null;
+    }
+  }
+
   static String getPathForProductImage(String id, int index) {
     String path = "products/images/$id";
     return "${path}_$index";

@@ -333,11 +333,24 @@ class ProductPage extends StatelessWidget {
                             ? (Product p) => function!(p)
                             : null,
                       );
-                    }).toList(),
+                    }),
+                  if (productController.selectedSortOrderSearch.value ==
+                      "runninglow")
+                    ...productController.outOfStockProducts.map((productModel) {
+                      return productCard(
+                        product: productModel,
+                        type: type,
+                        function: function != null
+                            ? (Product p) => function!(p)
+                            : null,
+                      );
+                    }),
 
                   // 🔴 COLLAPSIBLE OUT-OF-STOCK SECTION
                   if (productController.selectedSortOrderSearch.value !=
-                      "outofstock")
+                          "outofstock" &&
+                      productController.selectedSortOrderSearch.value !=
+                          "runninglow")
                     outOfStockCollapsible(
                       controller: productController,
                       type: type,
