@@ -51,11 +51,11 @@ class CreateSale extends StatelessWidget {
                             Get.back();
                             salesController.receipt.value = null;
                           },
-                          icon:  Icon(
+                          icon: Icon(
                             Icons.clear,
                             color: AppColors.mainColor,
                           )),
-                       Text(
+                      Text(
                         "Create sale",
                         style: TextStyle(
                             color: AppColors.mainColor,
@@ -161,7 +161,7 @@ class CreateSale extends StatelessWidget {
                                   ),
                                 ],
                               )),
-                           Divider(
+                          Divider(
                             color: AppColors.mainColor,
                           ),
                         ],
@@ -215,11 +215,11 @@ class CreateSale extends StatelessWidget {
                                                     .selectedCustomerController
                                                     .text
                                                     .isEmpty
-                                                ?  Icon(
+                                                ? Icon(
                                                     Icons.search,
                                                     color: AppColors.mainColor,
                                                   )
-                                                :  Icon(
+                                                : Icon(
                                                     Icons.cancel,
                                                     color: AppColors.mainColor,
                                                   ),
@@ -459,7 +459,7 @@ class CreateSale extends StatelessWidget {
                                             salesController.addToCart(product);
                                           }));
                                     },
-                                    child:  Column(
+                                    child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
                                       mainAxisAlignment:
@@ -503,147 +503,154 @@ class CreateSale extends StatelessWidget {
                 ],
               ),
             ),
-            bottomNavigationBar: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey)),
-              child: salesController.saveSaleLoad.value
-                  ? const Center(child: CircularProgressIndicator())
-                  : Container(
-                      padding: const EdgeInsets.all(10),
-                      width: double.infinity,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Text("Total : "),
-                                  Text(
-                                    htmlPrice(salesController
-                                            .receipt.value?.totalWithDiscount ??
-                                        0),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Text("Items : "),
-                                  Text(
-                                    salesController.receipt.value == null ||
-                                            salesController
-                                                .receipt.value!.items!.isEmpty
-                                        ? "0"
-                                        : salesController.receipt.value!.items!
-                                            .fold(
-                                                0.0,
-                                                (previousValue, element) =>
-                                                    previousValue +
-                                                    element.quantity!)
-                                            .toString(),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  salesController.amountPaid.text = '0.0';
-                                  if (salesController.receipt.value == null ||
-                                      salesController
-                                          .receipt.value!.items!.isEmpty) {
-                                    generalAlert(
-                                        title: "Error!",
-                                        message:
-                                            "Please select products to sell");
-                                    return;
-                                  }
-                                  Get.to(() => SalePreview(
-                                        page: page,
-                                      ));
-                                },
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width * .4,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  decoration: BoxDecoration(
-                                      color: AppColors.mainColor,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Center(
-                                    child: majorTitle(
-                                        title: "Cash in",
-                                        color: Colors.white,
-                                        size: 18.0),
-                                  ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: Colors.grey)),
+                child: salesController.saveSaleLoad.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : Container(
+                        padding: const EdgeInsets.all(10),
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Text("Total : "),
+                                    Text(
+                                      htmlPrice(salesController.receipt.value
+                                              ?.totalWithDiscount ??
+                                          0),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              InkWell(
-                                onTap: () async {
-                                  if (salesController.receipt.value == null ||
-                                      salesController
-                                          .receipt.value!.items!.isEmpty) {
-                                    generalAlert(title: "No items to pay");
-                                    return;
-                                  }
-                                  await salesController.saveSale(
-                                      screen: page ?? "admin", status: "hold");
-                                },
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width * .4,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Text("Items : "),
+                                    Text(
+                                      salesController.receipt.value == null ||
+                                              salesController
+                                                  .receipt.value!.items!.isEmpty
+                                          ? "0"
+                                          : salesController
+                                              .receipt.value!.items!
+                                              .fold(
+                                                  0.0,
+                                                  (previousValue, element) =>
+                                                      previousValue +
+                                                      element.quantity!)
+                                              .toString(),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    salesController.amountPaid.text = '0.0';
+                                    if (salesController.receipt.value == null ||
+                                        salesController
+                                            .receipt.value!.items!.isEmpty) {
+                                      generalAlert(
+                                          title: "Error!",
+                                          message:
+                                              "Please select products to sell");
+                                      return;
+                                    }
+                                    Get.to(() => SalePreview(
+                                          page: page,
+                                        ));
+                                  },
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * .4,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    decoration: BoxDecoration(
                                         color: AppColors.mainColor,
-                                      )),
-                                  child: Center(
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        majorTitle(
-                                            title: "Hold",
-                                            color: AppColors.mainColor,
-                                            size: 18.0),
-                                        const Icon(
-                                          Icons.pause_rounded,
-                                        )
-                                      ],
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Center(
+                                      child: majorTitle(
+                                          title: "Cash in",
+                                          color: Colors.white,
+                                          size: 18.0),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                        ],
+                                InkWell(
+                                  onTap: () async {
+                                    if (salesController.receipt.value == null ||
+                                        salesController
+                                            .receipt.value!.items!.isEmpty) {
+                                      generalAlert(title: "No items to pay");
+                                      return;
+                                    }
+                                    await salesController.saveSale(
+                                        screen: page ?? "admin",
+                                        status: "hold");
+                                  },
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * .4,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: AppColors.mainColor,
+                                        )),
+                                    child: Center(
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          majorTitle(
+                                              title: "Hold",
+                                              color: AppColors.mainColor,
+                                              size: 18.0),
+                                          const Icon(
+                                            Icons.pause_rounded,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
-                    ),
+              ),
             ),
           ),
         ));

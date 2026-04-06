@@ -1,7 +1,7 @@
 name: pointify
 description: "Pointify Pos."
 publish_to: 'none'
-version: 2.0.163+183
+version: 2.0.164+184
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -68,6 +68,8 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.3
+  shared_preferences_android: 2.4.21
+  webview_flutter_android: 4.8.0
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true

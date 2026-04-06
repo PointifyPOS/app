@@ -156,70 +156,72 @@ class PurchaesPreview extends StatelessWidget {
       backgroundColor: Colors.white,
       isScrollControlled: true,
       builder: (context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            margin: const EdgeInsets.only(left: 0),
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Obx(
-              () => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  majorTitle(
-                      title: "Payment Method $selectedpaymentMethod",
-                      color: Colors.black,
-                      size: 20.0,
-                      fontWeight: FontWeight.bold),
-                  const SizedBox(height: 15),
-                  majorTitle(
-                      title:
-                          "Total Amount ${htmlPrice(purchaseController.invoice.value?.totalAmount?.toStringAsFixed(2) ?? 0)}",
-                      color: Colors.black,
-                      size: 14.0),
-                  if (selectedpaymentMethod == "Cash") _cashFieldsWidgets(),
-                  if (selectedpaymentMethod == "Mpesa") mpesaFieldsWidgets(),
-                  if (selectedpaymentMethod == "Bank") bankFieldsWidgets(),
-                  const SizedBox(height: 10),
-                  // if (salesController.change.value > 0)
-                  Center(
-                    child: Obx(
-                      () => majorTitle(
-                          title:
-                              "${purchaseController.balanceText.value} ${htmlPrice(purchaseController.balance.value.toStringAsFixed(2))}",
-                          color: Colors.black,
-                          size: 19.0),
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              margin: const EdgeInsets.only(left: 0),
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Obx(
+                () => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    majorTitle(
+                        title: "Payment Method $selectedpaymentMethod",
+                        color: Colors.black,
+                        size: 20.0,
+                        fontWeight: FontWeight.bold),
+                    const SizedBox(height: 15),
+                    majorTitle(
+                        title:
+                            "Total Amount ${htmlPrice(purchaseController.invoice.value?.totalAmount?.toStringAsFixed(2) ?? 0)}",
+                        color: Colors.black,
+                        size: 14.0),
+                    if (selectedpaymentMethod == "Cash") _cashFieldsWidgets(),
+                    if (selectedpaymentMethod == "Mpesa") mpesaFieldsWidgets(),
+                    if (selectedpaymentMethod == "Bank") bankFieldsWidgets(),
+                    const SizedBox(height: 10),
+                    // if (salesController.change.value > 0)
+                    Center(
+                      child: Obx(
+                        () => majorTitle(
+                            title:
+                                "${purchaseController.balanceText.value} ${htmlPrice(purchaseController.balance.value.toStringAsFixed(2))}",
+                            color: Colors.black,
+                            size: 19.0),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            Get.back();
-                          },
-                          child: majorTitle(
-                              title: "Cancel",
-                              color: AppColors.mainColor,
-                              size: 16.0)),
-                      TextButton(
-                          onPressed: checkEnoughAmountEntered() == false
-                              ? null
-                              : () {
-                                  purchaseController.createPurchase();
-                                },
-                          child: majorTitle(
-                              title: "Confirm payment",
-                              color: checkEnoughAmountEntered() == false
-                                  ? Colors.grey
-                                  : AppColors.mainColor,
-                              size: 16.0)),
-                    ],
-                  )
-                ],
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: majorTitle(
+                                title: "Cancel",
+                                color: AppColors.mainColor,
+                                size: 16.0)),
+                        TextButton(
+                            onPressed: checkEnoughAmountEntered() == false
+                                ? null
+                                : () {
+                                    purchaseController.createPurchase();
+                                  },
+                            child: majorTitle(
+                                title: "Confirm payment",
+                                color: checkEnoughAmountEntered() == false
+                                    ? Colors.grey
+                                    : AppColors.mainColor,
+                                size: 16.0)),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),

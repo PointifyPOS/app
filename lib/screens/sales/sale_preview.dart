@@ -149,159 +149,161 @@ class SalePreview extends StatelessWidget {
       backgroundColor: Colors.white,
       isScrollControlled: true,
       builder: (context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            margin: const EdgeInsets.only(left: 0),
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Obx(
-              () => ListView(
-                children: [
-                  majorTitle(
-                      title: "Payment Method $paymentType",
-                      color: Colors.black,
-                      size: 20.0,
-                      fontWeight: FontWeight.bold),
-                  const SizedBox(height: 15),
-                  majorTitle(
-                      title:
-                          "Total Amount ${htmlPrice(salesController.receipt.value?.totalWithDiscount?.toStringAsFixed(2) ?? 0)}",
-                      color: Colors.black,
-                      size: 14.0),
-                  const SizedBox(height: 10),
-                  majorTitle(title: "Cash", color: Colors.black, size: 14.0),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      controller: salesController.cashPaid,
-                      onChanged: (value) {
-                        salesController.getTotalCredit();
-                        salesController.receipt.refresh();
-                      },
-                      keyboardType: TextInputType.number,
-                      autofocus: true,
-                      decoration: InputDecoration(
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              margin: const EdgeInsets.only(left: 0),
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Obx(
+                () => ListView(
+                  children: [
+                    majorTitle(
+                        title: "Payment Method $paymentType",
+                        color: Colors.black,
+                        size: 20.0,
+                        fontWeight: FontWeight.bold),
+                    const SizedBox(height: 15),
+                    majorTitle(
+                        title:
+                            "Total Amount ${htmlPrice(salesController.receipt.value?.totalWithDiscount?.toStringAsFixed(2) ?? 0)}",
+                        color: Colors.black,
+                        size: 14.0),
+                    const SizedBox(height: 10),
+                    majorTitle(title: "Cash", color: Colors.black, size: 14.0),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                        controller: salesController.cashPaid,
+                        onChanged: (value) {
+                          salesController.getTotalCredit();
+                          salesController.receipt.refresh();
+                        },
+                        keyboardType: TextInputType.number,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            prefix: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: Text(userController
+                                  .currentUser.value!.primaryShop!.currency!),
+                            ))),
+                    const SizedBox(height: 10),
+                    majorTitle(title: "Mpesa", color: Colors.black, size: 14.0),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                        controller: salesController.mpesaCashPaid,
+                        onChanged: (value) {
+                          salesController.getTotalCredit();
+                          salesController.receipt.refresh();
+                        },
+                        keyboardType: TextInputType.number,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            prefix: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: Text(userController
+                                  .currentUser.value!.primaryShop!.currency!),
+                            ))),
+                    const SizedBox(height: 10),
+                    majorTitle(
+                        title: "Mpesa Code", color: Colors.black, size: 14.0),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                        controller: salesController.mpesaTransId,
+                        keyboardType: TextInputType.text,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ))),
+                    const SizedBox(height: 10),
+                    majorTitle(title: "Bank", color: Colors.black, size: 14.0),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                        controller: salesController.bankCashPaid,
+                        onChanged: (value) {
+                          salesController.getTotalCredit();
+                          salesController.receipt.refresh();
+                        },
+                        keyboardType: TextInputType.number,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            prefix: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: Text(userController
+                                  .currentUser.value!.primaryShop!.currency!),
+                            ))),
+                    const SizedBox(height: 10),
+                    majorTitle(
+                        title: "Sales Note", color: Colors.black, size: 14.0),
+                    const SizedBox(height: 5),
+                    TextFormField(
+                        controller: salesController.salesnote,
+                        keyboardType: TextInputType.text,
+                        autofocus: true,
+                        decoration: InputDecoration(
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 5),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          prefix: Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text(userController
-                                .currentUser.value!.primaryShop!.currency!),
-                          ))),
-                  const SizedBox(height: 10),
-                  majorTitle(title: "Mpesa", color: Colors.black, size: 14.0),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      controller: salesController.mpesaCashPaid,
-                      onChanged: (value) {
-                        salesController.getTotalCredit();
-                        salesController.receipt.refresh();
-                      },
-                      keyboardType: TextInputType.number,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          prefix: Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text(userController
-                                .currentUser.value!.primaryShop!.currency!),
-                          ))),
-                  const SizedBox(height: 10),
-                  majorTitle(
-                      title: "Mpesa Code", color: Colors.black, size: 14.0),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      controller: salesController.mpesaTransId,
-                      keyboardType: TextInputType.text,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ))),
-                  const SizedBox(height: 10),
-                  majorTitle(title: "Bank", color: Colors.black, size: 14.0),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      controller: salesController.bankCashPaid,
-                      onChanged: (value) {
-                        salesController.getTotalCredit();
-                        salesController.receipt.refresh();
-                      },
-                      keyboardType: TextInputType.number,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 5),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          prefix: Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text(userController
-                                .currentUser.value!.primaryShop!.currency!),
-                          ))),
-                  const SizedBox(height: 10),
-                  majorTitle(
-                      title: "Sales Note", color: Colors.black, size: 14.0),
-                  const SizedBox(height: 5),
-                  TextFormField(
-                      controller: salesController.salesnote,
-                      keyboardType: TextInputType.text,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 5),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      )),
-                  const SizedBox(height: 10),
-                  // if (salesController.change.value > 0)
-                  Center(
-                    child: Obx(
-                      () => majorTitle(
-                          title:
-                              "${salesController.changeText.value} ${htmlPrice(salesController.change.value.toStringAsFixed(2))}",
-                          color: Colors.black,
-                          size: 19.0),
+                        )),
+                    const SizedBox(height: 10),
+                    // if (salesController.change.value > 0)
+                    Center(
+                      child: Obx(
+                        () => majorTitle(
+                            title:
+                                "${salesController.changeText.value} ${htmlPrice(salesController.change.value.toStringAsFixed(2))}",
+                            color: Colors.black,
+                            size: 19.0),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            Get.back();
-                          },
-                          child: majorTitle(
-                              title: "Cancel",
-                              color: AppColors.mainColor,
-                              size: 16.0)),
-                      TextButton(
-                          onPressed: () {
-                            salesController.saveSale(
-                                screen: page ?? "admin", status: status);
-                          },
-                          child: majorTitle(
-                              title: "Confirm payment",
-                              color: checkEnoughAmountEntered() == false
-                                  ? Colors.grey
-                                  : AppColors.mainColor,
-                              size: 16.0)),
-                    ],
-                  )
-                ],
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: majorTitle(
+                                title: "Cancel",
+                                color: AppColors.mainColor,
+                                size: 16.0)),
+                        TextButton(
+                            onPressed: () {
+                              salesController.saveSale(
+                                  screen: page ?? "admin", status: status);
+                            },
+                            child: majorTitle(
+                                title: "Confirm payment",
+                                color: checkEnoughAmountEntered() == false
+                                    ? Colors.grey
+                                    : AppColors.mainColor,
+                                size: 16.0)),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
@@ -318,120 +320,123 @@ class SalePreview extends StatelessWidget {
       backgroundColor: Colors.white,
       isScrollControlled: true,
       builder: (context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            margin: const EdgeInsets.only(left: 0),
-            color: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Obx(
-              () => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  majorTitle(
-                      title: "Payment Method $paymentType",
-                      color: Colors.black,
-                      size: 20.0,
-                      fontWeight: FontWeight.bold),
-                  const SizedBox(height: 15),
-                  majorTitle(
-                      title:
-                          "Total  ${htmlPrice(salesController.receipt.value?.totalWithDiscount?.toStringAsFixed(2) ?? 0)}",
-                      color: Colors.black,
-                      size: 14.0),
-                  if (paymentType == "Cash") _cashFieldsWidgets(),
-                  if (paymentType == "Mpesa") mpesaFieldsWidgets(),
-                  if (paymentType == "Bank") bankFieldsWidgets(),
-                  const SizedBox(height: 10),
-                  if (salesController.showSalesDiscount.isFalse)
-                    InkWell(
-                      child: const Text(
-                        "Add Discount",
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold),
-                      ),
-                      onTap: () {
-                        salesController.showSalesDiscount.value =
-                            !salesController.showSalesDiscount.value;
-                      },
-                    ),
-                  if (salesController.showSalesDiscount.isTrue)
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              margin: const EdgeInsets.only(left: 0),
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Obx(
+                () => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     majorTitle(
-                        title: "Discount", color: Colors.black, size: 14.0),
-                  if (salesController.showSalesDiscount.isTrue)
+                        title: "Payment Method $paymentType",
+                        color: Colors.black,
+                        size: 20.0,
+                        fontWeight: FontWeight.bold),
+                    const SizedBox(height: 15),
+                    majorTitle(
+                        title:
+                            "Total  ${htmlPrice(salesController.receipt.value?.totalWithDiscount?.toStringAsFixed(2) ?? 0)}",
+                        color: Colors.black,
+                        size: 14.0),
+                    if (paymentType == "Cash") _cashFieldsWidgets(),
+                    if (paymentType == "Mpesa") mpesaFieldsWidgets(),
+                    if (paymentType == "Bank") bankFieldsWidgets(),
+                    const SizedBox(height: 10),
+                    if (salesController.showSalesDiscount.isFalse)
+                      InkWell(
+                        child: const Text(
+                          "Add Discount",
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        onTap: () {
+                          salesController.showSalesDiscount.value =
+                              !salesController.showSalesDiscount.value;
+                        },
+                      ),
+                    if (salesController.showSalesDiscount.isTrue)
+                      majorTitle(
+                          title: "Discount", color: Colors.black, size: 14.0),
+                    if (salesController.showSalesDiscount.isTrue)
+                      const SizedBox(height: 5),
+                    if (salesController.showSalesDiscount.isTrue)
+                      TextFormField(
+                          controller: salesController.saleDiscount,
+                          keyboardType: TextInputType.text,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            prefix: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: Text(userController
+                                  .currentUser.value!.primaryShop!.currency!),
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          )),
+                    const SizedBox(height: 10),
+                    majorTitle(
+                        title: "Sales Note", color: Colors.black, size: 14.0),
                     const SizedBox(height: 5),
-                  if (salesController.showSalesDiscount.isTrue)
                     TextFormField(
-                        controller: salesController.saleDiscount,
+                        controller: salesController.salesnote,
                         keyboardType: TextInputType.text,
                         autofocus: true,
                         decoration: InputDecoration(
-                          prefix: Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text(userController
-                                .currentUser.value!.primaryShop!.currency!),
-                          ),
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 5),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         )),
-                  const SizedBox(height: 10),
-                  majorTitle(
-                      title: "Sales Note", color: Colors.black, size: 14.0),
-                  const SizedBox(height: 5),
-                  TextFormField(
-                      controller: salesController.salesnote,
-                      keyboardType: TextInputType.text,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 5),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      )),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Obx(
-                      () => majorTitle(
-                          title:
-                              "${salesController.changeText.value} ${htmlPrice(salesController.change.value.toStringAsFixed(2))}",
-                          color: Colors.black,
-                          size: 19.0),
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Obx(
+                        () => majorTitle(
+                            title:
+                                "${salesController.changeText.value} ${htmlPrice(salesController.change.value.toStringAsFixed(2))}",
+                            color: Colors.black,
+                            size: 19.0),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            Get.back();
-                          },
-                          child: majorTitle(
-                              title: "Cancel",
-                              color: AppColors.mainColor,
-                              size: 16.0)),
-                      TextButton(
-                          onPressed: checkEnoughAmountEntered() == false
-                              ? null
-                              : () {
-                                  salesController.saveSale(
-                                      screen: page ?? "admin", status: status);
-                                },
-                          child: majorTitle(
-                              title: "Confirm payment",
-                              color: checkEnoughAmountEntered() == false
-                                  ? Colors.grey
-                                  : AppColors.mainColor,
-                              size: 16.0)),
-                    ],
-                  )
-                ],
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: majorTitle(
+                                title: "Cancel",
+                                color: AppColors.mainColor,
+                                size: 16.0)),
+                        TextButton(
+                            onPressed: checkEnoughAmountEntered() == false
+                                ? null
+                                : () {
+                                    salesController.saveSale(
+                                        screen: page ?? "admin",
+                                        status: status);
+                                  },
+                            child: majorTitle(
+                                title: "Confirm payment",
+                                color: checkEnoughAmountEntered() == false
+                                    ? Colors.grey
+                                    : AppColors.mainColor,
+                                size: 16.0)),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ),
