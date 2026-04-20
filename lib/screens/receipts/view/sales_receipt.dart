@@ -595,136 +595,140 @@ class SalesReceipt extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-          height: 120,
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (salesController.currentReceipt.value!.totaltax! > 0)
-                    Column(
-                      children: [
+      bottomNavigationBar: SafeArea(
+        child: Container(
+            height: 120,
+            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (salesController.currentReceipt.value!.totaltax! > 0)
+                      Column(
+                        children: [
+                          const Text(
+                            "VAT: ",
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          Text(
+                            htmlPrice(salesController
+                                .currentReceipt.value!.totaltax!),
+                            style: const TextStyle(
+                                fontSize: 13, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                    if (salesController.currentReceipt.value!.paymentTag ==
+                            'split' &&
+                        salesController.currentReceipt.value!.amountPaid! > 0)
+                      Column(children: [
                         const Text(
-                          "VAT: ",
+                          "Cash: ",
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        Text(
+                          htmlPrice(salesController
+                              .currentReceipt.value!.amountPaid!),
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ]),
+                    if (salesController.currentReceipt.value!.paymentTag ==
+                            'split' &&
+                        salesController.currentReceipt.value!.mpesatotal! > 0)
+                      Column(children: [
+                        const Text(
+                          "Mpesa: ",
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        Text(
+                          htmlPrice(salesController
+                              .currentReceipt.value!.mpesatotal!),
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ]),
+                    if (salesController.currentReceipt.value!.paymentTag ==
+                            'split' &&
+                        salesController.currentReceipt.value!.banktotal! > 0)
+                      Column(children: [
+                        const Text(
+                          "Bank: ",
                           style: TextStyle(fontSize: 13),
                         ),
                         Text(
                           htmlPrice(
-                              salesController.currentReceipt.value!.totaltax!),
+                              salesController.currentReceipt.value!.banktotal!),
                           style: const TextStyle(
                               fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ]),
+                  ],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Divider(),
+                const SizedBox(
+                  height: 5,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        const Text(
+                          "Sub Total",
+                          style: TextStyle(fontSize: 13),
+                        ),
+                        Text(
+                          htmlPrice((salesController
+                                      .currentReceipt.value!.totalAmount! -
+                                  salesController
+                                      .currentReceipt.value!.totaltax!)
+                              .toStringAsFixed(2)),
+                          style: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
                         )
                       ],
                     ),
-                  if (salesController.currentReceipt.value!.paymentTag ==
-                          'split' &&
-                      salesController.currentReceipt.value!.amountPaid! > 0)
+                    if (salesController.currentReceipt.value!.totalDiscount !=
+                            null &&
+                        salesController.currentReceipt.value!.totalDiscount! >
+                            0)
+                      Column(children: [
+                        const Text(
+                          "Discount: ",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        Text(
+                          htmlPrice(salesController
+                              .currentReceipt.value!.totalDiscount!),
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ]),
                     Column(children: [
                       const Text(
-                        "Cash: ",
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      Text(
-                        htmlPrice(
-                            salesController.currentReceipt.value!.amountPaid!),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                    ]),
-                  if (salesController.currentReceipt.value!.paymentTag ==
-                          'split' &&
-                      salesController.currentReceipt.value!.mpesatotal! > 0)
-                    Column(children: [
-                      const Text(
-                        "Mpesa: ",
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      Text(
-                        htmlPrice(
-                            salesController.currentReceipt.value!.mpesatotal!),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                    ]),
-                  if (salesController.currentReceipt.value!.paymentTag ==
-                          'split' &&
-                      salesController.currentReceipt.value!.banktotal! > 0)
-                    Column(children: [
-                      const Text(
-                        "Bank: ",
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      Text(
-                        htmlPrice(
-                            salesController.currentReceipt.value!.banktotal!),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                    ]),
-                ],
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Divider(),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    children: [
-                      const Text(
-                        "Sub Total",
-                        style: TextStyle(fontSize: 13),
-                      ),
-                      Text(
-                        htmlPrice((salesController
-                                    .currentReceipt.value!.totalAmount! -
-                                salesController.currentReceipt.value!.totaltax!)
-                            .toStringAsFixed(2)),
-                        style: const TextStyle(
+                        "Total: ",
+                        style: TextStyle(
                             fontSize: 15, fontWeight: FontWeight.bold),
-                      )
-                    ],
-                  ),
-                  if (salesController.currentReceipt.value!.totalDiscount !=
-                          null &&
-                      salesController.currentReceipt.value!.totalDiscount! > 0)
-                    Column(children: [
-                      const Text(
-                        "Discount: ",
-                        style: TextStyle(fontSize: 15),
                       ),
                       Text(
                         htmlPrice(salesController
-                            .currentReceipt.value!.totalDiscount!),
+                            .currentReceipt.value!.totalWithDiscount!),
                         style: const TextStyle(
                             fontSize: 13, fontWeight: FontWeight.bold),
                       ),
-                    ]),
-                  Column(children: [
-                    const Text(
-                      "Total: ",
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      htmlPrice(salesController
-                          .currentReceipt.value!.totalWithDiscount!),
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.bold),
-                    ),
-                  ])
-                ],
-              )
-            ],
-          )),
+                    ])
+                  ],
+                )
+              ],
+            )),
+      ),
     );
   }
 }

@@ -1021,7 +1021,6 @@ class ProductController extends GetxController {
 
   Future<void> getProductStats(String shop) async {
     var productsHistory = await ProductService.getProductStats(shop);
-    print("productsHistory ${productsHistory}");
     countHistoryData.value = productsHistory;
   }
 

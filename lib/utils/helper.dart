@@ -15,7 +15,20 @@ import '../screens/cash_flow/cash_flow_manager.dart';
 import '../screens/home/home.dart';
 import '../screens/sales/create_sale.dart';
 import '../screens/shop/create_shop.dart';
+import 'dart:convert';
 
+void printFull(Object? obj) {
+  final text =
+      obj is String ? obj : const JsonEncoder.withIndent('  ').convert(obj);
+  const chunkSize = 800;
+  for (var i = 0; i < text.length; i += chunkSize) {
+    debugPrint(
+      text.substring(
+          i, i + chunkSize > text.length ? text.length : i + chunkSize),
+      wrapWidth: 10000,
+    );
+  }
+}
 missingValueDialog(context, message) {
   showDialog(
       context: context,

@@ -23,9 +23,6 @@ class User {
 
   profileUpdate(var json) async {
     String? id = userController.currentUser.value!.id!;
-    // if (userController.currentUser.value!.usertype == "attendant") {
-    //   json['usertype'] = "attendant";
-    // }
     var response = await DbBase().databaseRequest(
         "${EndPoints.profile}$id", DbBase().putRequestType,
         body: json);

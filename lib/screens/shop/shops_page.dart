@@ -15,12 +15,13 @@ import '../../widgets/shop_card.dart';
 import '../purchases/warehouse_create_purchase.dart';
 import 'create_shop.dart';
 
+// ignore: must_be_immutable
 class ShopsPage extends StatelessWidget {
   String? from;
   final ShopController shopController = Get.find<ShopController>();
   final AuthController authController = Get.find<AuthController>();
 
-  ShopsPage({Key? key, this.from}) : super(key: key) {
+  ShopsPage({super.key, this.from}) {
     if (from == "restockpage") {
       shopController.getShops(type: "warehouse");
     }

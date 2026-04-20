@@ -5,7 +5,9 @@ import 'package:pointify/utils/constants.dart';
 class UserModel {
   String? id;
   String? email;
+  bool? saleSmsEnabled;
   String? username;
+  double? smscredit;
   Attendant? attendantId;
   int? uniqueDigits;
   List<dynamic>? permisions;
@@ -24,8 +26,10 @@ class UserModel {
       this.phoneVerified,
       this.lastAppRatingDate,
       this.email,
+      this.smscredit,
       this.emailVerificationDate,
       this.phone,
+      this.saleSmsEnabled,
       this.username,
       this.primaryShop,
       this.referalCredit});
@@ -42,6 +46,12 @@ class UserModel {
             ? false
             : true
         : null;
+    smscredit = json['smscredit'] == null
+        ? 0.0
+        : isInteger(json['smscredit'] ?? json['smscredit'])
+            ? (json['smscredit']).toDouble()
+            : json['smscredit'] ?? json['smscredit'] ?? 0.0;
+    saleSmsEnabled = json['saleSmsEnabled'];
     emailVerificationDate = json['emailVerificationDate'];
     lastAppRatingDate = json['lastAppRatingDate'];
     permisions = json['permissions'] ?? [];

@@ -466,16 +466,14 @@ class ShopController {
           }
           LoadingDialog.showLoadingDialog(
               context: Get.context!, title: "Please wait...", key: _keyLoader);
-          var response = await ShopService().updatebackupiterval(shop!.id!, {
+          await ShopService().updatebackupiterval(shop!.id!, {
             "backupInterval": selectedbackupsendinterval['name'],
             "backupemail": shop.backupemail,
           });
           Get.back();
           generalAlert(message: "Update interval updated", title: "Success");
-          print(response);
         } else if (backupemail.isNotEmpty) {
         } else {
-          print("fff");
           var response = await ShopService().updateShop(shop!.id!, {
             "name": nameController.text,
             "backupInterval": selectedbackupsendinterval['name'],

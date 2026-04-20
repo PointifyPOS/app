@@ -153,8 +153,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    productController
-        .getProductStats(userController.currentUser.value!.primaryShop!.id!);
     return RefreshIndicator(
       onRefresh: () async {
         await shopController.getShops();
@@ -544,20 +542,23 @@ class HomePage extends StatelessWidget {
                                     );
                             },
                           ),
-                          InventoryInsightsMinimal(
-                            runningLow: productController
-                                    .countHistoryData['runningLow'] ??
-                                0,
-                            outOfStock: productController
-                                    .countHistoryData['outofstock'] ??
-                                0,
-                            fastMovingCount: productController
-                                    .countHistoryData['fastmoving']?.length ??
-                                0,
-                            dormant:
-                                productController.countHistoryData['dormant'] ??
-                                    0,
-                          ),
+                          const SizedBox(height: 20),
+                          if (userController.currentUser.value?.usertype ==
+                              'admin')
+                            InventoryInsightsMinimal(
+                              runningLow: productController
+                                      .countHistoryData['runningLow'] ??
+                                  0,
+                              outOfStock: productController
+                                      .countHistoryData['outofstock'] ??
+                                  0,
+                              fastMovingCount: productController
+                                      .countHistoryData['fastmoving']?.length ??
+                                  0,
+                              dormant: productController
+                                      .countHistoryData['dormant'] ??
+                                  0,
+                            ),
                           const SizedBox(height: 20),
                           majorTitle(
                               title: "Enterprise Operations",

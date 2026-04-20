@@ -25,7 +25,11 @@ class UserController {
   TextEditingController passwordControllerConfirm = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-
+  final TextEditingController topUpPhoneController = TextEditingController();
+  final TextEditingController topUpAmountController = TextEditingController();
+  final RxDouble topUpAmount = 0.0.obs;
+  final RxBool toppingUp = false.obs;
+  final RxDouble pricePerSms = 0.50.obs;
   Rxn<UserModel> switcheduser = Rxn(null);
   RxBool internetConected = RxBool(true);
   RxBool enableOffline = RxBool(AppConfig.offline_mode);

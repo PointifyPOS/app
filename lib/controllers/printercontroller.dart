@@ -78,10 +78,12 @@ class PrinterController extends GetxController {
         styles: const PosStyles(align: PosAlign.center),
       );
     }
-    bytes += generator.text(
-      'Date: ${DateFormat("MMM dd yyyy hh:mm a").format(DateTime.parse(date).toUtc())}',
-      styles: const PosStyles(align: PosAlign.center),
-    );
+    if (date.isNotEmpty) {
+      bytes += generator.text(
+        'Date: ${DateFormat("MMM dd yyyy hh:mm a").format(DateTime.parse(date).toUtc())}',
+        styles: const PosStyles(align: PosAlign.center),
+      );
+    }
     bytes += generator.text('-' * 32);
 
     bytes += generator.row([
@@ -102,10 +104,18 @@ class PrinterController extends GetxController {
       subtotal += total;
 
       bytes += generator.row([
-        PosColumn(text: name.length > 18 ? name.substring(0, 18) : name, width: 6),
-        PosColumn(text: "$qty", width: 2, styles: PosStyles(align: PosAlign.center)),
-        PosColumn(text: price.toStringAsFixed(0), width: 2, styles: PosStyles(align: PosAlign.right)),
-        PosColumn(text: total.toStringAsFixed(0), width: 2, styles: PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: name.length > 18 ? name.substring(0, 18) : name, width: 6),
+        PosColumn(
+            text: "$qty", width: 2, styles: PosStyles(align: PosAlign.center)),
+        PosColumn(
+            text: price.toStringAsFixed(0),
+            width: 2,
+            styles: PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: total.toStringAsFixed(0),
+            width: 2,
+            styles: PosStyles(align: PosAlign.right)),
       ]);
     }
 
@@ -131,8 +141,8 @@ class PrinterController extends GetxController {
 
     bytes += generator.qrcode(
       receiptUrl,
-      size: QRSize.size5,           // bigger
-      cor: QRCorrection.H,             // high error correction
+      size: QRSize.size5, // bigger
+      cor: QRCorrection.H, // high error correction
     );
     bytes += generator.feed(1);
     bytes += generator.text(" ");
@@ -142,7 +152,7 @@ class PrinterController extends GetxController {
       styles: const PosStyles(align: PosAlign.center, bold: true),
     );
     bytes += generator.text(
-      'System by Pointify,\ncontacts: 0791 334 234',
+      'System by Pointify,\nwebsite: pointifypos.com',
       styles: const PosStyles(align: PosAlign.center),
     );
     bytes += generator.feed(1);

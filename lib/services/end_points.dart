@@ -161,4 +161,6 @@ class EndPoints {
   static const checkpaymentstatus = "${apiEndPoint}payments/checkpaymentstatus";
 
   static var productstats = "${apiEndPoint}product/stats/summary";
+
+  static var topUp = "${apiEndPoint}sms/topup";
 }

@@ -130,7 +130,7 @@ class Sunmi {
     }
     await printText("Receipt No: ${saleModel.receiptNo}");
     await printText(
-        "Date: ${DateFormat("MMM dd yyyy hh:mm a").format(DateTime.parse(saleModel.createdAt!).toLocal())} ");
+        "Date: ${DateFormat("MMM dd yyyy hh:mm a").format(DateTime.parse(saleModel.createdAt ?? "0000-00-00 00:00:00").toLocal())} ");
     if (saleModel.customerId?.name != null) {
       await printText("Customer: ${saleModel.customerId?.name}");
     }

@@ -150,7 +150,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
 
   Future<void> checkPrinterConnection() async {
     final bool? isConnected = await PrintBluetoothThermal.connectionStatus;
-   await PrintBluetoothThermal.pairedBluetooths;
+    await PrintBluetoothThermal.pairedBluetooths;
     if (isConnected == true) {
       connected = true;
     }
@@ -255,7 +255,6 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
   }
 
   Future<void> printTest() async {
-
     bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
     if (conexionStatus) {
       bool result = false;
@@ -365,7 +364,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       styles: const PosStyles(align: PosAlign.center, bold: true),
     );
     bytes += generator.text(
-      'System by Pointify,\ncontacts: 0791 334 234',
+      'System by Pointify,\nwebsite: pointifypos.com',
       styles: const PosStyles(align: PosAlign.center),
     );
     bytes += generator.cut();

@@ -13,7 +13,6 @@ class PlanController extends GetxController {
       plans.clear();
       isLoadingPackages.value = true;
       var response = await PlansService().getPlans();
-      print(response);
       isLoadingPackages.value = false;
       if (response.isEmpty) {
         for (var element in defaultPlans) {
@@ -25,11 +24,8 @@ class PlanController extends GetxController {
       packages.map((e) => Package.fromJson(e)).toList();
 
       plans.addAll(allpackages.where((element) => element.type != "trial"));
-    }catch(e){
-      print(e);
-    } finally {
+    }finally {
       isLoadingPackages.value = false;
     }
-    // plans.refresh();
   }
 }

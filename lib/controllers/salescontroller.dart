@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -73,6 +74,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   TextEditingController textEditingCredit = TextEditingController();
   TextEditingController amountPaid = TextEditingController();
   TextEditingController cashPaid = TextEditingController();
+  final TextEditingController readyDateController = TextEditingController();
+  final TextEditingController laundryNoteController = TextEditingController();
   TextEditingController mpesaCashPaid = TextEditingController();
   TextEditingController bankCashPaid = TextEditingController();
   TextEditingController saleDiscount = TextEditingController();
@@ -95,6 +98,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     'mpesa': 0,
     'bank': 0,
   });
+  final TextEditingController creditPaidAmountController =
+      TextEditingController();
   RxString duesByDate = RxString("");
   RxList<SaleRetuns> allSalesReturns = RxList([]);
   RxList<OrderItem> orders = RxList([]);
@@ -169,6 +174,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     "Mpesa",
     "Bank",
   ]);
+  final RxBool showReadyDate = false.obs;
   RxList customerType = RxList(["Retail", "Wholesale", "Dealer"]);
   RxList receiptpaymentMethods = RxList(["Cash", "Wallet", "Mpesa", "Bank"]);
   Rxn<SaleModel> receipt = Rxn(SaleModel(items: []));
@@ -607,7 +613,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
     if (paymentType.value == "Cash" ||
         paymentType.value == "Mpesa" ||
-        paymentType.value == "Bank") {
+        paymentType.value == "Bank" ||
+        paymentType.value == "Credit") {
       amountTotalPaid = (double.parse(
         amountPaid.text.isEmpty ? "0" : amountPaid.text,
       ));
@@ -771,6 +778,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
   Future<void> saveReceipt({String? page, String? status}) async {
     SaleModel saleModel = receipt.value!;
+    var response = {};
+    SaleModel receiptData;
     try {
       cashPaid.text = cashPaid.text.isEmpty ? "0.0" : cashPaid.text;
       mpesaCashPaid.text =
@@ -788,7 +797,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         }
         amountPaid.text = amountTotalPaid.toStringAsFixed(2);
       }
-      SaleModel receiptData = receipt.value!;
+      receiptData = receipt.value!;
       var sale = {
         "products": receiptData.items?.map((e) => e.toJson()).toList(),
         "shopId": userController.currentUser.value?.primaryShop?.id ?? "",
@@ -806,6 +815,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         "salesnote": salesnote.text,
         'orderId': receiptData.orderId,
         "duedate": receipt.value!.dueDate,
+        'ready_date': readyDateController.text,
         "batchTrack":
             userController.currentUser.value?.primaryShop?.allowbatchtracking ??
                 false,
@@ -865,7 +875,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         title: "Please wait...",
         key: _keyLoader,
       );
-      var response = {};
       if (receiptData.sId != null) {
         response = await SalesService.updateSale(sale, receiptData.sId!);
       } else {
@@ -927,8 +936,10 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         type: "today",
         shopId: userController.currentUser.value!.primaryShop!.id!,
       );
+
       // if (saleModel.sId != null) {
-      _printReceipt(saleModel);
+      final sale = SaleModel.fromJson(response['sale']);
+      _printReceipt(sale);
       // }
       Get.find<ProductController>().getProductsBySort(type: 'all');
       sellingDate.value = null;
@@ -941,6 +952,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     saleDiscount.clear();
     paymentType.value = "Cash";
     mpesaCashPaid.clear();
+    readyDateController.clear();
     bankCashPaid.clear();
     creditAmount.clear();
     textEditingSellingPrice.clear();
@@ -1044,6 +1056,135 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     Get.back();
   }
 
+  void askCreditPaidAmount() {
+    creditPaidAmountController.clear();
+
+    showDialog(
+      context: Get.context!,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+
+                    /// Title
+                    const Text(
+                      "Any Payment Received?",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    /// Subtitle
+                    const Text(
+                      "Enter amount paid (leave empty if none).",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey,
+                      ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    /// Input
+                    TextFormField(
+                      controller: creditPaidAmountController,
+                      keyboardType: TextInputType.number,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: "Amount paid",
+                        prefix: Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: Text(
+                            userController
+                                .currentUser.value!.primaryShop!.currency!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    /// Single action button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.mainColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () async {
+                          amountPaid.text =
+                              creditPaidAmountController.text.trim().isEmpty
+                                  ? "0.0"
+                                  : creditPaidAmountController.text.trim();
+
+                          getTotalCredit();
+
+                          Get.back();
+                          Get.back();
+
+                          await saveReceipt(status: "cashed");
+                        },
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// Close (X)
+              Positioned(
+                right: 8,
+                top: 8,
+                child: GestureDetector(
+                  onTap: () => Get.back(),
+                  child: const Icon(
+                    Icons.close,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   showSaleDatePicker() {
     showModalBottomSheet(
       context: Get.context!,
@@ -1095,7 +1236,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
                 ),
                 TextButton(
                   onPressed: () async {
-                    Get.back();
                     if (receipt.value!.dueDate == null) {
                       receipt.value!.dueDate =
                           DateFormat('MMMM/dd/yyyy hh:mm a')
@@ -1108,7 +1248,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
                     }
 
                     Get.back();
-                    await saveReceipt(status: "cashed");
+                    askCreditPaidAmount();
                   },
                   child: Text(
                     "Ok".toUpperCase(),
@@ -1667,12 +1807,19 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
           .toList();
       List<int> ticket = await Get.find<PrinterController>().printSalesReceipt(
           items: items,
-          storeName: saleModel.shopId?.name ?? "Pointify",
-          phone: saleModel.shopId?.contact ?? "",
-          email: saleModel.shopId?.receiptemail ?? "",
-          address: saleModel.shopId?.addressReceipt ?? "",
-          paybill: saleModel.shopId?.paybillTill ?? "",
-          paybillAccount: saleModel.shopId?.paybillAccount ?? "",
+          storeName:
+              userController.currentUser.value?.primaryShop?.name ?? "Pointify",
+          phone: userController.currentUser.value?.primaryShop?.contact ?? "",
+          email:
+              userController.currentUser.value?.primaryShop?.receiptemail ?? "",
+          address:
+              userController.currentUser.value?.primaryShop?.addressReceipt ??
+                  "",
+          paybill:
+              userController.currentUser.value?.primaryShop?.paybillTill ?? "",
+          paybillAccount:
+              userController.currentUser.value?.primaryShop?.paybillAccount ??
+                  "",
           paymentType: saleModel.paymentType ?? "Cash",
           customer: saleModel.customerId?.name ?? "",
           date: saleModel.createdAt ?? "",

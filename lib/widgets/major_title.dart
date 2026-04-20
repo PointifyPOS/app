@@ -10,7 +10,7 @@ Widget majorTitle(
     style: TextStyle(
       color: color,
       fontWeight: fontWeight,
-      fontSize: size,
+      // fontSize: size ?? 16,
     ),
   );
 }

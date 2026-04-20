@@ -7,32 +7,57 @@ import 'package:pointify/controllers/paymentcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/screens/shop/edit_shop_details.dart';
-import 'package:pointify/screens/shop/shop_address.dart';
 import 'package:pointify/screens/usage/extend_usage.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/textbutton.dart';
 
 import '../../../main.dart';
 import '../../controllers/salescontroller.dart';
 import '../../models/shop.dart';
-import '../../reports/components/summarycard.dart';
 import '../../services/place_service.dart';
 import '../../services/shop_services.dart';
-import '../../utils/themer.dart';
 import '../../widgets/delete_dialog.dart';
 import '../../widgets/loading_dialog.dart';
-import '../../widgets/minor_title.dart';
+import 'shop_address.dart';
 
 class ShopDetails extends StatelessWidget {
   final Shop shopModel;
-  ShopDetails({Key? key, required this.shopModel}) : super(key: key) {
+
+  ShopDetails({super.key, required this.shopModel}) {
     reportsController.getSalesReport(
       startDate: reportsController.filterStartDate.value,
       toDate: reportsController.filterEndDate.value,
       shopid: userController.currentUser.value!.primaryShop!.id!,
     );
+
+    shopController.emailController.text = shopModel.receiptemail ?? "";
+    shopController.contactController.text = shopModel.contact ?? "";
+    shopController.paybillAcc.text = shopModel.paybillAccount ?? "";
+    shopController.paybillTill.text = shopModel.paybillTill ?? "";
+    shopController.address.text = shopModel.addressReceipt ?? "";
+    shopController.backupemail.text =
+        shopModel.backupemail ?? userController.currentUser.value?.email ?? "";
+
+    shopController.shopLocation.value = shopModel.location ?? "";
+    shopController.allowOnlineSelling.value =
+        shopModel.allowOnlineSelling ?? false;
+    shopController.productionEnabled.value = shopModel.production ?? false;
+    shopController.allowBackup.value = shopModel.allowBackup ?? false;
+    shopController.useWarehouse.value = shopModel.useWarehouse ?? false;
+
+    final backupName = shopModel.backupInterval;
+    final matchedBackup = shopController.backupsendinterval.firstWhereOrNull(
+      (item) => item["name"] == backupName,
+    );
+    if (matchedBackup != null) {
+      shopController.selectedbackupsendinterval.value = matchedBackup;
+    }
+
+    shopController.showbackupsettings.value = false;
+    shopController.onlinesellingsettings.value = false;
+    shopController.showReportssettings.value = false;
+    showDangerZone.value = false;
   }
 
   final ReportsController reportsController = Get.find<ReportsController>();
@@ -40,733 +65,922 @@ class ShopDetails extends StatelessWidget {
   final SalesController salesController = Get.find<SalesController>();
   final ShopController shopController = Get.find<ShopController>();
 
+  final RxBool showDangerZone = false.obs;
+
   @override
   Widget build(BuildContext context) {
-    if (shopModel.backupInterval == null) {
-      shopController.selectedbackupsendinterval["value"] = shopController
-          .backupsendinterval
-          .where((p0) => p0["name"] == shopModel.backupInterval)
-          .first["value"];
-    }
-    if (shopModel.backupemail != null) {
-      shopController.backupemail.text = shopModel.backupemail!;
-    } else {
-      shopController.backupemail.text =
-          userController.currentUser.value!.email!;
-    }
-    shopController.shopLocation.value = shopModel.location!;
-    shopController.allowOnlineSelling.value = shopModel.allowOnlineSelling!;
-    shopController.productionEnabled.value = shopModel.production!;
-    shopController.allowBackup.value = shopModel.allowBackup!;
-    shopController.useWarehouse.value = shopModel.useWarehouse!;
     return Helper(
-      widget: ListView(
-        children: [
-          Card(
-            elevation: 5,
-            child: Container(
-              padding: const EdgeInsets.all(15.0),
-              width: double.infinity,
-              child: Obx(
-                () => ListView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    children: [
-                      summaryCard(
-                          title: "Shop Settings",
-                          description: "Shop settings",
-                          widget: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                          ),
-                          onPressed: (key) {
-                            Get.to(() => EditShopDetails(shopModel: shopModel));
-                          }),
-                      summaryCard(
-                          title: "Backup settings",
-                          description:
-                              "Data back is automated by default but you can download it instantly as well",
-                          widget: Icon(
-                            shopController.showbackupsettings.isTrue
-                                ? Icons.keyboard_arrow_up_rounded
-                                : Icons.keyboard_arrow_down_rounded,
-                          ),
-                          // key: "end",
-                          onPressed: (key) {
-                            shopController.showbackupsettings.value =
-                                !shopController.showbackupsettings.value;
-
-                            shopController.onlinesellingsettings.value = false;
-                          }),
-                      if (shopController.showbackupsettings.isTrue)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 20),
-                          child: Card(
-                            elevation: 5,
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        "Allow Backup?",
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 18),
-                                      ),
-                                      CupertinoSwitch(
-                                        value: shopController.allowBackup.value,
-                                        activeColor: AppColors.mainColor,
-                                        onChanged: (value) {
-                                          shopModel.allowBackup = value;
-                                          shopController.allowBackup.value =
-                                              value;
-                                          shopController.updateShop(
-                                            shop: shopModel,
-                                            allowBackup: shopModel.allowBackup!,
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  if (shopController.allowBackup.isTrue)
-                                    Column(
-                                      children: [
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextFormField(
-                                                controller:
-                                                    shopController.backupemail,
-                                                decoration: ThemeHelper()
-                                                    .textInputDecoration(
-                                                        "Email to receive backup files",
-                                                        "Enter your name",
-                                                        Icons.email, () {
-                                                  shopController.updateShop(
-                                                      shop: shopModel,
-                                                      backupemail:
-                                                          shopController
-                                                              .backupemail
-                                                              .text);
-                                                }),
-                                                onChanged: (v) {
-                                                  shopController
-                                                      .updateEmail.value = true;
-                                                },
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            if (shopController
-                                                .updateEmail.isTrue)
-                                              InkWell(
-                                                onTap: () {
-                                                  if (!validateEmail(
-                                                      shopController
-                                                          .backupemail.text)) {
-                                                    generalAlert(
-                                                      title: "Error",
-                                                      message:
-                                                          "Please enter a valid email",
-                                                    );
-                                                    return;
-                                                  }
-
-                                                  shopController.updateShop(
-                                                      shop: shopModel,
-                                                      backupemail:
-                                                          shopController
-                                                              .backupemail
-                                                              .text);
-                                                  shopController.updateEmail
-                                                      .value = false;
-                                                  FocusScope.of(Get.context!)
-                                                      .requestFocus(
-                                                          FocusNode());
-                                                },
-                                                child:  Text(
-                                                  "Update",
-                                                  style: TextStyle(
-                                                      color:
-                                                          AppColors.mainColor),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        TextFormField(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text(
-                                                      'Select an option'),
-                                                  content: SizedBox(
-                                                    width: double.maxFinite,
-                                                    child: ListView.builder(
-                                                      shrinkWrap: true,
-                                                      itemCount: shopController
-                                                          .backupsendinterval
-                                                          .length,
-                                                      itemBuilder:
-                                                          (BuildContext context,
-                                                              int index) {
-                                                        return ListTile(
-                                                          title: Text(shopController
-                                                                  .backupsendinterval[
-                                                              index]["value"]),
-                                                          onTap: () {
-                                                            // Handle option selection here
-                                                            Navigator.pop(
-                                                                context,
-                                                                shopController
-                                                                        .backupsendinterval[
-                                                                    index]);
-                                                            shopController
-                                                                .selectedbackupsendinterval
-                                                                .value = shopController
-                                                                    .backupsendinterval[
-                                                                index];
-                                                            shopController.updateShop(
-                                                                shop: shopModel,
-                                                                backup: shopController
-                                                                        .selectedbackupsendinterval[
-                                                                    "name"]);
-                                                          },
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            );
-                                          },
-                                          controller: TextEditingController(
-                                              text: shopController
-                                                      .selectedbackupsendinterval[
-                                                  "value"]),
-                                          readOnly: true,
-                                          decoration: ThemeHelper()
-                                              .textInputDecoration(
-                                                  "Backup Send Interval",
-                                                  "Select your backup send interval",
-                                                  Icons.watch_later_outlined,
-                                                  () {}),
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        shopController.isBacking.isTrue
-                                            ? const Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              )
-                                            : textBtn(
-                                                text: "Download Backup Now",
-                                                hPadding: 40,
-                                                vPadding: 10,
-                                                bgColor: Colors.amber,
-                                                onPressed: () {
-                                                  if (shopController
-                                                          .checkSubscription() ==
-                                                      false) {
-                                                    generalAlert(
-                                                        title: "Error",
-                                                        message:
-                                                            "Please upgrade your shop subscription to download backup",
-                                                        function: () {
-                                                          Get.to(() =>
-                                                              ExtendUsage());
-                                                        });
-                                                  } else {
-                                                    return showDialog(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return AlertDialog(
-                                                              title: const Text(
-                                                                  "What you will get"),
-                                                              content: Column(
-                                                                mainAxisSize:
-                                                                    MainAxisSize
-                                                                        .min,
-                                                                crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  const Text(
-                                                                      "✅ Product Sales Report 📃"),
-                                                                  const Text(
-                                                                      "✅ Products Report 📃"),
-                                                                  const Text(
-                                                                      "✅ Customers 📃"),
-                                                                  const SizedBox(
-                                                                    height: 10,
-                                                                  ),
-                                                                  textBtn(
-                                                                      text:
-                                                                          "Backup Now ⬇️",
-                                                                      hPadding:
-                                                                          80,
-                                                                      vPadding:
-                                                                          10,
-                                                                      bgColor:
-                                                                          Colors
-                                                                              .amber,
-                                                                      onPressed:
-                                                                          () {
-                                                                        shopController.backupNow(
-                                                                            shopModel:
-                                                                                shopModel);
-                                                                        Get.back();
-                                                                      })
-                                                                ],
-                                                              ));
-                                                        });
-                                                  }
-                                                }),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      if (shopModel.warehouse == false)
-                        summaryCard(
-                            title: "Online Selling Settings",
-                            description:
-                                "Click to set up online selling options",
-                            widget: Icon(
-                              shopController.onlinesellingsettings.isTrue
-                                  ? Icons.keyboard_arrow_up_rounded
-                                  : Icons.keyboard_arrow_down_rounded,
-                            ),
-                            onPressed: (key) {
-                              shopController.onlinesellingsettings.value =
-                                  !shopController.onlinesellingsettings.value;
-                              shopController.showbackupsettings.value = false;
-                            }),
-                      if (shopController.onlinesellingsettings.isTrue)
-                        Card(
-                          elevation: 5,
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Allow Online Selling?",
-                                      style: TextStyle(
-                                          color: Colors.black, fontSize: 13),
-                                    ),
-                                    CupertinoSwitch(
-                                      value: shopController
-                                          .allowOnlineSelling.value,
-                                      activeColor: AppColors.mainColor,
-                                      onChanged: (value) {
-                                        shopModel.allowOnlineSelling = value;
-                                        shopController
-                                            .allowOnlineSelling.value = value;
-                                        shopController.updateShop(
-                                          shop: shopModel,
-                                          allowOnlineSelling:
-                                              shopModel.allowOnlineSelling!,
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                if (shopController.allowOnlineSelling.isTrue)
-                                  InkWell(
-                                    onTap: () async {
-                                      final Suggestion? result =
-                                          await showSearch(
-                                        context: context,
-                                        delegate: AddressSearch("details"),
-                                      );
-                                      if (result != null) {
-                                        shopModel.location = result.description;
-                                        shopController.reqionController.text =
-                                            result.description;
-                                        shopController.shopLocation.value =
-                                            result.description;
-
-                                        locationFromAddress(result.description)
-                                            .then((value) {
-                                          shopController.updateShop(
-                                            shop: shopModel,
-                                            location: result.description,
-                                            latitude:
-                                                value.first.latitude.toString(),
-                                            longitude: value.first.longitude
-                                                .toString(),
-                                          );
-                                        });
-                                        shopController.shopLocation.refresh();
-                                      }
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white,
-                                          border: Border.all(
-                                            color: AppColors.mainColor,
-                                          )),
-                                      margin: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 20),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              children: [
-                                                 Text(
-                                                    "Pick Current location",
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      color:
-                                                          AppColors.mainColor,
-                                                    )),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Text(
-                                                    shopController
-                                                        .shopLocation.value,
-                                                    style:  TextStyle(
-                                                      fontSize: 10,
-                                                      color:
-                                                          AppColors.mainColor,
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                          const Icon(Icons.location_on_outlined,
-                                              size: 20),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 20),
-                      summaryCard(
-                          title: "Receipt Customization",
-                          description: "Show shop shop details on the receipts",
-                          widget: Icon(
-                            shopController.showReportssettings.isTrue
-                                ? Icons.keyboard_arrow_up_rounded
-                                : Icons.keyboard_arrow_down_rounded,
-                          ),
-                          // key: "end",
-                          onPressed: (key) {
-                            shopController.showReportssettings.value =
-                                !shopController.showReportssettings.value;
-
-                            shopController.onlinesellingsettings.value = false;
-                            shopController.showbackupsettings.value = false;
-                          }),
-                      if (shopController.showReportssettings.isTrue)
-                        Card(
-                          elevation: 5,
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                minorTitle(title: "Email", color: Colors.black),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                SizedBox(
-                                  child: TextFormField(
-                                    keyboardType: TextInputType.text,
-                                    controller: shopController.emailController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                minorTitle(
-                                    title: "Contact", color: Colors.black),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                SizedBox(
-                                  child: TextFormField(
-                                    keyboardType: TextInputType.phone,
-                                    controller:
-                                        shopController.contactController,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                minorTitle(
-                                    title: "Mpesa paybill/Till number",
-                                    color: Colors.black),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                SizedBox(
-                                  child: TextFormField(
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    controller: shopController.paybillTill,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                minorTitle(
-                                    title: "Paybill account number ",
-                                    color: Colors.black),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                SizedBox(
-                                  child: TextFormField(
-                                    controller: shopController.paybillAcc,
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                minorTitle(
-                                    title: "Address", color: Colors.black),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                SizedBox(
-                                  child: TextFormField(
-                                    controller: shopController.address,
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: const BorderSide(
-                                            color: Colors.grey, width: 1),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Center(
-                                  child: textBtn(
-                                      text: "Save",
-                                      hPadding: 40,
-                                      vPadding: 10,
-                                      bgColor: Colors.amber,
-                                      onPressed: () async {
-                                        try {
-                                          LoadingDialog.showLoadingDialog(
-                                              context: context,
-                                              title: "Updating Shop...",
-                                              key: salesController.keyLoader);
-                                          await ShopService()
-                                              .updateShop(shopModel.id!, {
-                                            "contact": shopController
-                                                .contactController.text,
-                                            "paybill_till":
-                                                shopController.paybillTill.text,
-                                            "paybill_account":
-                                                shopController.paybillAcc.text,
-                                            "address_receipt":
-                                                shopController.address.text,
-                                            "receiptemail": shopController
-                                                .emailController.text,
-                                          });
-                                          Get.back();
-                                        } catch (e) {
-                                          Get.back();
-                                        }
-                                      }),
-                                ),
-                                const SizedBox(height: 20),
-                              ],
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 20),
-                      summaryCard(
-                          title: "Delete Shop Data",
-                          description: "Erase All shop Data",
-                          widget: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: (key) {
-                            deleteDialog(
-                                context: context,
-                                message:
-                                    "Are you sure you want to delete this shop data? This option is irreversible and it will erase all your shops data and you cannot recover them again.",
-                                onPressed: () async {
-                                  await shopController.deleteShopData(
-                                      shop: shopModel);
-                                });
-                          }),
-                      const SizedBox(height: 20),
-                      summaryCard(
-                          title: "Delete This Shop",
-                          description: "Erase All shop Data",
-                          key: "end",
-                          widget: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: (key) {
-                            deleteDialog(
-                                context: context,
-                                message:
-                                    "Are you sure you want to delete this shop? This option is irreversible and it will erase all your shops data and you cannot recover them again.",
-                                onPressed: () async {
-                                  await shopController.deleteShop(
-                                      shop: shopModel);
-                                });
-                          }),
-                    ]),
-              ),
-            ),
-          ),
-          const SizedBox(height: 25),
-        ],
-      ),
       appBar: AppBar(
         titleSpacing: 0,
         elevation: 0,
+        backgroundColor: Colors.white,
         centerTitle: true,
         title: Text(
-          shopModel.name!,
-          style:  TextStyle(color: AppColors.mainColor),
+          "Shop Settings",
+          style: TextStyle(
+            color: AppColors.mainColor,
+            fontWeight: FontWeight.w700,
+            fontSize: 17,
+          ),
         ),
         leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon:  Icon(
-            Icons.clear,
+          onPressed: Get.back,
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
             color: AppColors.mainColor,
+            size: 18,
+          ),
+        ),
+      ),
+      widget: Obx(
+        () => ListView(
+          padding: const EdgeInsets.all(12),
+          children: [
+            _buildHeaderCard(),
+            const SizedBox(height: 10),
+            _buildQuickActionCard(),
+            const SizedBox(height: 10),
+            _buildBackupSection(context),
+            const SizedBox(height: 10),
+            if (shopModel.warehouse == false) ...[
+              _buildOnlineSellingSection(context),
+              const SizedBox(height: 10),
+            ],
+            _buildReceiptSection(context),
+            const SizedBox(height: 10),
+            _buildDangerZone(context),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            height: 42,
+            width: 42,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.mainColor.withOpacity(0.10),
+            ),
+            child: Icon(
+              Icons.storefront_outlined,
+              color: AppColors.mainColor,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  shopModel.name ?? "Shop",
+                  style: const TextStyle(
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  "Manage main shop settings",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionCard() {
+    return _compactCard(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Get.to(() => EditShopDetails(shopModel: shopModel));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              _smallIcon(Icons.tune_rounded),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "General Settings",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.5,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      "Edit shop details, tax, category and currency",
+                      style: TextStyle(fontSize: 11.5, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+            ],
           ),
         ),
       ),
     );
   }
+
+  Widget _buildBackupSection(BuildContext context) {
+    return _collapsibleSection(
+      title: "Backup",
+      subtitle: "Auto and manual backups",
+      icon: Icons.backup_outlined,
+      expanded: shopController.showbackupsettings.value,
+      onTap: () {
+        shopController.showbackupsettings.toggle();
+      },
+      child: Column(
+        children: [
+          _settingSwitchTile(
+            title: "Allow Backup",
+            subtitle: "Enable scheduled backup delivery",
+            value: shopController.allowBackup.value,
+            onChanged: (value) {
+              shopModel.allowBackup = value;
+              shopController.allowBackup.value = value;
+              shopController.updateShop(
+                shop: shopModel,
+                allowBackup: value,
+              );
+            },
+          ),
+          if (shopController.allowBackup.isTrue) ...[
+            const SizedBox(height: 10),
+            _fieldLabel("Backup Email"),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: shopController.backupemail,
+                    onChanged: (_) {
+                      shopController.updateEmail.value = true;
+                    },
+                    decoration: _modernInputDecoration(
+                      hint: "Enter backup email",
+                      prefixIcon: Icons.email_outlined,
+                    ),
+                  ),
+                ),
+                if (shopController.updateEmail.isTrue) ...[
+                  const SizedBox(width: 8),
+                  InkWell(
+                    onTap: () {
+                      if (!validateEmail(
+                          shopController.backupemail.text.trim())) {
+                        generalAlert(
+                          title: "Error",
+                          message: "Please enter a valid email",
+                        );
+                        return;
+                      }
+
+                      shopController.updateShop(
+                        shop: shopModel,
+                        backupemail: shopController.backupemail.text.trim(),
+                      );
+                      shopController.updateEmail.value = false;
+                      FocusScope.of(Get.context!).requestFocus(FocusNode());
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 13,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.mainColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        "Save",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 10),
+            _fieldLabel("Backup Interval"),
+            const SizedBox(height: 6),
+            TextFormField(
+              readOnly: true,
+              controller: TextEditingController(
+                text: shopController.selectedbackupsendinterval["value"] ?? "",
+              ),
+              onTap: () => _showBackupIntervalDialog(context),
+              decoration: _modernInputDecoration(
+                hint: "Select interval",
+                prefixIcon: Icons.watch_later_outlined,
+                suffixIcon: Icons.keyboard_arrow_down_rounded,
+              ),
+            ),
+            const SizedBox(height: 12),
+            shopController.isBacking.isTrue
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                : SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        if (shopController.checkSubscription() == false) {
+                          generalAlert(
+                            title: "Error",
+                            message:
+                                "Please upgrade your shop subscription to download backup",
+                            function: () {
+                              Get.to(() => ExtendUsage());
+                            },
+                          );
+                          return;
+                        }
+
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            title: const Text("Backup Contents"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("✅ Product Sales Report"),
+                                const SizedBox(height: 5),
+                                const Text("✅ Products Report"),
+                                const SizedBox(height: 5),
+                                const Text("✅ Customers"),
+                                const SizedBox(height: 14),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.amber,
+                                      foregroundColor: Colors.black,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 13,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      shopController.backupNow(
+                                        shopModel: shopModel,
+                                      );
+                                      Get.back();
+                                    },
+                                    child: const Text("Backup Now"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.download_rounded, size: 18),
+                      label: const Text(
+                        "Download Backup",
+                        style: TextStyle(fontSize: 12.5),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black87,
+                        side: BorderSide(color: Colors.grey.shade300),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOnlineSellingSection(BuildContext context) {
+    return _collapsibleSection(
+      title: "Online Selling",
+      subtitle: "Selling options and location",
+      icon: Icons.language_rounded,
+      expanded: shopController.onlinesellingsettings.value,
+      onTap: () {
+        shopController.onlinesellingsettings.toggle();
+      },
+      child: Column(
+        children: [
+          _settingSwitchTile(
+            title: "Allow Online Selling",
+            subtitle: "Enable online selling for this shop",
+            value: shopController.allowOnlineSelling.value,
+            onChanged: (value) {
+              shopModel.allowOnlineSelling = value;
+              shopController.allowOnlineSelling.value = value;
+              shopController.updateShop(
+                shop: shopModel,
+                allowOnlineSelling: value,
+              );
+            },
+          ),
+          if (shopController.allowOnlineSelling.isTrue) ...[
+            const SizedBox(height: 10),
+            InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () => _pickShopLocation(context),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  color: AppColors.mainColor.withOpacity(0.06),
+                  border: Border.all(
+                    color: AppColors.mainColor.withOpacity(0.20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    _smallIcon(Icons.location_on_outlined),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Shop Location",
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            shopController.shopLocation.value.isEmpty
+                                ? "Tap to pick location"
+                                : shopController.shopLocation.value,
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReceiptSection(BuildContext context) {
+    return _collapsibleSection(
+      title: "Receipt Customization",
+      subtitle: "Receipt details and contacts",
+      icon: Icons.receipt_long_outlined,
+      expanded: shopController.showReportssettings.value,
+      onTap: () {
+        shopController.showReportssettings.toggle();
+      },
+      child: Column(
+        children: [
+          _buildModernField(
+            label: "Email",
+            controller: shopController.emailController,
+            keyboardType: TextInputType.emailAddress,
+            icon: Icons.email_outlined,
+          ),
+          const SizedBox(height: 10),
+          _buildModernField(
+            label: "Contact",
+            controller: shopController.contactController,
+            keyboardType: TextInputType.phone,
+            icon: Icons.phone_outlined,
+          ),
+          const SizedBox(height: 10),
+          _buildModernField(
+            label: "Mpesa Paybill / Till Number",
+            controller: shopController.paybillTill,
+            keyboardType: TextInputType.number,
+            icon: Icons.payments_outlined,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 10),
+          _buildModernField(
+            label: "Paybill Account Number",
+            controller: shopController.paybillAcc,
+            keyboardType: TextInputType.number,
+            icon: Icons.confirmation_number_outlined,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 10),
+          _buildModernField(
+            label: "Address",
+            controller: shopController.address,
+            icon: Icons.location_city_outlined,
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () async {
+                try {
+                  LoadingDialog.showLoadingDialog(
+                    context: context,
+                    title: "Updating Shop...",
+                    key: salesController.keyLoader,
+                  );
+
+                  await ShopService().updateShop(shopModel.id!, {
+                    "contact": shopController.contactController.text,
+                    "paybill_till": shopController.paybillTill.text,
+                    "paybill_account": shopController.paybillAcc.text,
+                    "address_receipt": shopController.address.text,
+                    "receiptemail": shopController.emailController.text,
+                  });
+
+                  Get.back();
+                  Get.snackbar(
+                    "Success",
+                    "Receipt settings updated",
+                    backgroundColor: Colors.green,
+                    colorText: Colors.white,
+                  );
+                } catch (_) {
+                  Get.back();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.mainColor,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                "Save Receipt Settings",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12.5,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDangerZone(BuildContext context) {
+    return _collapsibleSection(
+      title: "Danger Zone",
+      subtitle: "Irreversible actions",
+      icon: Icons.warning_amber_rounded,
+      expanded: showDangerZone.value,
+      iconColor: Colors.red.shade700,
+      iconBgColor: Colors.red.shade50,
+      borderColor: Colors.red.shade100,
+      onTap: () {
+        showDangerZone.toggle();
+      },
+      child: Column(
+        children: [
+          _dangerTile(
+            title: "Delete Shop Data",
+            subtitle: "Erase all shop data",
+            onTap: () {
+              deleteDialog(
+                context: context,
+                message:
+                    "Are you sure you want to delete this shop data? This option is irreversible and it will erase all your shop data and you cannot recover it again.",
+                onPressed: () async {
+                  await shopController.deleteShopData(shop: shopModel);
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          _dangerTile(
+            title: "Delete This Shop",
+            subtitle: "Remove this shop completely",
+            onTap: () {
+              deleteDialog(
+                context: context,
+                message:
+                    "Are you sure you want to delete this shop? This option is irreversible and it will erase all your shop data and you cannot recover it again.",
+                onPressed: () async {
+                  await shopController.deleteShop(shop: shopModel);
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _collapsibleSection({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool expanded,
+    required VoidCallback onTap,
+    required Widget child,
+    Color? iconColor,
+    Color? iconBgColor,
+    Color? borderColor,
+  }) {
+    return _compactCard(
+      borderColor: borderColor,
+      child: Column(
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  _smallIcon(
+                    icon,
+                    color: iconColor ?? AppColors.mainColor,
+                    background:
+                        iconBgColor ?? AppColors.mainColor.withOpacity(0.10),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    expanded
+                        ? Icons.keyboard_arrow_up_rounded
+                        : Icons.keyboard_arrow_down_rounded,
+                    size: 20,
+                    color: Colors.grey.shade700,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AnimatedCrossFade(
+            duration: const Duration(milliseconds: 220),
+            crossFadeState:
+                expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            firstChild: const SizedBox.shrink(),
+            secondChild: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: child,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _compactCard({
+    required Widget child,
+    Color? borderColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        border: Border.all(color: borderColor ?? Colors.grey.shade200),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _smallIcon(
+    IconData icon, {
+    Color? color,
+    Color? background,
+  }) {
+    return Container(
+      height: 34,
+      width: 34,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: background ?? AppColors.mainColor.withOpacity(0.10),
+      ),
+      child: Icon(
+        icon,
+        color: color ?? AppColors.mainColor,
+        size: 18,
+      ),
+    );
+  }
+
+  Widget _settingSwitchTile({
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: Colors.grey.shade50,
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          CupertinoSwitch(
+            value: value,
+            activeColor: AppColors.mainColor,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernField({
+    required String label,
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    List<TextInputFormatter>? inputFormatters,
+    IconData? icon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _fieldLabel(label),
+        const SizedBox(height: 5),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          style: const TextStyle(fontSize: 12.5),
+          decoration: _modernInputDecoration(
+            hint: label,
+            prefixIcon: icon,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _dangerTile({
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: Colors.white,
+          border: Border.all(color: Colors.red.shade100),
+        ),
+        child: Row(
+          children: [
+            _smallIcon(
+              Icons.delete_outline_rounded,
+              color: Colors.red.shade700,
+              background: Colors.red.shade50,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Colors.red.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: Colors.red.shade400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 13,
+              color: Colors.red.shade400,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fieldLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  InputDecoration _modernInputDecoration({
+    required String hint,
+    IconData? prefixIcon,
+    IconData? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(
+        color: Colors.grey.shade500,
+        fontSize: 12,
+      ),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+      isDense: true,
+      prefixIcon: prefixIcon == null
+          ? null
+          : Icon(prefixIcon, color: Colors.grey.shade700, size: 18),
+      suffixIcon: suffixIcon == null
+          ? null
+          : Icon(suffixIcon, color: Colors.grey.shade700, size: 18),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 12,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: AppColors.mainColor.withOpacity(0.5)),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+    );
+  }
+
+  Future<void> _showBackupIntervalDialog(BuildContext context) async {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Select Backup Interval'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: shopController.backupsendinterval.length,
+              itemBuilder: (_, index) {
+                final item = shopController.backupsendinterval[index];
+                return ListTile(
+                  dense: true,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  title: Text(
+                    item["value"],
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    shopController.selectedbackupsendinterval.value = item;
+                    shopController.updateShop(
+                      shop: shopModel,
+                      backup: shopController.selectedbackupsendinterval["name"],
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickShopLocation(BuildContext context) async {
+    final Suggestion? result = await showSearch(
+      context: context,
+      delegate: AddressSearch("details"),
+    );
+
+    if (result == null) return;
+
+    shopModel.location = result.description;
+    shopController.reqionController.text = result.description;
+    shopController.shopLocation.value = result.description;
+
+    final locations = await locationFromAddress(result.description);
+
+    shopController.updateShop(
+      shop: shopModel,
+      location: result.description,
+      latitude: locations.first.latitude.toString(),
+      longitude: locations.first.longitude.toString(),
+    );
+
+    shopController.shopLocation.refresh();
+  }
 }
 
-validateEmail(String email) {
+bool validateEmail(String email) {
   return RegExp(
-          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-      .hasMatch(email);
+    r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$",
+  ).hasMatch(email);
 }

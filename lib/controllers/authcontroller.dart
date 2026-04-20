@@ -26,7 +26,6 @@ import 'package:uuid/uuid.dart';
 import '../functions/functions.dart';
 import '../models/usermodel.dart';
 import '../responsive/responsiveness.dart';
-import '../screens/authentication/verify_email.dart';
 import '../screens/home/home_page.dart';
 import '../screens/shop/create_shop.dart';
 import '../services/authentication.dart';
@@ -68,8 +67,25 @@ class AuthController {
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
   var prefs = PreferenceManager();
 
+  final RxBool smsEnabled = false.obs;
   getToken() async {
     return await prefs.getString('user_token');
+  }
+
+  getUserData() async {
+    var response = await Authentication.getUser(
+      userController.currentUserId.value,
+    );
+    if (response["error"] != null) {
+      logOut();
+    }
+    userController.currentUser.value?.smscredit = response['smscredit'] == null
+        ? 0.0
+        : isInteger(response['smscredit'] ?? response['smscredit'])
+            ? (response['smscredit']).toDouble()
+            : response['smscredit'] ?? response['smscredit'] ?? 0.0;
+    userController.currentUser.refresh();
+    return response;
   }
 
   initUser({String type = ""}) async {
@@ -130,11 +146,6 @@ class AuthController {
           int days = DateTime.parse(
             userController.currentUser.value!.emailVerificationDate!,
           ).difference(DateTime(now.year, now.month, now.day)).inDays;
-          // if (days <= 0 &&
-          //     userController.currentUser.value!.emailVerified == false) {
-          //   Get.off(() => EmailVerificationPage());
-          //   return;
-          // }
           if (userController.currentUser.value?.primaryShop != null) {
             if (type == "auth") {
               Get.offAll(() => const Home());
@@ -150,20 +161,20 @@ class AuthController {
       print("Error: $e");
       debugPrintMessage(e);
     } finally {
-
       SettingsApi.getSettings().then((data) async {
         var app = data['APP_CONFIG'];
         var themes = data['theme'];
         var general = data['GENERAL_CONFIG'];
         var stripe = data['STRIPE_CONFIG'];
-        AppConfig.country_code = general ==null ? "KES" : general['country_code'] ?? "US";
+        AppConfig.country_code =
+            general == null ? "KES" : general['country_code'] ?? "US";
         AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
         if (AppConfig.stripePublishKey.isNotEmpty) {
           Stripe.publishableKey = AppConfig.stripePublishKey;
           Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
           await Stripe.instance.applySettings();
         }
-        if(app !=null) {
+        if (app != null) {
           AppConfig.offline_mode = app['offlineEnabled'] ?? false;
           AppConfig.androidLink = app['androidLink'] ?? "";
           AppConfig.demo_mode = app['demoEnabled'] ?? false;
@@ -176,9 +187,12 @@ class AuthController {
         }
         checkForUpdate(app);
       });
+
       if (await isConnected()) {
         if (userController.currentUser.value != null &&
             userController.currentUser.value!.primaryShop != null) {
+          Get.find<ProductController>().getProductStats(
+              userController.currentUser.value!.primaryShop!.id!);
           Get.find<SalesController>().getSalesByDate(
             type: "today",
             shop: userController.currentUser.value!.primaryShop!.id!,
@@ -203,7 +217,7 @@ class AuthController {
             );
           }
         }
-        if(userController.currentUser.value?.primaryShop !=null) {
+        if (userController.currentUser.value?.primaryShop != null) {
           rateApp();
         }
         Get.find<ShopController>().getShops();
@@ -257,34 +271,39 @@ class AuthController {
     }
   }
 
-
   Future<void> checkForUpdate(var value) async {
-    print("checkForUpdate $value");
-    if(value == null){
-      var response = await SettingsApi.getSettings(type: "APP_CONFIG");
+    if (value == null) {
+      var response = await SettingsApi.getSettings(type: "APP_SETTINGS");
       value = response;
     }
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      int latestVersion = value['android_version'] ==null ? 0 :int.parse(value['android_version'] ?? 0);
-      String buildNumber = packageInfo.buildNumber;
-      settingsData = value;
-      if (Platform.isAndroid) {
-        if (latestVersion > int.parse(buildNumber) &&
-            showingUpdateAlert.isFalse) {
-          showingUpdateAlert.value = true;
-          showUpdateAlert(value['forceUpdate']);
-        }else{
-          showingUpdateAlert.value = false;
-        }
-      } else if (Platform.isIOS) {
-        int latestVersion = value['ios_version'] == null ? 0: int.parse(value['ios_version'] ?? 0);
-        String buildNumber = packageInfo.buildNumber;
-        if (latestVersion > int.parse(buildNumber) &&
-            showingUpdateAlert.isFalse) {
-          showingUpdateAlert.value = true;
-          showUpdateAlert(value['forceUpdate']);
-        }
+    print("checkForUpdate $value");
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    int latestVersion = value['android_version'] == null
+        ? 0
+        : int.parse(value['android_version'] ?? 0);
+    String buildNumber = packageInfo.buildNumber;
+    settingsData = value;
+    print("checkForUpdate $buildNumber $latestVersion");
+    if (Platform.isAndroid) {
+      if (latestVersion > int.parse(buildNumber) &&
+          showingUpdateAlert.isFalse) {
+        showingUpdateAlert.value = true;
+        showUpdateAlert(value['forceUpdate']);
+      } else {
+        showingUpdateAlert.value = false;
       }
+    } else if (Platform.isIOS) {
+      int latestVersion = value['ios_version'] == null
+          ? 0
+          : int.parse(value['ios_version'] ?? 0);
+      String buildNumber = packageInfo.buildNumber;
+      if (latestVersion > int.parse(buildNumber) &&
+          showingUpdateAlert.isFalse) {
+        showingUpdateAlert.value = true;
+        showUpdateAlert(value['forceUpdate']);
+      }
+    }
   }
 
   void showUpdateAlert(bool forceUpdate) {
@@ -323,7 +342,7 @@ class AuthController {
   void launchStore() async {
     String appPackageName = '';
     if (Platform.isAndroid) {
-      appPackageName = AppConfig.androidLink ;
+      appPackageName = AppConfig.androidLink;
     } else if (Platform.isIOS) {
       appPackageName = AppConfig.iosLink;
     }
