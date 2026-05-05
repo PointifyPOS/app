@@ -19,7 +19,7 @@ class PlanController extends GetxController {
           PlansService().createPackage(element);
         }
       }
-      List packages = response['data'];
+      List packages = response['data'] ?? response['packages'];
       List<Package> allpackages =
           packages.map((e) => Package.fromJson(e)).toList();
 
