@@ -1,4 +1,4 @@
-const apiEndPoint = "https://api.pointifypos.com/";
+const apiEndPoint = "https://sandbox.pointifypos.com/";
 const storeurl = "https://store.pointifypos.com/";
 
 class EndPoints {
@@ -144,7 +144,6 @@ class EndPoints {
   static const inpappsubscribe = "${apiEndPoint}subscriptions/inapp/ios";
   static const updatestripesubscriptions =
       "${apiEndPoint}subscriptions/stripe/updateAfterStripeSuccessPayment";
-  static const subscriptionPayment = "${apiEndPoint}payment/subscribe/";
   static const subscriptionPaymentconfirm =
       "${apiEndPoint}payment/subscribe/confirm";
 

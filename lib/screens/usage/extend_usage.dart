@@ -240,7 +240,7 @@ class ExtendUsage extends StatelessWidget {
                             children: List.generate(
                                 plan.features!.length,
                                 (index) => minorTitle(
-                                    title: "${plan.features?[index]}",
+                                    title: _shops_count(plan),
                                     color: Colors.black,
                                     size: 12.0)).toList(),
                           )
@@ -280,5 +280,17 @@ class ExtendUsage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // ignore: non_constant_identifier_names
+  _shops_count(Package plan) {
+    if (plan.type == "free") {
+      return "Unlimited Shops";
+    } else {
+      if (plan.maxShops! > 10) {
+        return ' 11+ Shops';
+      }
+      return "max ${plan.maxShops} Shops";
+    }
   }
 }

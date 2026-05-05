@@ -91,145 +91,144 @@ class AuthController {
   initUser({String type = ""}) async {
     bool connected = await isConnected();
 
-    try {
-      if (connected) {
-        if ((await prefs.getString('id')) == null) return;
-        userController.currentUserId.value = (await prefs.getString('id'))!;
-        if (userController.currentUserId.value.isEmpty) logOut();
-        var usertype = await prefs.getString('user_type');
-        var response;
-        if (usertype == "admin") {
-          response = await Authentication.getUser(
-            userController.currentUserId.value,
-          );
-          if (response["error"] != null) {
-            logOut();
-          }
-          response["usertype"] = usertype;
+    // try {
+    if (connected) {
+      if ((await prefs.getString('id')) == null) return;
+      userController.currentUserId.value = (await prefs.getString('id'))!;
+      if (userController.currentUserId.value.isEmpty) logOut();
+      var usertype = await prefs.getString('user_type');
+      var response;
+      if (usertype == "admin") {
+        response = await Authentication.getUser(
+          userController.currentUserId.value,
+        );
+        if (response["error"] != null) {
+          logOut();
+        }
+        response["usertype"] = usertype;
 
-          DatabaseHelper().insertUser(response);
-          userController.currentUser.value = UserModel.fromJson(response);
-        } else if (usertype == "attendant") {
-          var response = await Authentication.getAttendant(
-            userController.currentUserId.value,
-          );
-          if (response["error"] != null) {
-            logOut();
-          }
-          response["usertype"] = usertype;
-          userController.currentUser.value = UserModel.fromJson(response);
-          userController.getRoles(userController.currentUser.value!);
+        DatabaseHelper().insertUser(response);
+        userController.currentUser.value = UserModel.fromJson(response);
+      } else if (usertype == "attendant") {
+        var response = await Authentication.getAttendant(
+          userController.currentUserId.value,
+        );
+        if (response["error"] != null) {
+          logOut();
         }
-      } else {
-        if (await prefs.getString('id') == null) return;
-        String? id = await prefs.getString('id');
-        if (id!.isEmpty) return;
-        final dbHelper = DatabaseHelper();
-        final user = await dbHelper.getUserByEmail(id: id);
-        if (user != null) {
-          user['primaryShop']['_id'] = user['primaryShop']['id'];
-          user['attendantId']['_id'] = user['attendantId']['id'];
-          user['_id'] = user['id'];
-          userController.currentUser.value = UserModel.fromJson(user);
-        } else {
-          await logOut();
-          return;
-        }
+        response["usertype"] = usertype;
+        userController.currentUser.value = UserModel.fromJson(response);
+        userController.getRoles(userController.currentUser.value!);
       }
-
-      var user = userController.currentUser.value;
+    } else {
+      if (await prefs.getString('id') == null) return;
+      String? id = await prefs.getString('id');
+      if (id!.isEmpty) return;
+      final dbHelper = DatabaseHelper();
+      final user = await dbHelper.getUserByEmail(id: id);
       if (user != null) {
-        if (user.usertype == "attendant") {
-          Get.off(() => HomePage());
-        } else {
-          final DateTime now = DateTime.now();
-          int days = DateTime.parse(
-            userController.currentUser.value!.emailVerificationDate!,
-          ).difference(DateTime(now.year, now.month, now.day)).inDays;
-          if (userController.currentUser.value?.primaryShop != null) {
-            if (type == "auth") {
-              Get.offAll(() => const Home());
-            } else {
-              Get.off(() => const Home());
-            }
-          } else {
-            Get.offAll(() => CreateShop(page: "reg"));
-          }
-        }
+        user['primaryShop']['_id'] = user['primaryShop']['id'];
+        user['attendantId']['_id'] = user['attendantId']['id'];
+        user['_id'] = user['id'];
+        userController.currentUser.value = UserModel.fromJson(user);
+      } else {
+        await logOut();
+        return;
       }
-    } catch (e) {
-      print("Error: $e");
-      debugPrintMessage(e);
-    } finally {
-      SettingsApi.getSettings().then((data) async {
-        var app = data['APP_CONFIG'];
-        var themes = data['theme'];
-        var general = data['GENERAL_CONFIG'];
-        var stripe = data['STRIPE_CONFIG'];
-        AppConfig.country_code =
-            general == null ? "KES" : general['country_code'] ?? "US";
-        AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
-        if (AppConfig.stripePublishKey.isNotEmpty) {
-          Stripe.publishableKey = AppConfig.stripePublishKey;
-          Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
-          await Stripe.instance.applySettings();
-        }
-        if (app != null) {
-          AppConfig.offline_mode = app['offlineEnabled'] ?? false;
-          AppConfig.androidLink = app['androidLink'] ?? "";
-          AppConfig.demo_mode = app['demoEnabled'] ?? false;
-          AppConfig.iosLink = app['iosLink'] ?? "";
-        }
-        if (AppConfig.offline_mode == false) {
-          userController.enableOffline.value = false;
-        } else {
-          userController.enableOffline.value = true;
-        }
-        checkForUpdate(app);
-      });
-
-      if (await isConnected()) {
-        if (userController.currentUser.value != null &&
-            userController.currentUser.value!.primaryShop != null) {
-          Get.find<ProductController>().getProductStats(
-              userController.currentUser.value!.primaryShop!.id!);
-          Get.find<SalesController>().getSalesByDate(
-            type: "today",
-            shop: userController.currentUser.value!.primaryShop!.id!,
-          );
-          Get.find<SalesController>().getNetAnalysis(
-            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-            type: "today",
-            shopId: userController.currentUser.value!.primaryShop!.id!,
-          );
-
-          Get.find<ExpenseController>().getExpenses(
-            fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-            toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-            shop: userController.currentUser.value?.primaryShop!.id!,
-          );
-          User().updateLastSeen();
-          if (userController.currentUser.value?.primaryShop?.warehouse ==
-              true) {
-            Get.find<WareHouseController>().getRequests(
-              warehouse: userController.currentUser.value?.primaryShop?.id,
-            );
-          }
-        }
-        if (userController.currentUser.value?.primaryShop != null) {
-          rateApp();
-        }
-        Get.find<ShopController>().getShops();
-      }
-
-      Get.find<ProductController>().getProductsBySort(type: "all");
-      Get.find<CustomerController>().getCustomersInShop('');
-      Get.find<SalesController>().getOrders(
-        fromDate: Get.find<ReportsController>().filterStartDate.value,
-        toDate: Get.find<ReportsController>().filterEndDate.value,
-      );
     }
+
+    var user = userController.currentUser.value;
+    if (user != null) {
+      if (user.usertype == "attendant") {
+        Get.off(() => HomePage());
+      } else {
+        final DateTime now = DateTime.now();
+        int days = DateTime.parse(
+          userController.currentUser.value!.emailVerificationDate!,
+        ).difference(DateTime(now.year, now.month, now.day)).inDays;
+        if (userController.currentUser.value?.primaryShop != null) {
+          if (type == "auth") {
+            Get.offAll(() => const Home());
+          } else {
+            Get.off(() => const Home());
+          }
+        } else {
+          Get.offAll(() => CreateShop(page: "reg"));
+        }
+      }
+    }
+    // } catch (e) {
+    //   print("Error: $e");
+    //   debugPrintMessage(e);
+    // } finally {
+    SettingsApi.getSettings().then((data) async {
+      var app = data['APP_CONFIG'];
+      var themes = data['theme'];
+      var general = data['GENERAL_CONFIG'];
+      var stripe = data['STRIPE_CONFIG'];
+      AppConfig.country_code =
+          general == null ? "KES" : general['country_code'] ?? "US";
+      AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
+      if (AppConfig.stripePublishKey.isNotEmpty) {
+        Stripe.publishableKey = AppConfig.stripePublishKey;
+        Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
+        await Stripe.instance.applySettings();
+      }
+      if (app != null) {
+        AppConfig.offline_mode = app['offlineEnabled'] ?? false;
+        AppConfig.androidLink = app['androidLink'] ?? "";
+        AppConfig.demo_mode = app['demoEnabled'] ?? false;
+        AppConfig.iosLink = app['iosLink'] ?? "";
+      }
+      if (AppConfig.offline_mode == false) {
+        userController.enableOffline.value = false;
+      } else {
+        userController.enableOffline.value = true;
+      }
+      checkForUpdate(app);
+    });
+
+    if (await isConnected()) {
+      if (userController.currentUser.value != null &&
+          userController.currentUser.value!.primaryShop != null) {
+        Get.find<ProductController>().getProductStats(
+            userController.currentUser.value!.primaryShop!.id!);
+        Get.find<SalesController>().getSalesByDate(
+          type: "today",
+          shop: userController.currentUser.value!.primaryShop!.id!,
+        );
+        Get.find<SalesController>().getNetAnalysis(
+          fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          type: "today",
+          shopId: userController.currentUser.value!.primaryShop!.id!,
+        );
+
+        Get.find<ExpenseController>().getExpenses(
+          fromDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+          shop: userController.currentUser.value?.primaryShop!.id!,
+        );
+        User().updateLastSeen();
+        if (userController.currentUser.value?.primaryShop?.warehouse == true) {
+          Get.find<WareHouseController>().getRequests(
+            warehouse: userController.currentUser.value?.primaryShop?.id,
+          );
+        }
+      }
+      if (userController.currentUser.value?.primaryShop != null) {
+        rateApp();
+      }
+      Get.find<ShopController>().getShops();
+    }
+
+    Get.find<ProductController>().getProductsBySort(type: "all");
+    Get.find<CustomerController>().getCustomersInShop('');
+    Get.find<SalesController>().getOrders(
+      fromDate: Get.find<ReportsController>().filterStartDate.value,
+      toDate: Get.find<ReportsController>().filterEndDate.value,
+    );
+    // }
   }
 
   rateApp() async {
@@ -284,7 +283,6 @@ class AuthController {
         : int.parse(value['android_version'] ?? 0);
     String buildNumber = packageInfo.buildNumber;
     settingsData = value;
-    print("checkForUpdate $buildNumber $latestVersion");
     if (Platform.isAndroid) {
       if (latestVersion > int.parse(buildNumber) &&
           showingUpdateAlert.isFalse) {

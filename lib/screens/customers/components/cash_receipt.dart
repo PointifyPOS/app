@@ -55,7 +55,7 @@ class CashReceipt extends StatelessWidget {
                               cashReceiptPdf([receipt!], "CASH RECEIPT")),
                     ));
               },
-              icon:  Icon(
+              icon: Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               )),
@@ -77,218 +77,206 @@ class CashReceipt extends StatelessWidget {
               ))
         ],
       ),
-      body: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Obx(
-          () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (receipt!.customerId != null)
+      body: Obx(
+        () => SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Row(
                   children: [
-                    Text(
-                      "Customer: ${receipt!.customerId!.name!}",
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        normalText(
-                            title: "Date:", color: Colors.black, size: 14.0),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        majorTitle(
-                            title: DateFormat("yyyy/MM/dd hh:mm")
-                                .format(DateTime.parse(receipt!.date!)),
-                            color: Colors.grey,
-                            size: 11.0)
-                      ],
-                    )
-                  ],
-                ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      normalText(
-                          title: "Total", color: Colors.black, size: 14.0),
-                      const SizedBox(
-                        height: 10,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      majorTitle(
-                          title: htmlPrice(receipt!.amount),
-                          color: Colors.black,
-                          size: 18.0)
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(5)),
-                    child: const Text(
-                      "CASH RECEIPT",
-                      style: TextStyle(color: Colors.white),
+                      child: const Text(
+                        "CASH RECEIPT",
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                ],
-              ),
-              const Divider(
-                color: Colors.grey,
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    Table(children: [
-                      TableRow(children: [
-                        Text(
-                          receipt!.type!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          htmlPrice(receipt!.amount!),
-                          style: const TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {},
-                          child: Row(
-                            children: [
-                              Text(
-                                htmlPrice(receipt!.amount),
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ]),
-                    ]),
-                    const Divider(
-                      color: Colors.black,
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Table(children: [
-                        TableRow(children: [
-                          const Text(
-                            "",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          const Text(
-                            "",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                htmlPrice(receipt!.amount),
-                                style: const TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              const Divider(
-                                thickness: 3,
-                                color: Colors.black,
-                              )
-                            ],
-                          ),
-                        ]),
-                      ]),
+                    const Spacer(),
+                    Text(
+                      DateFormat("yyyy/MM/dd hh:mm")
+                          .format(DateTime.parse(receipt!.date!)),
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Row(
+                const SizedBox(height: 22),
+                Text(
+                  htmlPrice(receipt!.amount),
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Total amount received",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Divider(color: Colors.grey.shade200),
+                if (receipt!.customerId != null) ...[
+                  _receiptInfoRow(
+                    title: "Customer",
+                    value: receipt!.customerId!.name!,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                _receiptInfoRow(
+                  title: "Receipt No.",
+                  value: "#${receipt!.recieptNumber}".toUpperCase(),
+                ),
+                const SizedBox(height: 12),
+                _receiptInfoRow(
+                  title: "Payment Type",
+                  value: receipt!.type ?? "Cash",
+                ),
+                const SizedBox(height: 12),
+                if (receipt!.date != null)
+                  _receiptInfoRow(
+                    title: "Date",
+                    value: DateFormat("yyyy-MM-dd HH:mm")
+                        .format(DateTime.parse(receipt!.date!).toLocal()),
+                  ),
+                const SizedBox(height: 12),
+                _receiptInfoRow(
+                  title: "Served by",
+                  value: receipt!.attendantId!.username ?? "",
+                ),
+                const SizedBox(height: 22),
+                Divider(color: Colors.grey.shade200),
+                Row(
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        normalText(
-                            title: "Date", color: Colors.black, size: 14.0),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        if (receipt!.date != null)
-                          majorTitle(
-                              title: DateFormat("yyyy-MM-dd HH:mm").format(
-                                  DateTime.parse(receipt!.date!).toLocal()),
-                              color: Colors.black,
-                              size: 18.0)
-                      ],
+                    const Text(
+                      "Amount Paid",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        normalText(
-                            title: "Served by",
-                            color: Colors.black,
-                            size: 14.0),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        majorTitle(
-                            title: receipt!.attendantId!.username,
-                            color: Colors.black,
-                            size: 18.0)
-                      ],
+                    Text(
+                      htmlPrice(receipt!.amount),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 12,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Get.to(() => Scaffold(
+                          appBar: AppBar(
+                            title: const Text("Cash Receipt"),
+                          ),
+                          body: PdfPreview(
+                            build: (context) =>
+                                cashReceiptPdf([receipt!], "CASH RECEIPT"),
+                          ),
+                        ));
+                  },
+                  icon: const Icon(Icons.print, size: 18),
+                  label: const Text("Print Receipt"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-          height: 80,
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Center(
-                child: textBtn(
-                    onPressed: () {
-                      Get.to(() => Scaffold(
-                            appBar: AppBar(
-                              title: const Text("Cash Receipt"),
-                            ),
-                            body: PdfPreview(
-                                build: (context) =>
-                                    cashReceiptPdf([receipt!], "CASH RECEIPT")),
-                          ));
-                    },
-                    hPadding: 20,
-                    text: "Print",
-                    radius: 10,
-                    bgColor: AppColors.mainColor,
-                    color: Colors.white),
-              ),
-            ],
-          )),
     );
   }
+}
+
+Widget _receiptInfoRow({
+  required String title,
+  required String value,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(
+        width: 110,
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ),
+      Expanded(
+        child: Text(
+          value,
+          textAlign: TextAlign.right,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 onCredit(SaleModel salesModel) => salesModel.outstandingBalance! > 0;

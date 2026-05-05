@@ -19,12 +19,12 @@ class PlanController extends GetxController {
           PlansService().createPackage(element);
         }
       }
-      List packages = response;
+      List packages = response['data'];
       List<Package> allpackages =
-      packages.map((e) => Package.fromJson(e)).toList();
+          packages.map((e) => Package.fromJson(e)).toList();
 
       plans.addAll(allpackages.where((element) => element.type != "trial"));
-    }finally {
+    } finally {
       isLoadingPackages.value = false;
     }
   }

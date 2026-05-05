@@ -100,637 +100,597 @@ class SalesReceipt extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-          child: Obx(
-            () => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: Obx(
+          () {
+            final receipt = salesController.currentReceipt.value!;
+
+            return Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (verifyPermission(
-                        category: "sales", permission: "return"))
-                      InkWell(
-                        onTap: () {
-                          saleReceiptActions(
-                              saleModel: salesController.currentReceipt.value!,
-                              from: from ?? "");
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.only(right: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Top status card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(6),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 5,
-                                )
-                              ]),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          child: const Row(
-                            children: [
-                              Text(
-                                "Refund",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 12),
-                              ),
-                              SizedBox(
-                                width: 5,
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 12,
+                                offset: const Offset(0, 5),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    // Center(child: Obx(() {
-                    //   return printerController.printing.value == true
-                    //       ? const Center(
-                    //           child: CircularProgressIndicator(),
-                    //         )
-                    //       : InkWell(
-                    //           onTap: () async {
-                    //             showModalBottomSheet(
-                    //                 context: context,
-                    //                 builder: (_) {
-                    //                   return Container(
-                    //                     width:
-                    //                         MediaQuery.of(context).size.width,
-                    //                     margin: const EdgeInsets.symmetric(
-                    //                         vertical: 10, horizontal: 10),
-                    //                     child: Column(
-                    //                       children: [
-                    //                         const Text(
-                    //                           "Select Printer Type",
-                    //                           style: TextStyle(
-                    //                               fontSize: 20,
-                    //                               fontWeight: FontWeight.bold),
-                    //                         ),
-                    //                         const SizedBox(
-                    //                           height: 20,
-                    //                         ),
-                    //                         InkWell(
-                    //                           onTap: () {
-                    //                             Get.back();
-                    //                             Sunmi().printReceipt(
-                    //                                 saleModel: salesModel!,
-                    //                                 receiptTitle:
-                    //                                     "Cash Receipt");
-                    //
-                    //                             Cs50PrinterSetup().printReceipt(
-                    //                                 saleModel: salesModel!,
-                    //                                 receiptTitle:
-                    //                                     "Cash Receipt");
-                    //                           },
-                    //                           child: Row(
-                    //                             children: [
-                    //                               Container(
-                    //                                   padding:
-                    //                                       const EdgeInsets.all(
-                    //                                           10),
-                    //                                   decoration: BoxDecoration(
-                    //                                       borderRadius:
-                    //                                           BorderRadius
-                    //                                               .circular(50),
-                    //                                       color: AppColors
-                    //                                           .mainColor,
-                    //                                       boxShadow: [
-                    //                                         BoxShadow(
-                    //                                           color: Colors.grey
-                    //                                               .withOpacity(
-                    //                                                   0.5),
-                    //                                           spreadRadius: 3,
-                    //                                         )
-                    //                                       ]),
-                    //                                   child: const Icon(
-                    //                                       Icons.print,
-                    //                                       color: Colors.white)),
-                    //                               const SizedBox(
-                    //                                 width: 20,
-                    //                               ),
-                    //                               const Text("Sunmi Printer"),
-                    //                             ],
-                    //                           ),
-                    //                         ),
-                    //                         const SizedBox(
-                    //                           height: 10,
-                    //                         ),
-                    //                         const Divider(),
-                    //                         const SizedBox(
-                    //                           height: 10,
-                    //                         ),
-                    //                         InkWell(
-                    //                           onTap: () {
-                    //                             Get.back();
-                    //                             if (printerController
-                    //                                         .device?.value ==
-                    //                                     null ||
-                    //                                 printerController
-                    //                                         .connected.value ==
-                    //                                     false) {
-                    //                               Get.to(() =>
-                    //                                   const PrintingPage());
-                    //                             } else {
-                    //                               printerController
-                    //                                   .printSaleReceipt(
-                    //                                 title:
-                    //                                     "${chechPayment(salesController.currentReceipt.value!, type!)} RECEIPT",
-                    //                                 salesModel: salesModel!,
-                    //                               );
-                    //                             }
-                    //                           },
-                    //                           child: Row(
-                    //                             children: [
-                    //                               Container(
-                    //                                   padding:
-                    //                                       const EdgeInsets.all(
-                    //                                           10),
-                    //                                   decoration: BoxDecoration(
-                    //                                       borderRadius:
-                    //                                           BorderRadius
-                    //                                               .circular(50),
-                    //                                       color: AppColors
-                    //                                           .mainColor,
-                    //                                       boxShadow: [
-                    //                                         BoxShadow(
-                    //                                           color: Colors.grey
-                    //                                               .withOpacity(
-                    //                                                   0.5),
-                    //                                           spreadRadius: 3,
-                    //                                         )
-                    //                                       ]),
-                    //                                   child: const Icon(
-                    //                                       Icons.print,
-                    //                                       color: Colors.white)),
-                    //                               const SizedBox(
-                    //                                 width: 20,
-                    //                               ),
-                    //                               Text(
-                    //                                   "Thermal/Bluetooth Printer"),
-                    //                             ],
-                    //                           ),
-                    //                         )
-                    //                       ],
-                    //                     ),
-                    //                   );
-                    //                 });
-                    //           },
-                    //           child: Container(
-                    //               padding: const EdgeInsets.all(10),
-                    //               decoration: BoxDecoration(
-                    //                   borderRadius: BorderRadius.circular(50),
-                    //                   color: AppColors.mainColor,
-                    //                   boxShadow: [
-                    //                     BoxShadow(
-                    //                       color: Colors.grey.withOpacity(0.5),
-                    //                       spreadRadius: 3,
-                    //                     )
-                    //                   ]),
-                    //               child: const Icon(Icons.print,
-                    //                   color: Colors.white)),
-                    //         );
-                    // })),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Divider(
-                  height: 0,
-                  thickness: 1,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (salesController.currentReceipt.value!.createdAt != null)
-                      majorTitle(
-                          title: DateFormat("yyyy-MM-dd hh:mm").format(
-                              DateTime.parse(salesController
-                                      .currentReceipt.value!.createdAt!)
-                                  .toUtc()),
-                          color: Colors.black,
-                          size: 12.0),
-                    if (salesModel?.status != "order")
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          normalText(
-                              title: "Served by: ",
-                              color: Colors.black,
-                              size: 12.0),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          majorTitle(
-                              title: salesModel?.attendant?.username,
-                              color: Colors.black,
-                              size: 12.0)
-                        ],
-                      ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (salesController.currentReceipt.value!.customerId == null)
-                  const SizedBox(
-                    height: 10,
-                  ),
-                if (salesController.currentReceipt.value!.customerId != null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          "Customer:\n${salesController.currentReceipt.value!.customerId!.name!}",
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                      if (salesController
-                                  .currentReceipt.value!.outstandingBalance! >
-                              0 &&
-                          salesController.currentReceipt.value!.dueDate != null)
-                        Text(
-                          "Due Date:\n${DateFormat("yyyy/MM/dd HH:mm").format(DateTime.parse(salesController.currentReceipt.value!.dueDate!).toLocal())}",
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                    ],
-                  ),
-                if (salesController.currentReceipt.value?.salesnote != null &&
-                    salesController.currentReceipt.value!.salesnote!.isNotEmpty)
-                  Text(
-                    "Note: ${salesController.currentReceipt.value?.salesnote}",
-                    style: const TextStyle(fontSize: 13),
-                  ),
-                if (salesController.currentReceipt.value!.customerId != null)
-                  const SizedBox(
-                    height: 20,
-                  ),
-                Row(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        normalText(
-                            title: "Total", color: Colors.black, size: 14.0),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        majorTitle(
-                            title: htmlPrice(salesController
-                                .currentReceipt.value!.totalWithDiscount),
-                            color: Colors.black,
-                            size: 14.0)
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 40,
-                    ),
-                    if (salesController
-                            .currentReceipt.value!.outstandingBalance! >
-                        0)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          normalText(
-                              title: "Total Paid",
-                              color: Colors.black,
-                              size: 14.0),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          majorTitle(
-                              title: htmlPrice(salesController.currentReceipt
-                                      .value!.totalWithDiscount! -
-                                  salesController.currentReceipt.value!
-                                      .outstandingBalance!),
-                              color: Colors.black,
-                              size: 14.0)
-                        ],
-                      ),
-                    const SizedBox(
-                      width: 40,
-                    ),
-                    if (onCredit(salesController.currentReceipt.value!) &&
-                        type != "returns")
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          normalText(
-                              title: "Balance",
-                              color: Colors.black,
-                              size: 14.0),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          majorTitle(
-                              title: htmlPrice(salesController
-                                  .currentReceipt.value!.outstandingBalance!
-                                  .abs()),
-                              color: Colors.black,
-                              size: 14.0)
-                        ],
-                      ),
-                    const SizedBox(
-                      width: 30,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: _chechPaymentColor(
-                              salesController.currentReceipt.value!, type!),
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Text(
-                        chechPayment(
-                            salesController.currentReceipt.value!, type!),
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    if (salesController.currentReceipt.value!.paymentTag ==
-                        'credit')
-                      Center(
-                        child: InkWell(
-                          onTap: () {
-                            paymentController.getSalesPaymentBySaleId(
-                                salesController.currentReceipt.value!.sId!);
-                            Get.to(() => PaymentHistory());
-                          },
-                          child: const Text(
-                            "View payments",
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    if (onCredit(salesController.currentReceipt.value!) &&
-                        salesController.currentReceipt.value!.items!.fold(
-                                0.0,
-                                (previousValue, element) =>
-                                    previousValue + element.quantity!) >
-                            0 &&
-                        type != "returns")
-                      InkWell(
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: _chechPaymentColor(
-                                        salesController.currentReceipt.value!,
-                                        type!)),
-                                borderRadius: BorderRadius.circular(5)),
-                            child: const Text("Pay Now")),
-                        onTap: () {
-                          showAmountDialog(
-                              salesController.currentReceipt.value!);
-                        },
-                      )
-                  ],
-                ),
-                const Divider(
-                  color: Colors.grey,
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount:
-                          salesController.currentReceipt.value?.items!.length,
-                      itemBuilder: (BuildContext c, int i) {
-                        SaleItem receiptitem =
-                            salesController.currentReceipt.value!.items![i];
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Table(children: [
-                                TableRow(children: [
-                                  Text(
-                                    receiptitem.product!.name!.capitalize!,
-                                    style: TextStyle(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _chechPaymentColor(receipt, type!)
+                                          .withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: Text(
+                                      chechPayment(receipt, type!),
+                                      style: TextStyle(
+                                        color:
+                                            _chechPaymentColor(receipt, type!),
                                         fontSize: 12,
-                                        decoration: receiptitem.quantity == 0
-                                            ? TextDecoration.lineThrough
-                                            : null),
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
                                   ),
-                                  Text(
-                                    "${receiptitem.quantity!} @${htmlPrice(receiptitem.unitPrice! + receiptitem.lineDiscount!)}",
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        decoration: receiptitem.quantity == 0
-                                            ? TextDecoration.lineThrough
-                                            : null),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      if (verifyPermission(
-                                          category: "sales",
-                                          permission: "return")) {
+                                  const Spacer(),
+                                  if (verifyPermission(
+                                      category: "sales", permission: "return"))
+                                    InkWell(
+                                      onTap: () {
                                         saleReceiptActions(
-                                            saleItem: receiptitem, from: from!);
-                                      }
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          htmlPrice((receiptitem.unitPrice! *
-                                                  receiptitem.quantity!) +
-                                              receiptitem.lineDiscount!),
+                                          saleModel: receipt,
+                                          from: from ?? "",
+                                        );
+                                      },
+                                      borderRadius: BorderRadius.circular(30),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 7,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        child: const Text(
+                                          "Refund",
                                           style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _summaryBox(
+                                      title: "Total",
+                                      value:
+                                          htmlPrice(receipt.totalWithDiscount),
+                                    ),
+                                  ),
+                                  if (receipt.outstandingBalance! > 0) ...[
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: _summaryBox(
+                                        title: "Paid",
+                                        value: htmlPrice(
+                                          receipt.totalWithDiscount! -
+                                              receipt.outstandingBalance!,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  if (onCredit(receipt) &&
+                                      type != "returns") ...[
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: _summaryBox(
+                                        title: "Balance",
+                                        value: htmlPrice(
+                                          receipt.outstandingBalance!.abs(),
+                                        ),
+                                        valueColor: Colors.red,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              if (receipt.createdAt != null)
+                                _receiptInfoRow(
+                                  title: "Date",
+                                  value: DateFormat("yyyy-MM-dd hh:mm").format(
+                                    DateTime.parse(receipt.createdAt!).toUtc(),
+                                  ),
+                                ),
+                              if (salesModel?.status != "order")
+                                _receiptInfoRow(
+                                  title: "Served by",
+                                  value: salesModel?.attendant?.username ?? "",
+                                ),
+                              if (receipt.customerId != null)
+                                _receiptInfoRow(
+                                  title: "Customer",
+                                  value: receipt.customerId!.name ?? "",
+                                ),
+                              if (receipt.outstandingBalance! > 0 &&
+                                  receipt.dueDate != null)
+                                _receiptInfoRow(
+                                  title: "Due date",
+                                  value: DateFormat("yyyy/MM/dd HH:mm").format(
+                                    DateTime.parse(receipt.dueDate!).toLocal(),
+                                  ),
+                                ),
+                              if (receipt.salesnote != null &&
+                                  receipt.salesnote!.isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    "Note: ${receipt.salesnote}",
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                              if (receipt.paymentTag == 'credit' ||
+                                  (onCredit(receipt) &&
+                                      receipt.items!.fold(
+                                            0.0,
+                                            (previousValue, element) =>
+                                                previousValue +
+                                                element.quantity!,
+                                          ) >
+                                          0 &&
+                                      type != "returns")) ...[
+                                const SizedBox(height: 14),
+                                Row(
+                                  children: [
+                                    if (receipt.paymentTag == 'credit')
+                                      Expanded(
+                                        child: OutlinedButton(
+                                          onPressed: () {
+                                            paymentController
+                                                .getSalesPaymentBySaleId(
+                                              receipt.sId!,
+                                            );
+                                            Get.to(() => PaymentHistory());
+                                          },
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: Colors.red,
+                                            side: const BorderSide(
+                                                color: Colors.red),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          child: const Text("View payments"),
+                                        ),
+                                      ),
+                                    if (receipt.paymentTag == 'credit' &&
+                                        onCredit(receipt) &&
+                                        receipt.items!.fold(
+                                              0.0,
+                                              (previousValue, element) =>
+                                                  previousValue +
+                                                  element.quantity!,
+                                            ) >
+                                            0 &&
+                                        type != "returns")
+                                      const SizedBox(width: 10),
+                                    if (onCredit(receipt) &&
+                                        receipt.items!.fold(
+                                              0.0,
+                                              (previousValue, element) =>
+                                                  previousValue +
+                                                  element.quantity!,
+                                            ) >
+                                            0 &&
+                                        type != "returns")
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            showAmountDialog(receipt);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                AppColors.mainColor,
+                                            foregroundColor: Colors.white,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                          child: const Text("Pay Now"),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 14),
+
+                        Text(
+                          "Items",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: receipt.items!.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (BuildContext c, int i) {
+                            SaleItem receiptitem = receipt.items![i];
+
+                            return Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        if (verifyPermission(
+                                          category: "sales",
+                                          permission: "return",
+                                        )) {
+                                          saleReceiptActions(
+                                            saleItem: receiptitem,
+                                            from: from!,
+                                          );
+                                        }
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            receiptitem
+                                                .product!.name!.capitalize!,
+                                            style: TextStyle(
                                               fontSize: 13,
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w700,
                                               decoration:
                                                   receiptitem.quantity == 0
                                                       ? TextDecoration
                                                           .lineThrough
-                                                      : null),
+                                                      : null,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            "${receiptitem.quantity!} @ ${htmlPrice(receiptitem.unitPrice! + receiptitem.lineDiscount!)}",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade600,
+                                              decoration:
+                                                  receiptitem.quantity == 0
+                                                      ? TextDecoration
+                                                          .lineThrough
+                                                      : null,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        htmlPrice(
+                                          (receiptitem.unitPrice! *
+                                                  receiptitem.quantity!) +
+                                              receiptitem.lineDiscount!,
                                         ),
-                                        if (receiptitem.quantity == 0)
-                                          const Icon(
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w800,
+                                          decoration: receiptitem.quantity == 0
+                                              ? TextDecoration.lineThrough
+                                              : null,
+                                        ),
+                                      ),
+                                      if (receiptitem.quantity == 0)
+                                        const Padding(
+                                          padding: EdgeInsets.only(top: 4),
+                                          child: Icon(
                                             Icons.file_download,
                                             color: Colors.red,
                                             size: 15,
-                                          )
-                                      ],
-                                    ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
-                                ]),
-                              ]),
-                            ),
-                            if (salesController.currentReceipt.value?.status !=
-                                    "order" &&
-                                verifyPermission(
-                                    category: "sales", permission: "return"))
-                              InkWell(
-                                  onTap: () {
-                                    saleReceiptActions(
-                                        saleItem: receiptitem,
-                                        from: from ?? "");
-                                  },
-                                  child: const Icon(
-                                    Icons.undo,
-                                    color: Colors.red,
-                                  )),
-                          ],
-                        );
-                      }),
+                                  if (receipt.status != "order" &&
+                                      verifyPermission(
+                                        category: "sales",
+                                        permission: "return",
+                                      )) ...[
+                                    const SizedBox(width: 10),
+                                    InkWell(
+                                      onTap: () {
+                                        saleReceiptActions(
+                                          saleItem: receiptitem,
+                                          from: from ?? "",
+                                        );
+                                      },
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.08),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.undo,
+                                          color: Colors.red,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
-            ),
-          ),
+            );
+          },
         ),
       ),
       bottomNavigationBar: SafeArea(
-        child: Container(
-            height: 120,
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (salesController.currentReceipt.value!.totaltax! > 0)
-                      Column(
-                        children: [
-                          const Text(
-                            "VAT: ",
-                            style: TextStyle(fontSize: 13),
-                          ),
-                          Text(
-                            htmlPrice(salesController
-                                .currentReceipt.value!.totaltax!),
-                            style: const TextStyle(
-                                fontSize: 13, fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                    if (salesController.currentReceipt.value!.paymentTag ==
-                            'split' &&
-                        salesController.currentReceipt.value!.amountPaid! > 0)
-                      Column(children: [
-                        const Text(
-                          "Cash: ",
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        Text(
-                          htmlPrice(salesController
-                              .currentReceipt.value!.amountPaid!),
-                          style: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                      ]),
-                    if (salesController.currentReceipt.value!.paymentTag ==
-                            'split' &&
-                        salesController.currentReceipt.value!.mpesatotal! > 0)
-                      Column(children: [
-                        const Text(
-                          "Mpesa: ",
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        Text(
-                          htmlPrice(salesController
-                              .currentReceipt.value!.mpesatotal!),
-                          style: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                      ]),
-                    if (salesController.currentReceipt.value!.paymentTag ==
-                            'split' &&
-                        salesController.currentReceipt.value!.banktotal! > 0)
-                      Column(children: [
-                        const Text(
-                          "Bank: ",
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        Text(
-                          htmlPrice(
-                              salesController.currentReceipt.value!.banktotal!),
-                          style: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                      ]),
-                  ],
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Divider(),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
+        child: Obx(
+          () {
+            final receipt = salesController.currentReceipt.value!;
+
+            return Container(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 14,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (receipt.totaltax! > 0 ||
+                      receipt.paymentTag == 'split') ...[
+                    Row(
                       children: [
-                        const Text(
-                          "Sub Total",
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        Text(
-                          htmlPrice((salesController
-                                      .currentReceipt.value!.totalAmount! -
-                                  salesController
-                                      .currentReceipt.value!.totaltax!)
-                              .toStringAsFixed(2)),
-                          style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.bold),
-                        )
+                        if (receipt.totaltax! > 0)
+                          Expanded(
+                            child: _bottomMiniTotal(
+                              title: "VAT",
+                              value: htmlPrice(receipt.totaltax!),
+                            ),
+                          ),
+                        if (receipt.paymentTag == 'split' &&
+                            receipt.amountPaid! > 0)
+                          Expanded(
+                            child: _bottomMiniTotal(
+                              title: "Cash",
+                              value: htmlPrice(receipt.amountPaid!),
+                            ),
+                          ),
+                        if (receipt.paymentTag == 'split' &&
+                            receipt.mpesatotal! > 0)
+                          Expanded(
+                            child: _bottomMiniTotal(
+                              title: "Mpesa",
+                              value: htmlPrice(receipt.mpesatotal!),
+                            ),
+                          ),
+                        if (receipt.paymentTag == 'split' &&
+                            receipt.banktotal! > 0)
+                          Expanded(
+                            child: _bottomMiniTotal(
+                              title: "Bank",
+                              value: htmlPrice(receipt.banktotal!),
+                            ),
+                          ),
                       ],
                     ),
-                    if (salesController.currentReceipt.value!.totalDiscount !=
-                            null &&
-                        salesController.currentReceipt.value!.totalDiscount! >
-                            0)
-                      Column(children: [
-                        const Text(
-                          "Discount: ",
-                          style: TextStyle(fontSize: 15),
-                        ),
-                        Text(
-                          htmlPrice(salesController
-                              .currentReceipt.value!.totalDiscount!),
-                          style: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                      ]),
-                    Column(children: [
-                      const Text(
-                        "Total: ",
-                        style: TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        htmlPrice(salesController
-                            .currentReceipt.value!.totalWithDiscount!),
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.bold),
-                      ),
-                    ])
+                    const SizedBox(height: 8),
+                    Divider(height: 1, color: Colors.grey.shade200),
+                    const SizedBox(height: 8),
                   ],
-                )
-              ],
-            )),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _bottomMiniTotal(
+                          title: "Sub Total",
+                          value: htmlPrice(
+                            (receipt.totalAmount! - receipt.totaltax!)
+                                .toStringAsFixed(2),
+                          ),
+                        ),
+                      ),
+                      if (receipt.totalDiscount != null &&
+                          receipt.totalDiscount! > 0)
+                        Expanded(
+                          child: _bottomMiniTotal(
+                            title: "Discount",
+                            value: htmlPrice(receipt.totalDiscount!),
+                          ),
+                        ),
+                      Expanded(
+                        child: _bottomMiniTotal(
+                          title: "Total",
+                          value: htmlPrice(receipt.totalWithDiscount!),
+                          bold: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
+}
+
+Widget _summaryBox({
+  required String title,
+  required String value,
+  Color? valueColor,
+}) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: Colors.grey.shade50,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade200),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey.shade600,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            color: valueColor ?? Colors.black,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _receiptInfoRow({
+  required String title,
+  required String value,
+}) {
+  if (value.isEmpty) return const SizedBox.shrink();
+
+  return Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 85,
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _bottomMiniTotal({
+  required String title,
+  required String value,
+  bool bold = false,
+}) {
+  return Column(
+    children: [
+      Text(
+        title,
+        style: TextStyle(
+          fontSize: 11,
+          color: Colors.grey.shade600,
+          fontWeight: bold ? FontWeight.w700 : FontWeight.normal,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: bold ? 14 : 12,
+          fontWeight: bold ? FontWeight.w900 : FontWeight.w700,
+          color: Colors.black,
+        ),
+      ),
+    ],
+  );
 }
 
 String chechPayment(SaleModel salesModel, String? type) {

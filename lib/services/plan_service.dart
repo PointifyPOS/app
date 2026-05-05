@@ -9,7 +9,7 @@ class PlansService {
 
   getPlans() async {
     String url =
-        "${EndPoints.packages}?id=${userController.currentUser.value?.id}";
+        "${EndPoints.packages}?page=1&limit=100&id=${userController.currentUser.value?.id}";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }
