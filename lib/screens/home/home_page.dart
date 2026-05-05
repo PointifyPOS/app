@@ -68,9 +68,10 @@ class HomePage extends StatelessWidget {
   getAllowedTabs() {
     List<Map<String, dynamic>> enterpriseOperations = [
       {
-        "title": userController.currentUser.value!.primaryShop!.production!
-            ? "Invoices"
-            : "Invoices",
+        "title":
+            userController.currentUser.value!.primaryShop!.production == true
+                ? "Invoices"
+                : "Invoices",
         "icon": Icons.sell_rounded,
         "category": "whinvoices",
         "isWarehouse": true,

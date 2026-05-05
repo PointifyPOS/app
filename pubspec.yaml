@@ -1,7 +1,7 @@
 name: pointify
 description: "Pointify Pos."
 publish_to: 'none'
-version: 2.0.167+187
+version: 2.0.168+188
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -80,7 +80,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
-    - assets/fonts/Helvetica.ttf
+    - assets/fonts/
     - assets/
 fonts:
   - family: Montserrat

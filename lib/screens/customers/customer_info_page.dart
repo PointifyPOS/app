@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/models/salereturn.dart';
+import 'package:pointify/pdfFiles/pdf/sales_by_items.dart';
 import 'package:pointify/screens/customers/edit_user.dart';
 import 'package:pointify/screens/customers/wallet_page.dart';
 import 'package:pointify/screens/sales/components/sales_card.dart';
@@ -194,7 +195,7 @@ class CustomerInfoPage extends StatelessWidget {
                                 salesController.getSalesByDate(
                                     shop: userController
                                         .currentUser.value!.primaryShop!.id!,
-                                    status: "cashed",
+                                    status: "",
                                     customerid: customerController
                                         .currentCustomer.value?.sId);
                               } else if (index == 2) {
@@ -458,32 +459,251 @@ class SalesTab extends StatelessWidget {
   SalesTab({Key? key}) : super(key: key);
 
   final CustomerController customerController = Get.find<CustomerController>();
-  final SupplierController supplierController = Get.find<SupplierController>();
-  final ShopController createShopController = Get.find<ShopController>();
   final SalesController salesController = Get.find<SalesController>();
+
+  final Rx<DateTime?> startDate = Rx<DateTime?>(null);
+  final Rx<DateTime?> endDate = Rx<DateTime?>(null);
+  final RxString status = "cashed".obs;
+
+  Future<void> applyFilter() async {
+    await salesController.getSalesByDate(
+      shop: userController.currentUser.value!.primaryShop!.id!,
+      customerid: customerController.currentCustomer.value?.sId,
+      status: status.value,
+      fromDate: startDate.value == null
+          ? ""
+          : DateFormat("yyyy-MM-dd").format(startDate.value!),
+      toDate: endDate.value == null
+          ? ""
+          : DateFormat("yyyy-MM-dd").format(endDate.value!),
+    );
+  }
+
+  Future<void> pickDate({
+    required BuildContext context,
+    required bool isStart,
+  }) async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: isStart
+          ? startDate.value ?? DateTime.now()
+          : endDate.value ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      if (isStart) {
+        startDate.value = picked;
+      } else {
+        endDate.value = picked;
+      }
+
+      await applyFilter();
+    }
+  }
+
+  Widget filterChipButton({
+    required String text,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(30),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Colors.grey.shade300),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 15, color: Colors.black54),
+            const SizedBox(width: 5),
+            Text(
+              text,
+              style: const TextStyle(fontSize: 12, color: Colors.black87),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return salesController.loadingSales.value
-          ? const Center(child: CircularProgressIndicator())
-          : salesController.allSales.isEmpty
-              ? Container(
-                  margin: const EdgeInsets.only(top: 50),
-                  child: const Text(
-                    "No entries",
-                    textAlign: TextAlign.center,
-                  ))
-              : ListView.builder(
-                  itemCount: salesController.allSales.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    SaleModel saleOrder =
-                        salesController.allSales.elementAt(index);
-                    return salesCard(
-                        salesModel: saleOrder, from: 'customerpage');
-                  });
+      final sales = salesController.allSales;
+
+      return Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade200),
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: filterChipButton(
+                        icon: Icons.calendar_today,
+                        text: startDate.value == null
+                            ? "Start"
+                            : DateFormat("dd MMM").format(startDate.value!),
+                        onTap: () => pickDate(
+                          context: context,
+                          isStart: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: filterChipButton(
+                        icon: Icons.event,
+                        text: endDate.value == null
+                            ? "End"
+                            : DateFormat("dd MMM").format(endDate.value!),
+                        onTap: () => pickDate(
+                          context: context,
+                          isStart: false,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Container(
+                        height: 34,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: status.value,
+                            isExpanded: true,
+                            iconSize: 18,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.black87,
+                            ),
+                            items: const [
+                              DropdownMenuItem(
+                                value: "cashed",
+                                child: Text("Cash"),
+                              ),
+                              DropdownMenuItem(
+                                value: "credit",
+                                child: Text("Credit"),
+                              ),
+                              DropdownMenuItem(
+                                value: "",
+                                child: Text("All"),
+                              ),
+                            ],
+                            onChanged: (value) async {
+                              status.value = value ?? "";
+                              await applyFilter();
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "${sales.length} sales found",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: sales.isEmpty
+                          ? null
+                          : () async {
+                              await downloadSalesItemsPdf(sales);
+                            },
+                      icon: const Icon(Icons.picture_as_pdf, size: 17),
+                      label: const Text(
+                        "PDF",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                    if (startDate.value != null ||
+                        endDate.value != null ||
+                        status.value != "cashed")
+                      TextButton(
+                        onPressed: () async {
+                          startDate.value = null;
+                          endDate.value = null;
+                          status.value = "";
+                          await applyFilter();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          "Clear",
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: salesController.loadingSales.value
+                ? const Center(child: CircularProgressIndicator())
+                : sales.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No entries",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.only(top: 4, bottom: 10),
+                        itemCount: sales.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 2),
+                        itemBuilder: (context, index) {
+                          final saleOrder = sales.elementAt(index);
+
+                          return salesCard(
+                            salesModel: saleOrder,
+                            from: 'customerpage',
+                          );
+                        },
+                      ),
+          ),
+        ],
+      );
     });
   }
 }

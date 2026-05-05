@@ -294,7 +294,7 @@ class AuthController {
     } else if (Platform.isIOS) {
       int latestVersion = value['ios_version'] == null
           ? 0
-          : int.parse(value['ios_version'] ?? 0);
+          : int.parse(value['ios_version'].toString());
       String buildNumber = packageInfo.buildNumber;
       if (latestVersion > int.parse(buildNumber) &&
           showingUpdateAlert.isFalse) {
