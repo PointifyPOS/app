@@ -31,9 +31,9 @@ class PaymentService {
     return response;
   }
 
-  static deleteReceiptById(id) async {
+  static deleteReceiptById(id, rId) async {
     String url =
-        "${EndPoints.deletepayments}/$id?type=${Get.find<CustomerController>().customerReceiptType.value}";
+        "${EndPoints.deletepayments}/$id?type=${Get.find<CustomerController>().customerReceiptType.value}&receiptId=$rId";
     var response =
         await DbBase().databaseRequest(url, DbBase().deleteRequestType);
     return response;
@@ -53,7 +53,7 @@ class PaymentService {
     return response;
   }
 
-  static  getPaymentMethods  () async {
+  static getPaymentMethods() async {
     String url = EndPoints.paymentsmethods;
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;

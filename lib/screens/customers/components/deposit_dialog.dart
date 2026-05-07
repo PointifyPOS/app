@@ -81,7 +81,8 @@ void showDepositDialog({
                     walletController.deposit(
                         customerModel, context, page, size);
                   },
-                  child: Text(title.toUpperCase()),
+                  child: Text(title.toUpperCase(),
+                      style: const TextStyle(color: Colors.white)),
                 ),
               ],
             )

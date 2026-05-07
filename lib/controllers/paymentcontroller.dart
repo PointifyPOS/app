@@ -47,13 +47,14 @@ class PaymentController extends GetxController {
     isPaymentLoading.value = false;
   }
 
-  deleteReceiptById(String id) async {
+  deleteReceiptById(String id, String rId) async {
     isPaymentLoading.value = true;
-    CustomerController controller = Get.find<CustomerController>();
-    var response = await PaymentService.deleteReceiptById(id);
-    print(response);
-    controller.getTransactions(controller.customerReceiptType.value,
-        controller.currentCustomer.value!.sId!);
+    await PaymentService.deleteReceiptById(id, rId);
+    PaymentController paymentController = Get.find<PaymentController>();
+    int i =
+        paymentController.payments.indexWhere((element) => element.id == rId);
+    Get.find<PaymentController>().payments.removeAt(i);
+    Get.find<PaymentController>().payments.refresh();
     isPaymentLoading.value = false;
   }
 
@@ -82,11 +83,11 @@ class PaymentController extends GetxController {
     isPaymentLoading.value = false;
   }
 
-  getPaymentMethods()async {
+  getPaymentMethods() async {
     isPaymentLoading.value = true;
     List<dynamic> response = await PaymentService.getPaymentMethods();
     List<PaymentMethods> paymentData =
-    response.map((e) => PaymentMethods.fromJson(e)).toList();
+        response.map((e) => PaymentMethods.fromJson(e)).toList();
     paymentmethods.assignAll(paymentData);
     isPaymentLoading.value = false;
   }

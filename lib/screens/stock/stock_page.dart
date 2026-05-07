@@ -23,7 +23,7 @@ import '../purchases/create_purchase.dart';
 import '../shop/shops_page.dart';
 
 class StockPage extends StatelessWidget {
-  StockPage({Key? key}) : super(key: key) {
+  StockPage({super.key}) {
     productController.getProductsAnalysis(type: "all");
   }
   final ShopController shopController = Get.find<ShopController>();
@@ -98,10 +98,20 @@ class StockPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    enterpriseOperations.removeWhere((e) =>
-        (e["category"] == 'warehouse' &&
-            userController.currentUser.value?.primaryShop?.warehouse == true) &&
-        userController.currentUser.value?.primaryShop?.production == false);
+    final operations = enterpriseOperations.where((e) {
+      final hideWarehouse = e["category"] == "warehouse" &&
+          userController.currentUser.value?.primaryShop?.warehouse == true &&
+          userController.currentUser.value?.primaryShop?.production == false;
+
+      return !hideWarehouse;
+    }).toList();
+
+    final filteredOperations = operations
+        .where((e) => verifyPermission(
+              category: e["category"],
+              permission: e["permission"],
+            ))
+        .toList();
     return Helper(
         widget: SingleChildScrollView(
           child: Container(
@@ -116,18 +126,11 @@ class StockPage extends StatelessWidget {
                 majorTitle(
                     title: "Stock Actions", color: Colors.black, size: 18.0),
                 ListView.builder(
-                  itemCount: enterpriseOperations
-                      .where((e) =>
-                          verifyPermission(
-                              category: e["category"],
-                              permission: e["permission"]) ==
-                          true)
-                      .toList()
-                      .length,
+                  itemCount: filteredOperations.length,
                   shrinkWrap: true,
                   physics: const ScrollPhysics(),
                   itemBuilder: (c, i) {
-                    var e = enterpriseOperations.elementAt(i);
+                    var e = filteredOperations[i];
                     return stockContainers(
                         title: e["title"],
                         subtitle: e["subtitle"],

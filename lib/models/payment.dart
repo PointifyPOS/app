@@ -14,6 +14,8 @@ class Payment {
   String? type;
   String? date;
 
+  String? id;
+
   Payment(
       {this.amount,
       this.attendantId,
@@ -22,11 +24,13 @@ class Payment {
       this.mpesaCode,
       this.date,
       this.paymentType,
+      this.id,
       this.type,
       this.recieptNumber});
 
   Payment.fromJson(Map<String, dynamic> json) {
     balance = json['balance'] ?? 0;
+    id = json['_id'];
     type = json['type'] ?? "Payment";
     amount = json['totalAmount'] ?? json['amount'];
     attendantId = json['attendantId'] != null

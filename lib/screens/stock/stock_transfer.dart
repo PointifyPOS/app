@@ -10,9 +10,10 @@ import '../../utils/colors.dart';
 import '../../widgets/major_title.dart';
 import '../../widgets/minor_title.dart';
 
+// ignore: must_be_immutable
 class StockTransfer extends StatelessWidget {
   String type;
-  StockTransfer({Key? key, this.type = "stockTransfer"}) : super(key: key);
+  StockTransfer({super.key, this.type = "stockTransfer"});
 
   final ShopController shopController = Get.find<ShopController>();
 

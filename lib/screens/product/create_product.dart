@@ -675,6 +675,9 @@ class CreateProduct extends StatelessWidget {
                                     ),
                                     IconButton(
                                         onPressed: () {
+                                          productController
+                                              .minsellingPriceController
+                                              .clear();
                                           productController.addminPrice.value =
                                               !productController
                                                   .addminPrice.value;
@@ -721,7 +724,6 @@ class CreateProduct extends StatelessWidget {
                                         filled: true,
                                         hintText: "0",
                                         labelStyle: const TextStyle(
-                                            fontFamily: 'Montserrat',
                                             fontWeight: FontWeight.bold,
                                             color: Colors.grey),
                                         border: OutlineInputBorder(
@@ -757,7 +759,6 @@ class CreateProduct extends StatelessWidget {
                                       fillColor: Colors.white,
                                       filled: true,
                                       labelStyle: const TextStyle(
-                                          fontFamily: 'Montserrat',
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey),
                                       border: OutlineInputBorder(
@@ -807,7 +808,6 @@ class CreateProduct extends StatelessWidget {
                                             filled: true,
                                             hintText: "0",
                                             labelStyle: const TextStyle(
-                                                fontFamily: 'Montserrat',
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey),
                                             border: OutlineInputBorder(
@@ -856,7 +856,6 @@ class CreateProduct extends StatelessWidget {
                                             filled: true,
                                             hintText: "0",
                                             labelStyle: const TextStyle(
-                                                fontFamily: 'Montserrat',
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey),
                                             border: OutlineInputBorder(
@@ -958,7 +957,6 @@ class CreateProduct extends StatelessWidget {
                                             filled: true,
                                             hintText: "0",
                                             labelStyle: const TextStyle(
-                                                fontFamily: 'Montserrat',
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey),
                                             border: OutlineInputBorder(
@@ -1492,18 +1490,18 @@ class CreateProduct extends StatelessWidget {
       collapsedIconColor: AppColors.mainColor,
       title: Text(
         productController.isProduct() ? "Product Images" : "Service Images",
-        style:  TextStyle(
+        style: TextStyle(
             color: AppColors.mainColor,
             fontSize: 18,
             fontWeight: FontWeight.w600),
       ),
-      leading:  Icon(Icons.image, color: AppColors.mainColor),
+      leading: Icon(Icons.image, color: AppColors.mainColor),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: IconButton(
-              icon:  Icon(Icons.add_a_photo, color: AppColors.mainColor),
+              icon: Icon(Icons.add_a_photo, color: AppColors.mainColor),
               color: AppColors.lightDeepPurple,
               onPressed: () {
                 addImageButtonCallback(context);

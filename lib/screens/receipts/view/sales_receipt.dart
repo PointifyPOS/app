@@ -13,8 +13,6 @@ import '../../../models/salemodel.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/themer.dart';
 import '../../../widgets/alert.dart';
-import '../../../widgets/major_title.dart';
-import '../../../widgets/normal_text.dart';
 import '../../cash_flow/payment_history.dart';
 import '../pdf/delivery_note_pdf.dart';
 
@@ -285,7 +283,11 @@ class SalesReceipt extends StatelessWidget {
                                                 .getSalesPaymentBySaleId(
                                               receipt.sId!,
                                             );
-                                            Get.to(() => PaymentHistory());
+                                            Get.to(() => PaymentHistory(
+                                                  saleId: receipt.sId!,
+                                                  customerModel:
+                                                      salesModel!.customerId,
+                                                ));
                                           },
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: Colors.red,

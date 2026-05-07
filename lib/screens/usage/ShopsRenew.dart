@@ -18,6 +18,28 @@ class ShopsToRenew extends StatelessWidget {
 
   final ShopController shopController = Get.find();
   final PaymentController paymentController = Get.find();
+  ShopPriceOption? getSelectedShopOption() {
+    final selectedCount = shopController.shopsRenew.length;
+
+    if (plan.shopOptions.isEmpty) return null;
+
+    // exact match first
+    for (final option in plan.shopOptions) {
+      if (option.shops == selectedCount) {
+        return option;
+      }
+    }
+
+    // if selected shops are below package minimum,
+    // charge the package starting price
+    final firstOption = plan.shopOptions.first;
+
+    if (selectedCount > 0 && selectedCount < firstOption.shops) {
+      return firstOption;
+    }
+
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -203,17 +225,19 @@ class ShopsToRenew extends StatelessWidget {
     );
   }
 
-  // ================= BOTTOM ACTION =================
-
   Widget _bottomAction(BuildContext context) {
-    if (shopController.shopsRenew.isEmpty) {
+    final selectedCount = shopController.shopsRenew.length;
+
+    if (selectedCount == 0) {
       return const SizedBox.shrink();
     }
 
+    final selectedOption = getSelectedShopOption();
+
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: EdgeInsets.only(bottom: 50),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        margin: const EdgeInsets.only(bottom: 50),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -227,26 +251,47 @@ class ShopsToRenew extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                "${shopController.shopsRenew.length}/${plan.maxShops} selected",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "$selectedCount shop${selectedCount > 1 ? 's' : ''} selected",
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black54,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    selectedOption?.priceText ?? plan.priceText ?? "",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: AppColors.mainColor,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.mainColor,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 13,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              onPressed: () => _paymentSheet(context),
-              child: const Text("Continue",
-                  style: TextStyle(fontSize: 15, color: Colors.white)),
+              onPressed:
+                  selectedOption == null ? null : () => _paymentSheet(context),
+              child: const Text(
+                "Continue",
+                style: TextStyle(fontSize: 14, color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -332,6 +377,8 @@ class ShopsToRenew extends StatelessWidget {
     final Shop shopp = shop ?? userController.currentUser.value!.primaryShop!;
 
     // 1️⃣ Start Mpesa (STK push)
+
+    showMpesaWaitingDialog(context);
     final response = await shopController.subscribe(
       shopp,
       package: plan,
@@ -346,7 +393,6 @@ class ShopsToRenew extends StatelessWidget {
     }
 
     // 2️⃣ NOW show waiting dialog (STK was sent)
-    showMpesaWaitingDialog(context);
 
     // 3️⃣ Start polling
     final reference = response; // or your reference
@@ -454,7 +500,18 @@ class ShopsToRenew extends StatelessWidget {
   Future<void> _paywithPaystack(
       BuildContext context, PaymentMethods pay) async {
     final String reference = _generateRef();
-    var amount = plan.amount!;
+    final selectedOption = getSelectedShopOption();
+
+    if (selectedOption == null) {
+      Get.snackbar(
+        "Invalid selection",
+        "Please select shops within this plan limit",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    var amount = selectedOption.amount;
     if (userController.currentUser.value?.primaryShop?.currency == "USD") {
       amount = plan.amountusd!;
     }

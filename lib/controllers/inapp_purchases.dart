@@ -202,6 +202,7 @@ class InappPurchasesController extends GetxController {
     for (var product in subscriptions) {
       print("product ${product.id}");
       Package package = Package(
+        shopOptions: [],
         id: product.id == '656730258f38fe9d1d7bef5b'
             ? '656730258f38fe9d1d7bef51'
             : product.id,

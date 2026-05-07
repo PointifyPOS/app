@@ -574,9 +574,7 @@ class HomePage extends StatelessWidget {
                           const SizedBox(height: 20),
                           Container(
                             width: double.infinity,
-                            margin: EdgeInsets.only(
-                                right: isSmallScreen(context) ? 0 : 5,
-                                left: isSmallScreen(context) ? 0 : 5),
+                            margin: EdgeInsets.only(right: 0, left: 0),
                             padding: const EdgeInsets.symmetric(vertical: 15),
                             decoration: BoxDecoration(
                                 color: AppColors.mainColor,
@@ -590,8 +588,7 @@ class HomePage extends StatelessWidget {
                                         SliverGridDelegateWithFixedCrossAxisCount(
                                             childAspectRatio: 0.85,
                                             crossAxisCount: 4,
-                                            crossAxisSpacing:
-                                                isSmallScreen(context) ? 2 : 10,
+                                            crossAxisSpacing: 2,
                                             mainAxisSpacing: 10),
                                     padding: EdgeInsets.zero,
                                     itemCount: getAllowedTabs().length,
@@ -1103,7 +1100,7 @@ class HomePage extends StatelessWidget {
 
   handleClickFunctions({required context, required title}) {
     if (userController.internetConected.value == false && title != "pos") {
-      if (title == "stock") {
+      if (title == "stock" || title == "stocks") {
         Get.to(() => ProductPage());
         return;
       }
@@ -1133,12 +1130,14 @@ class HomePage extends StatelessWidget {
         break;
       case "stock":
         {
-          if (userController.currentUser.value?.usertype == "attendant" &&
-              !verifyPermission(
-                  category: "stocks", permission: "stock_summary")) {
-            Get.to(() => ProductPage());
-            return;
-          }
+          print("user type ${userController.currentUser.value?.usertype}");
+          // if (userController.currentUser.value?.usertype == "attendant" &&
+          //     !verifyPermission(
+          //         category: "stocks", permission: "stock_summary")) {
+          //   Get.to(() => ProductPage());
+          //   return;
+          // }
+
           Get.to(() => StockPage());
         }
         break;

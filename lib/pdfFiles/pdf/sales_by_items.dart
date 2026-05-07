@@ -1,3 +1,5 @@
+// sales_by_items.dart
+
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -6,26 +8,26 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pointify/models/customer.dart';
+import 'package:pointify/models/payment.dart';
 import 'package:pointify/models/salemodel.dart';
+import 'package:pointify/models/salereturn.dart';
 
 Future<void> downloadSalesItemsPdf(
   List<SaleModel> sales, {
+  String? reportTitle,
   String? statusFilter,
   DateTime? startDateFilter,
   DateTime? endDateFilter,
+  bool useOutstandingForCredit = false,
+  num? walletBalance,
 }) async {
-  final regularFont = pw.Font.ttf(
-    await rootBundle.load("assets/fonts/Roboto-Regular.ttf"),
-  );
-
-  final boldFont = pw.Font.ttf(
-    await rootBundle.load("assets/fonts/Roboto-Bold.ttf"),
-  );
+  final fonts = await _loadFonts();
 
   final pdf = pw.Document(
     theme: pw.ThemeData.withFont(
-      base: regularFont,
-      bold: boldFont,
+      base: fonts.regular,
+      bold: fonts.bold,
     ),
   );
 
@@ -43,9 +45,29 @@ Future<void> downloadSalesItemsPdf(
     return "$currency ${NumberFormat("#,##0.00").format(value)}";
   }
 
+  num saleReportAmount(SaleModel sale) {
+    if (useOutstandingForCredit || statusFilter == "credit") {
+      return sale.outstandingBalance ??
+          ((sale.totalWithDiscount ?? sale.totalAmount ?? 0) -
+              (sale.amountPaid ?? 0));
+    }
+
+    return sale.totalWithDiscount ?? sale.totalAmount ?? 0;
+  }
+
   final totalSales = sales.fold<num>(
     0,
+    (sum, sale) => sum + saleReportAmount(sale),
+  );
+
+  final totalOriginalSales = sales.fold<num>(
+    0,
     (sum, sale) => sum + (sale.totalWithDiscount ?? sale.totalAmount ?? 0),
+  );
+
+  final totalPaid = sales.fold<num>(
+    0,
+    (sum, sale) => sum + (sale.amountPaid ?? 0),
   );
 
   final totalItems = sales.fold<int>(
@@ -63,8 +85,7 @@ Future<void> downloadSalesItemsPdf(
         .where((sale) => (sale.paymentType ?? "").toLowerCase() == type)
         .fold<num>(
           0,
-          (sum, sale) =>
-              sum + (sale.totalWithDiscount ?? sale.totalAmount ?? 0),
+          (sum, sale) => sum + saleReportAmount(sale),
         );
   }
 
@@ -83,11 +104,17 @@ Future<void> downloadSalesItemsPdf(
     "Qty",
     "Unit",
     "Total",
+    if (useOutstandingForCredit || statusFilter == "credit") "Paid",
+    if (useOutstandingForCredit || statusFilter == "credit") "Balance",
     if (!hasStatusFilter) "Payment",
     "Attendant",
   ];
 
   final rows = sales.expand((sale) {
+    final saleTotal = sale.totalWithDiscount ?? sale.totalAmount ?? 0;
+    final saleBalance = saleReportAmount(sale);
+    final salePaid = sale.amountPaid ?? 0;
+
     return (sale.items ?? []).map((item) {
       final qty = item.quantity ?? 0;
       final unitPrice = item.unitPrice ?? 0;
@@ -104,6 +131,10 @@ Future<void> downloadSalesItemsPdf(
         qty.toString(),
         money(unitPrice),
         money(lineTotal),
+        if (useOutstandingForCredit || statusFilter == "credit")
+          money(salePaid),
+        if (useOutstandingForCredit || statusFilter == "credit")
+          money(saleBalance),
         if (!hasStatusFilter) sale.paymentType ?? "",
         sale.attendant?.username ?? "",
       ];
@@ -114,32 +145,9 @@ Future<void> downloadSalesItemsPdf(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(14),
-      footer: (context) => pw.Container(
-        padding: const pw.EdgeInsets.only(top: 5),
-        decoration: const pw.BoxDecoration(
-          border: pw.Border(
-            top: pw.BorderSide(color: PdfColors.grey300, width: 0.4),
-          ),
-        ),
-        child: pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          children: [
-            pw.Text(
-              shop?.name ?? "Pointify",
-              style: const pw.TextStyle(
-                fontSize: 7,
-                color: PdfColors.grey600,
-              ),
-            ),
-            pw.Text(
-              "Page ${context.pageNumber} of ${context.pagesCount}",
-              style: const pw.TextStyle(
-                fontSize: 7,
-                color: PdfColors.grey600,
-              ),
-            ),
-          ],
-        ),
+      footer: (context) => _footer(
+        shopName: shop?.name ?? "Pointify",
+        context: context,
       ),
       build: (context) {
         return [
@@ -149,7 +157,7 @@ Future<void> downloadSalesItemsPdf(
             contact: shop?.contact ?? "",
             paybillTill: shop?.paybillTill ?? "",
             paybillAccount: shop?.paybillAccount ?? "",
-            title: "Customer Sales Items Report",
+            title: reportTitle ?? "Customer Sales Items Report",
           ),
           pw.SizedBox(height: 6),
           _customerAndFilterBox(
@@ -160,6 +168,8 @@ Future<void> downloadSalesItemsPdf(
             status: hasStatusFilter ? statusFilter : null,
             startDate: startDateFilter,
             endDate: endDateFilter,
+            walletBalance: walletBalance,
+            currency: currency,
           ),
           pw.SizedBox(height: 6),
           pw.Row(
@@ -168,16 +178,34 @@ Future<void> downloadSalesItemsPdf(
               pw.SizedBox(width: 5),
               _summaryBox("Items", totalItems.toString()),
               pw.SizedBox(width: 5),
-              _summaryBox("Total", money(totalSales)),
+              _summaryBox(
+                useOutstandingForCredit || statusFilter == "credit"
+                    ? "Amount Due"
+                    : "Total",
+                money(totalSales),
+              ),
             ],
           ),
+          if (useOutstandingForCredit || statusFilter == "credit") ...[
+            pw.SizedBox(height: 5),
+            pw.Row(
+              children: [
+                _summaryBox("Invoice Total", money(totalOriginalSales)),
+                pw.SizedBox(width: 5),
+                _summaryBox("Paid", money(totalPaid)),
+                pw.SizedBox(width: 5),
+                _summaryBox("Balance", money(totalSales)),
+              ],
+            ),
+          ],
           pw.SizedBox(height: 6),
-          _paymentSummary(
-            cash: money(cashTotal),
-            mpesa: money(mpesaTotal),
-            wallet: money(walletTotal),
-            bank: money(bankTotal),
-          ),
+          if (!(useOutstandingForCredit || statusFilter == "credit"))
+            _paymentSummary(
+              cash: money(cashTotal),
+              mpesa: money(mpesaTotal),
+              wallet: money(walletTotal),
+              bank: money(bankTotal),
+            ),
           pw.SizedBox(height: 7),
           pw.Text(
             "Sold Items",
@@ -188,19 +216,7 @@ Future<void> downloadSalesItemsPdf(
           ),
           pw.SizedBox(height: 4),
           if (rows.isEmpty)
-            pw.Container(
-              width: double.infinity,
-              padding: const pw.EdgeInsets.all(8),
-              decoration: pw.BoxDecoration(
-                color: PdfColors.grey100,
-                borderRadius: pw.BorderRadius.circular(5),
-                border: pw.Border.all(color: PdfColors.grey300),
-              ),
-              child: pw.Text(
-                "No sales items found.",
-                style: const pw.TextStyle(fontSize: 8),
-              ),
-            )
+            _emptyBox("No sales items found.")
           else
             pw.Table.fromTextArray(
               headers: headers,
@@ -217,7 +233,7 @@ Future<void> downloadSalesItemsPdf(
                 fontWeight: pw.FontWeight.bold,
                 color: PdfColors.white,
               ),
-              cellStyle: pw.TextStyle(fontSize: 6.5),
+              cellStyle: pw.TextStyle(fontSize: 6.3),
               cellPadding: const pw.EdgeInsets.symmetric(
                 horizontal: 3,
                 vertical: 3,
@@ -228,17 +244,15 @@ Future<void> downloadSalesItemsPdf(
           pw.Align(
             alignment: pw.Alignment.centerRight,
             child: pw.Container(
-              padding: const pw.EdgeInsets.symmetric(
-                horizontal: 9,
-                vertical: 5,
-              ),
+              padding:
+                  const pw.EdgeInsets.symmetric(horizontal: 9, vertical: 5),
               decoration: pw.BoxDecoration(
                 color: PdfColors.grey100,
                 borderRadius: pw.BorderRadius.circular(5),
                 border: pw.Border.all(color: PdfColors.grey300),
               ),
               child: pw.Text(
-                "Grand Total: ${money(totalSales)}",
+                "${useOutstandingForCredit || statusFilter == "credit" ? "Amount Due" : "Grand Total"}: ${money(totalSales)}",
                 style: pw.TextStyle(
                   fontSize: 10,
                   fontWeight: pw.FontWeight.bold,
@@ -251,15 +265,276 @@ Future<void> downloadSalesItemsPdf(
     ),
   );
 
-  final dir = await getTemporaryDirectory();
+  await _saveAndOpenPdf(
+    pdf,
+    "customer_sales_items_${DateTime.now().millisecondsSinceEpoch}.pdf",
+  );
+}
 
-  final file = File(
-    "${dir.path}/customer_sales_items_${DateTime.now().millisecondsSinceEpoch}.pdf",
+Future<void> downloadCustomerReturnsPdf(
+  List<SaleRetuns> returns, {
+  Customer? customer,
+  DateTime? startDateFilter,
+  DateTime? endDateFilter,
+}) async {
+  final fonts = await _loadFonts();
+
+  final pdf = pw.Document(
+    theme: pw.ThemeData.withFont(
+      base: fonts.regular,
+      bold: fonts.bold,
+    ),
   );
 
-  await file.writeAsBytes(await pdf.save(), flush: true);
+  const currency = "KES";
 
-  await OpenFile.open(file.path);
+  String money(num value) {
+    return "$currency ${NumberFormat("#,##0.00").format(value)}";
+  }
+
+  num getNum(dynamic object, List<String> keys) {
+    for (final key in keys) {
+      try {
+        final value = _readDynamic(object, key);
+        if (value == null) continue;
+        if (value is num) return value;
+        return num.tryParse(value.toString()) ?? 0;
+      } catch (_) {}
+    }
+    return 0;
+  }
+
+  String getText(dynamic object, List<String> keys) {
+    for (final key in keys) {
+      try {
+        final value = _readDynamic(object, key);
+        if (value != null && value.toString().isNotEmpty) {
+          return value.toString();
+        }
+      } catch (_) {}
+    }
+    return "";
+  }
+
+  final rows = returns.map((item) {
+    final date = getText(item, ["createdAt", "date"]);
+    final receipt = getText(item, ["receiptNo", "receipt", "invoice"]);
+    final reason = getText(item, ["reason", "salesnote", "note"]);
+    final amount = getNum(item, [
+      "totalWithDiscount",
+      "totalAmount",
+      "amount",
+      "total",
+    ]);
+
+    return [
+      date.isEmpty ? "" : DateFormat("dd-MM-yyyy").format(DateTime.parse(date)),
+      receipt,
+      reason,
+      money(amount),
+    ];
+  }).toList();
+
+  final totalReturns = returns.fold<num>(
+    0,
+    (sum, item) =>
+        sum +
+        getNum(item, [
+          "totalWithDiscount",
+          "totalAmount",
+          "amount",
+          "total",
+        ]),
+  );
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: const pw.EdgeInsets.all(14),
+      footer: (context) => _footer(shopName: "Pointify", context: context),
+      build: (context) {
+        return [
+          _header(
+            shopName: "Customer Returns",
+            address: "",
+            contact: "",
+            paybillTill: "",
+            paybillAccount: "",
+            title: "Customer Returns Report",
+          ),
+          pw.SizedBox(height: 6),
+          _customerAndFilterBox(
+            customerName: customer?.name ?? "Customer",
+            customerNo: customer?.customerNo?.toString() ?? "",
+            generatedAt:
+                DateFormat("dd MMM yyyy, hh:mm a").format(DateTime.now()),
+            startDate: startDateFilter,
+            endDate: endDateFilter,
+            currency: currency,
+          ),
+          pw.SizedBox(height: 6),
+          pw.Row(
+            children: [
+              _summaryBox("Returns", returns.length.toString()),
+              pw.SizedBox(width: 5),
+              _summaryBox("Total Returned", money(totalReturns)),
+            ],
+          ),
+          pw.SizedBox(height: 8),
+          if (rows.isEmpty)
+            _emptyBox("No returns found.")
+          else
+            pw.Table.fromTextArray(
+              headers: const ["Date", "Receipt", "Reason/Note", "Amount"],
+              data: rows,
+              border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.3),
+              headerDecoration: const pw.BoxDecoration(
+                color: PdfColors.deepPurple,
+              ),
+              headerStyle: pw.TextStyle(
+                fontSize: 7,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.white,
+              ),
+              cellStyle: const pw.TextStyle(fontSize: 6.5),
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 3,
+                vertical: 3,
+              ),
+            ),
+          pw.SizedBox(height: 8),
+          pw.Align(
+            alignment: pw.Alignment.centerRight,
+            child: pw.Text(
+              "Total Returns: ${money(totalReturns)}",
+              style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold),
+            ),
+          ),
+        ];
+      },
+    ),
+  );
+
+  await _saveAndOpenPdf(
+    pdf,
+    "customer_returns_${DateTime.now().millisecondsSinceEpoch}.pdf",
+  );
+}
+
+Future<void> downloadCustomerStatementPdf(
+  List<Payment> payments, {
+  Customer? customer,
+  DateTime? startDateFilter,
+  DateTime? endDateFilter,
+}) async {
+  final fonts = await _loadFonts();
+
+  final pdf = pw.Document(
+    theme: pw.ThemeData.withFont(
+      base: fonts.regular,
+      bold: fonts.bold,
+    ),
+  );
+
+  const currency = "KES";
+
+  String money(num value) {
+    return "$currency ${NumberFormat("#,##0.00").format(value)}";
+  }
+
+  final totalIn = payments
+      .where((p) => p.type != "withdraw")
+      .fold<num>(0, (sum, p) => sum + (p.amount ?? 0));
+
+  final totalOut = payments
+      .where((p) => p.type == "withdraw")
+      .fold<num>(0, (sum, p) => sum + (p.amount ?? 0));
+
+  final currentBalance = payments.isEmpty ? 0 : payments.last.balance ?? 0;
+
+  final rows = payments.map((payment) {
+    final isWithdraw = payment.type == "withdraw";
+
+    return [
+      payment.date == null
+          ? ""
+          : DateFormat("dd-MM-yyyy HH:mm")
+              .format(DateTime.parse(payment.date!)),
+      isWithdraw ? "" : money(payment.amount ?? 0),
+      isWithdraw ? money(payment.amount ?? 0) : "",
+      money(payment.balance ?? 0),
+    ];
+  }).toList();
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: const pw.EdgeInsets.all(14),
+      footer: (context) => _footer(shopName: "Pointify", context: context),
+      build: (context) {
+        return [
+          _header(
+            shopName: "Customer Statement",
+            address: "",
+            contact: "",
+            paybillTill: "",
+            paybillAccount: "",
+            title: "Customer Wallet Statement",
+          ),
+          pw.SizedBox(height: 6),
+          _customerAndFilterBox(
+            customerName: customer?.name ?? "Customer",
+            customerNo: customer?.customerNo?.toString() ?? "",
+            generatedAt:
+                DateFormat("dd MMM yyyy, hh:mm a").format(DateTime.now()),
+            startDate: startDateFilter,
+            endDate: endDateFilter,
+            walletBalance: customer?.wallet,
+            currency: currency,
+          ),
+          pw.SizedBox(height: 6),
+          pw.Row(
+            children: [
+              _summaryBox("Entries", payments.length.toString()),
+              pw.SizedBox(width: 5),
+              _summaryBox("In", money(totalIn)),
+              pw.SizedBox(width: 5),
+              _summaryBox("Out", money(totalOut)),
+              pw.SizedBox(width: 5),
+              _summaryBox("Balance", money(currentBalance)),
+            ],
+          ),
+          pw.SizedBox(height: 8),
+          if (rows.isEmpty)
+            _emptyBox("No statement entries found.")
+          else
+            pw.Table.fromTextArray(
+              headers: const ["Date", "In", "Out", "Balance"],
+              data: rows,
+              border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.3),
+              headerDecoration: const pw.BoxDecoration(
+                color: PdfColors.deepPurple,
+              ),
+              headerStyle: pw.TextStyle(
+                fontSize: 7,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColors.white,
+              ),
+              cellStyle: const pw.TextStyle(fontSize: 6.5),
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 3,
+                vertical: 3,
+              ),
+            ),
+        ];
+      },
+    ),
+  );
+
+  await _saveAndOpenPdf(
+    pdf,
+    "customer_statement_${DateTime.now().millisecondsSinceEpoch}.pdf",
+  );
 }
 
 pw.Widget _header({
@@ -340,9 +615,15 @@ pw.Widget _customerAndFilterBox({
   String? status,
   DateTime? startDate,
   DateTime? endDate,
+  num? walletBalance,
+  String currency = "KES",
 }) {
   final hasStatus = status != null && status.trim().isNotEmpty;
   final hasDate = startDate != null || endDate != null;
+
+  String money(num value) {
+    return "$currency ${NumberFormat("#,##0.00").format(value)}";
+  }
 
   return pw.Container(
     width: double.infinity,
@@ -377,6 +658,11 @@ pw.Widget _customerAndFilterBox({
               if (customerNo.isNotEmpty)
                 pw.Text(
                   "No: $customerNo",
+                  style: const pw.TextStyle(fontSize: 7),
+                ),
+              if (walletBalance != null)
+                pw.Text(
+                  "Wallet: ${money(walletBalance)}",
                   style: const pw.TextStyle(fontSize: 7),
                 ),
             ],
@@ -517,7 +803,109 @@ pw.Widget _paymentItem(String title, String value) {
   );
 }
 
+pw.Widget _footer({
+  required String shopName,
+  required pw.Context context,
+}) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.only(top: 5),
+    decoration: const pw.BoxDecoration(
+      border: pw.Border(
+        top: pw.BorderSide(color: PdfColors.grey300, width: 0.4),
+      ),
+    ),
+    child: pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        pw.Text(
+          shopName,
+          style: const pw.TextStyle(
+            fontSize: 7,
+            color: PdfColors.grey600,
+          ),
+        ),
+        pw.Text(
+          "Page ${context.pageNumber} of ${context.pagesCount}",
+          style: const pw.TextStyle(
+            fontSize: 7,
+            color: PdfColors.grey600,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _emptyBox(String text) {
+  return pw.Container(
+    width: double.infinity,
+    padding: const pw.EdgeInsets.all(8),
+    decoration: pw.BoxDecoration(
+      color: PdfColors.grey100,
+      borderRadius: pw.BorderRadius.circular(5),
+      border: pw.Border.all(color: PdfColors.grey300),
+    ),
+    child: pw.Text(
+      text,
+      style: const pw.TextStyle(fontSize: 8),
+    ),
+  );
+}
+
 String _capitalize(String value) {
   if (value.isEmpty) return value;
   return "${value[0].toUpperCase()}${value.substring(1)}";
+}
+
+class _PdfFonts {
+  final pw.Font regular;
+  final pw.Font bold;
+
+  _PdfFonts({
+    required this.regular,
+    required this.bold,
+  });
+}
+
+Future<_PdfFonts> _loadFonts() async {
+  final regularFont = pw.Font.ttf(
+    await rootBundle.load("assets/fonts/Roboto-Regular.ttf"),
+  );
+
+  final boldFont = pw.Font.ttf(
+    await rootBundle.load("assets/fonts/Roboto-Bold.ttf"),
+  );
+
+  return _PdfFonts(
+    regular: regularFont,
+    bold: boldFont,
+  );
+}
+
+Future<void> _saveAndOpenPdf(pw.Document pdf, String fileName) async {
+  final dir = await getTemporaryDirectory();
+
+  final file = File("${dir.path}/$fileName");
+
+  await file.writeAsBytes(await pdf.save(), flush: true);
+
+  await OpenFile.open(file.path);
+}
+
+dynamic _readDynamic(dynamic object, String key) {
+  try {
+    final json = object.toJson();
+    if (json is Map && json.containsKey(key)) {
+      return json[key];
+    }
+  } catch (_) {}
+
+  try {
+    final json = object.toMap();
+    if (json is Map && json.containsKey(key)) {
+      return json[key];
+    }
+  } catch (_) {}
+
+  return null;
 }

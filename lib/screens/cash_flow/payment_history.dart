@@ -11,12 +11,13 @@ import '../../controllers/shopcontroller.dart';
 import '../../models/customer.dart';
 import '../../models/payment.dart';
 
+// ignore: must_be_immutable
 class PaymentHistory extends StatelessWidget {
-  final String? id;
   final String? type;
+  String? saleId;
   final Customer? customerModel;
 
-  PaymentHistory({super.key, this.id, this.customerModel, this.type});
+  PaymentHistory({super.key, this.customerModel, this.type, this.saleId});
   final ShopController shopController = Get.find<ShopController>();
   final PaymentController paymentController = Get.find<PaymentController>();
 
@@ -59,7 +60,10 @@ class PaymentHistory extends StatelessWidget {
                                 paymentController.payments.elementAt(index);
                             return InkWell(
                               onTap: () {
-                                Get.to(() => CashReceipt(receipt: payHistory));
+                                Get.to(() => CashReceipt(
+                                    receipt: payHistory,
+                                    saleId: saleId,
+                                    customer: customerModel));
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(10),

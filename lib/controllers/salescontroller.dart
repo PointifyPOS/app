@@ -1416,6 +1416,11 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   }
 
   payCredit({required SaleModel salesBody, required int amount}) async {
+    LoadingDialog.showLoadingDialog(
+      context: Get.context!,
+      title: "Please wait...",
+      key: _keyLoader,
+    );
     var paymentData = {
       "saleId": salesBody.sId,
       "paymentAmount": amount,
@@ -1425,6 +1430,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     };
 
     var response = await SalesService.payCredit(paymentData);
+    Get.back();
     if (response["error"] != null) {
       showSnackBar(message: response["error"], color: Colors.red);
       return;

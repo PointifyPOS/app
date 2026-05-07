@@ -59,12 +59,7 @@ class StockTakeReport extends StatelessWidget {
             ],
             leading: IconButton(
                 onPressed: () {
-                  if (isSmallScreen(context)) {
-                    Get.back();
-                  } else {
-                    Get.find<HomeController>().selectedWidget.value =
-                        StockCount();
-                  }
+                 Get.back();
                 },
                 icon: const Icon(
                   Icons.arrow_back_ios,

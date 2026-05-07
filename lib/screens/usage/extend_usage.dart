@@ -122,11 +122,13 @@ class ExtendUsage extends StatelessWidget {
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
-                  : ListView.builder(
+                  : ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 18),
+                      separatorBuilder: (_, __) => const SizedBox(height: 4),
                       itemCount: planController.plans.length,
                       itemBuilder: (BuildContext c, int i) {
                         Package plan = planController.plans[i];
-                        return _usageCard(plan, context);
+                        return _usageCard(plan);
                       }),
             ),
           )
@@ -135,11 +137,20 @@ class ExtendUsage extends StatelessWidget {
     );
   }
 
-  _usageCard(Package plan, context) {
-    return Obx(
-      () => InkWell(
-        onTap: (shopController.isCurrentPackage(plan) &&
-                shopController.checkDaysRemaining(shop: shop) > 0)
+  Widget _usageCard(Package plan) {
+    return Obx(() {
+      final bool isActive = shopController.isCurrentPackage(plan) &&
+          shopController.checkDaysRemaining(shop: shop) > 0;
+
+      final int daysRemaining = shopController.checkDaysRemaining(shop: shop);
+
+      final String price = (plan.priceText ?? "").trim();
+      final String displayPrice =
+          price.toLowerCase().startsWith("from") ? price : "From $price";
+
+      return InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: isActive
             ? null
             : () {
                 shopController.shopsRenew.clear();
@@ -147,150 +158,102 @@ class ExtendUsage extends StatelessWidget {
                 Get.to(() => ShopsToRenew(plan: plan, shop: shop));
               },
         child: Container(
-          padding:
-              const EdgeInsets.only(bottom: 10, left: 10, right: 10, top: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
-            color: shopController.isCurrentPackage(plan) &&
-                    shopController.checkDaysRemaining(shop: shop) > 0
-                ? Colors.green
-                : Colors.transparent,
-            border: const Border(
-              bottom: BorderSide(
-                color: Colors.black,
-                width: 1.0,
-              ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isActive
+                  ? AppColors.mainColor.withOpacity(.25)
+                  : Colors.black.withOpacity(.05),
             ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    majorTitle(
-                        title: "${plan.title}",
-                        color: Colors.black,
-                        size: 18.0),
-                    Row(
-                      children: [
-                        Text(
-                          userController.currentUser.value?.primaryShop!
-                                      .currency !=
-                                  "KES"
-                              ? "USD"
-                              : "@ ${htmlPrice('')}",
-                          style: TextStyle(
-                              fontSize: 15, color: AppColors.mainColor),
-                        ),
-                        if (plan.discount! == 0)
-                          Text(
-                            userController.currentUser.value?.primaryShop!
-                                        .currency !=
-                                    "KES"
-                                ? "${plan.amountusd}"
-                                : plan.amount!.toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 23,
-                                color: AppColors.mainColor),
-                          ),
-                        if (plan.discount! > 0 &&
-                            userController
-                                    .currentUser.value?.primaryShop!.currency !=
-                                "KES")
-                          Text(
-                            userController.currentUser.value?.primaryShop!
-                                        .currency !=
-                                    "KES"
-                                ? "${plan.amountusd}"
-                                : plan.amount!.toString(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 23,
-                                color: AppColors.mainColor),
-                          ),
-                        if (plan.discount! > 0 &&
-                            userController
-                                    .currentUser.value?.primaryShop!.currency ==
-                                "KES")
-                          Row(
-                            children: [
-                              Text(
-                                "${plan.amount} ~ ",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.red,
-                                    decoration: TextDecoration.lineThrough),
-                              ),
-                              Text(
-                                "${plan.discount}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 23,
-                                    color: AppColors.mainColor),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                    plan.features!.isNotEmpty
-                        ? Wrap(
-                            children: List.generate(
-                                plan.features!.length,
-                                (index) => minorTitle(
-                                    title: _shops_count(plan),
-                                    color: Colors.black,
-                                    size: 12.0)).toList(),
-                          )
-                        : Text(plan.description!),
-                    if (shopController.isCurrentPackage(plan) &&
-                        shopController.checkDaysRemaining(shop: shop) > 0)
-                      Text(
-                        "${shopController.checkDaysRemaining(shop: shop)} days remaining",
-                        style: const TextStyle(color: Colors.red),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      plan.title ?? "",
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black87,
                       ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? Colors.green.withOpacity(.12)
+                          : AppColors.mainColor.withOpacity(.10),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Text(
+                      isActive ? "Active" : "Subscribe",
+                      style: TextStyle(
+                          color: isActive
+                              ? Colors.green.shade700
+                              : AppColors.mainColor,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 10.5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                plan.shopText ?? "",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black.withOpacity(.52),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "From ",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    TextSpan(
+                      text: plan.priceText ?? "",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.mainColor,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              if (plan.type != "free")
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: shopController.isCurrentPackage(plan) &&
-                            shopController.checkDaysRemaining(shop: shop) > 0
-                        ? AppColors.lightDeepPurple
-                        : AppColors.mainColor,
-                    borderRadius: BorderRadius.circular(50),
+              if (isActive) ...[
+                const SizedBox(height: 6),
+                Text(
+                  "$daysRemaining days remaining",
+                  style: TextStyle(
+                    color: Colors.red.shade500,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
                   ),
-                  child: minorTitle(
-                      title: shopController.isCurrentPackage(plan) &&
-                              shopController.checkDaysRemaining(shop: shop) > 0
-                          ? "Active"
-                          : "Subscribe",
-                      color: shopController.isCurrentPackage(plan) &&
-                              shopController.checkDaysRemaining(shop: shop) > 0
-                          ? Colors.white
-                          : Colors.white),
-                )
+                ),
+              ],
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  // ignore: non_constant_identifier_names
-  _shops_count(Package plan) {
-    if (plan.type == "free") {
-      return "Unlimited Shops";
-    } else {
-      if (plan.maxShops! > 10) {
-        return ' 11+ Shops';
-      }
-      return "max ${plan.maxShops} Shops";
-    }
+      );
+    });
   }
 }

@@ -222,6 +222,11 @@ class CustomerController extends GetxController
     if (amountController.text == "") {
       generalAlert(title: "Error", message: "Please enter a valid amount");
     } else {
+      LoadingDialog.showLoadingDialog(
+        context: Get.context!,
+        title: "Please wait...",
+        key: _keyLoader,
+      );
       try {
         var customerData = {
           "wallet": int.parse(amountController.text),
@@ -232,6 +237,7 @@ class CustomerController extends GetxController
         };
         var response = await CustomerService.updateCustomer(
             customerData, customerModel.sId!);
+        Get.back();
         if (response['error'] != null) {
           generalAlert(title: "Error", message: response["error"]);
           return;
@@ -242,7 +248,7 @@ class CustomerController extends GetxController
         debugPrintMessage(e);
         generalAlert(title: "Error", message: e.toString());
       } finally {
-        Get.find<SalesController>().paynowMethod.value = "";
+        Get.find<SalesController>().paynowMethod.value = "Cash";
         amountController.text = "";
         Get.find<SalesController>().mpesaCode.text = "";
       }

@@ -97,6 +97,7 @@ verifyPermission({required String category, permission, bool group = false}) {
   if (userController.currentUser.value?.usertype == "attendant") {
     List role =
         userController.roles.where((p0) => p0["key"] == category).toList();
+    print(role);
     if (role.isEmpty) return false;
     if (group) {
       return role.isNotEmpty;

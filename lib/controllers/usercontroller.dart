@@ -167,8 +167,6 @@ class UserController {
       String? lastAppRatingDate}) async {
     profileupdateLoading.value = true;
     attendants.clear();
-    LoadingDialog.showLoadingDialog(
-        context: Get.context!, title: "Please wait...", key: _keyLoader);
     if (type == "other") {
       await User().atendantUpdate({
         "username": nameController.text,
@@ -180,11 +178,10 @@ class UserController {
         "permissions": permissions ?? permissions?.map((e) => e).toList(),
       }, userModel.id!);
     }
+    attendants.refresh();
 
     List<dynamic> attendantResponse = await User.getAttendants();
     attendants.addAll(attendantResponse.map((e) => UserModel.fromJson(e)));
-    Get.back();
-    attendants.refresh();
     profileupdateLoading.value = false;
   }
 

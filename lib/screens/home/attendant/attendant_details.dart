@@ -7,6 +7,7 @@ import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/utils/helper.dart';
+import 'package:pointify/widgets/loading_dialog.dart';
 import 'package:switcher_button/switcher_button.dart';
 
 import '../../../../utils/colors.dart';
@@ -22,7 +23,7 @@ import 'attendants_page.dart';
 class AttendantDetails extends StatelessWidget {
   final UserModel? userModel;
 
-  AttendantDetails({Key? key, required this.userModel}) : super(key: key) {
+  AttendantDetails({super.key, required this.userModel}) {
     if (userModel != null) {
       userController.nameController.text = userModel!.username ?? "";
       userController.attendantId.text = userModel!.uniqueDigits.toString();
@@ -135,26 +136,6 @@ class AttendantDetails extends StatelessWidget {
             ],
           ),
         ),
-        actions: [
-          if (!isSmallScreen(context) && userModel != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: IconButton(
-                  onPressed: () {
-                    deleteDialog(
-                        context: context,
-                        onPressed: () {
-                          userController.deleteAttendant(userModel: userModel);
-                          Get.find<HomeController>().selectedWidget.value =
-                              AttendantsPage();
-                        });
-                  },
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  )),
-            )
-        ],
       ),
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
@@ -233,10 +214,7 @@ class AttendantDetails extends StatelessWidget {
               height: 50,
               child: InkWell(
                 onTap: () {
-                  isSmallScreen(context)
-                      ? Get.to(() => Permissions())
-                      : Get.find<HomeController>().selectedWidget.value =
-                          Permissions();
+                  Get.to(() => Permissions());
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -350,7 +328,7 @@ class AttendantDetails extends StatelessWidget {
 class Permissions extends StatelessWidget {
   final UserModel? userModel;
 
-  Permissions({Key? key, this.userModel}) : super(key: key);
+  Permissions({super.key, this.userModel});
   final UserController userController = Get.find<UserController>();
 
   itemRow({required String key, required data, required catId}) {
@@ -400,6 +378,7 @@ class Permissions extends StatelessWidget {
                     "key": keyy,
                     "value": [key]
                   };
+                  print(role);
                   userController.roles.addAll([role]);
                 }
               },
@@ -544,62 +523,20 @@ class Permissions extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            isSmallScreen(context) ? AppColors.mainColor : Colors.white,
+        backgroundColor: AppColors.mainColor,
         leading: IconButton(
             onPressed: () {
-              if (isSmallScreen(context)) {
-                Get.back();
-              } else {
-                Get.find<HomeController>().selectedWidget.value =
-                    AttendantDetails(
-                  userModel: userModel,
-                );
-              }
+              Get.back();
             },
             icon: Icon(
               Icons.arrow_back_ios,
-              color: isSmallScreen(context) ? Colors.white : Colors.black,
+              color: Colors.white,
             )),
         title: Text(
           "Permissions",
-          style: TextStyle(
-              color: isSmallScreen(context) ? Colors.white : Colors.black),
+          style: TextStyle(color: Colors.white),
         ),
         elevation: 0.2,
-        actions: [
-          if (!isSmallScreen(context))
-            InkWell(
-              splashColor: Colors.transparent,
-              onTap: () async {
-                var all = [];
-                for (var element in userController.roles) {
-                  all.add({"key": element["key"], "value": element["value"]});
-                }
-                if (userModel == null) {
-                  await userController.createAttendant(all);
-                } else {
-                  await userController.updateAttendant(
-                      userModel: userModel!,
-                      permissions: all,
-                      type: "permissions");
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.all(5).copyWith(right: 15),
-                height: kToolbarHeight,
-                decoration: BoxDecoration(
-                    border: Border.all(width: 3, color: AppColors.mainColor),
-                    borderRadius: BorderRadius.circular(40)),
-                child: Center(
-                    child: majorTitle(
-                        title: "Update Changes",
-                        color: AppColors.mainColor,
-                        size: 18.0)),
-              ),
-            )
-        ],
       ),
       body: Obx(
         () => ListView.builder(
@@ -652,45 +589,47 @@ class Permissions extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: Container(
-        height: isSmallScreen(context) ? 50 : 0,
-        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        child: Obx(
-          () => userController.profileupdateLoading.isTrue
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : InkWell(
-                  splashColor: Colors.transparent,
-                  onTap: () async {
-                    var all = [];
-                    for (var element in userController.roles) {
-                      all.add(
-                          {"key": element["key"], "value": element["value"]});
-                    }
-                    if (userModel == null) {
-                      await userController.createAttendant(all);
-                    } else {
-                      await userController.updateAttendant(
-                          userModel: userModel!,
-                          permissions: all,
-                          type: "permissions");
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 3, color: AppColors.mainColor),
-                        borderRadius: BorderRadius.circular(40)),
-                    child: Center(
-                        child: majorTitle(
-                            title: "Update Changes",
-                            color: AppColors.mainColor,
-                            size: 18.0)),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 50,
+          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          child: Obx(
+            () => userController.profileupdateLoading.isTrue
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : InkWell(
+                    splashColor: Colors.transparent,
+                    onTap: () async {
+                      var all = [];
+                      for (var element in userController.roles) {
+                        all.add(
+                            {"key": element["key"], "value": element["value"]});
+                      }
+                      if (userModel == null) {
+                        await userController.createAttendant(all);
+                      } else {
+                        await userController.updateAttendant(
+                            userModel: userModel!,
+                            permissions: all,
+                            type: "permissions");
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                          border:
+                              Border.all(width: 3, color: AppColors.mainColor),
+                          borderRadius: BorderRadius.circular(40)),
+                      child: Center(
+                          child: majorTitle(
+                              title: "Update Changes",
+                              color: AppColors.mainColor,
+                              size: 18.0)),
+                    ),
                   ),
-                ),
+          ),
         ),
       ),
     );

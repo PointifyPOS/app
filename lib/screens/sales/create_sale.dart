@@ -188,6 +188,7 @@ class CreateSale extends StatelessWidget {
                                         onTap: () {
                                           Get.to(() => Customers(type: "sale"));
                                         },
+                                        style: const TextStyle(fontSize: 12),
                                         decoration: InputDecoration(
                                           contentPadding:
                                               const EdgeInsets.fromLTRB(

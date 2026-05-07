@@ -80,10 +80,7 @@ class BadStockPage extends StatelessWidget {
                   onTap: () {
                     productController.showBadStockWidget.value = true;
                     productController.getProductsBySort(type: "all");
-                    isSmallScreen(context)
-                        ? Get.to(() => CreateBadStock(page: page))
-                        : Get.find<HomeController>().selectedWidget.value =
-                            CreateBadStock(page: page);
+                    Get.to(() => CreateBadStock(page: page));
                   },
                   child: Container(
                     padding: const EdgeInsets.all(10),
@@ -139,8 +136,7 @@ class BadStockPage extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                         Icon(Icons.credit_card,
-                            color: AppColors.mainColor),
+                        Icon(Icons.credit_card, color: AppColors.mainColor),
                         const SizedBox(width: 10),
                         Column(
                           children: [
@@ -150,7 +146,7 @@ class BadStockPage extends StatelessWidget {
                                   (previousValue, element) =>
                                       previousValue +
                                       element.quantity! * element.unitPrice!)),
-                              style:  TextStyle(
+                              style: TextStyle(
                                   color: AppColors.mainColor, fontSize: 21),
                             ),
                           ],
@@ -348,7 +344,7 @@ class CreateBadStock extends StatelessWidget {
   final String? page;
   final ProductController productController = Get.find<ProductController>();
 
-  CreateBadStock({Key? key, required this.page}) : super(key: key);
+  CreateBadStock({super.key, required this.page});
 
   @override
   Widget build(BuildContext context) {
@@ -362,12 +358,7 @@ class CreateBadStock extends StatelessWidget {
         ),
         leading: IconButton(
           onPressed: () {
-            if (isSmallScreen(Get.context)) {
-              Get.back();
-            } else {
-              Get.find<HomeController>().selectedWidget.value =
-                  BadStockPage(page: page);
-            }
+            Get.back();
           },
           icon: const Icon(
             Icons.clear,
@@ -377,8 +368,7 @@ class CreateBadStock extends StatelessWidget {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.symmetric(
-            horizontal: isSmallScreen(context) ? 10 : 20, vertical: 10),
+        margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         width: double.infinity,
         child: Column(
           children: [
@@ -392,8 +382,7 @@ class CreateBadStock extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    if (productController.products.isEmpty &&
-                        !productController.getProductLoad.value) {
+                    if (productController.products.isEmpty) {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -531,9 +520,12 @@ class CreateBadStock extends StatelessWidget {
                                 return;
                               }
                               if (productController
+                                  .spoiltreasonController.text.isEmpty) {
+                                missingValueDialog(context, "Enter a reason");
+                                return;
+                              }
+                              if (productController
                                       .qtyController.text.isEmpty ||
-                                  productController
-                                      .spoiltreasonController.text.isEmpty ||
                                   productController.selectedBadStock.value ==
                                       null) {
                                 missingValueDialog(

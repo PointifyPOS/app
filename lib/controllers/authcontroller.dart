@@ -275,7 +275,6 @@ class AuthController {
       var response = await SettingsApi.getSettings(type: "APP_SETTINGS");
       value = response;
     }
-    print("checkForUpdate $value");
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     int latestVersion = value['android_version'] == null

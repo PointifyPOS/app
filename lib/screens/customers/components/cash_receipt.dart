@@ -3,24 +3,23 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/controllers/paymentcontroller.dart';
 import 'package:pointify/functions/functions.dart';
+import 'package:pointify/models/customer.dart';
 import 'package:pointify/models/payment.dart';
-import 'package:pointify/widgets/textbutton.dart';
 import 'package:printing/printing.dart';
 
-import '../../../controllers/homecontroller.dart';
 import '../../../models/salemodel.dart';
-import '../../../responsive/responsiveness.dart';
 import '../../../utils/colors.dart';
 import '../../../widgets/alert.dart';
-import '../../../widgets/major_title.dart';
-import '../../../widgets/normal_text.dart';
 import '../../receipts/pdf/cash_receipt_pdf.dart';
-import '../wallet_page.dart';
 
+// ignore: must_be_immutable
 class CashReceipt extends StatelessWidget {
   final Payment? receipt;
+  String? saleId;
+  Customer? customer;
 
-  CashReceipt({Key? key, required this.receipt}) : super(key: key);
+  CashReceipt(
+      {super.key, required this.receipt, this.saleId, Customer? customer});
   final PaymentController paymentController = Get.find<PaymentController>();
   @override
   Widget build(BuildContext context) {
@@ -31,11 +30,7 @@ class CashReceipt extends StatelessWidget {
         leading: IconButton(
           color: Colors.black,
           onPressed: () {
-            if (isSmallScreen(context)) {
-              Get.back();
-            } else {
-              Get.find<HomeController>().selectedWidget.value = WalletPage();
-            }
+            Get.back();
           },
           icon: const Icon(Icons.clear),
         ),
@@ -68,7 +63,8 @@ class CashReceipt extends StatelessWidget {
                     message: "Are you sure you want to delete receipt?",
                     function: () {
                       Get.back();
-                      paymentController.deleteReceiptById(receipt!.sId!);
+                      paymentController.deleteReceiptById(
+                          saleId!, receipt!.id!);
                     });
               },
               icon: const Icon(
