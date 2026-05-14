@@ -1,3 +1,4 @@
+import 'package:pointify/models/extra_charge.dart';
 import 'package:pointify/models/product.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/shop.dart';
@@ -9,6 +10,8 @@ class SaleModel {
   double? totalDiscount;
   double? totaltax;
   double? totalAmount;
+  List<ExtraCharge>? extraCharges;
+  double? extraChargesTotal;
   double? totalWithDiscount;
   List<SaleItem>? items;
   String? receiptNo;
@@ -25,7 +28,6 @@ class SaleModel {
   double? mpesatotal;
   double? banktotal;
   double? outstandingBalance;
-  List<void>? payments;
   String? createdAt;
   String? orderId;
   String? dueDate;
@@ -40,6 +42,8 @@ class SaleModel {
       this.salesnote,
       this.saleType,
       this.orderId,
+      this.extraCharges,
+      this.extraChargesTotal,
       this.totaltax,
       this.totalAmount,
       this.totalWithDiscount,
@@ -55,7 +59,6 @@ class SaleModel {
       this.attendant,
       this.paymentType,
       this.outstandingBalance,
-      this.payments,
       this.createdAt});
 
   SaleModel.fromJson(Map<String, dynamic> json) {
@@ -83,7 +86,20 @@ class SaleModel {
       });
     }
     receiptNo = json['receiptNo'];
+    extraChargesTotal = json['extraChargesTotal'] != null
+        ? json['extraChargesTotal'].toDouble()
+        : 0.0;
+    if (json['extraCharges'] != null && json['extraCharges'] is List) {
+      extraCharges = <ExtraCharge>[];
 
+      json['extraCharges'].forEach((v) {
+        if (v is Map<String, dynamic>) {
+          extraCharges!.add(
+            ExtraCharge.fromJson(v),
+          );
+        }
+      });
+    }
     if (json['shopId'] != null && json['shopId'] is String == false) {
       shopId = Shop.fromJson(json['shopId']);
     }
@@ -119,6 +135,10 @@ class SaleModel {
     data['receiptNo'] = receiptNo;
     if (shopId != null) {
       data['shopId'] = shopId!.id;
+    }
+    data['extraChargesTotal'] = extraChargesTotal;
+    if (extraCharges != null) {
+      data['extraCharges'] = extraCharges!.map((v) => v.toJson()).toList();
     }
     if (customerId != null) {
       data['customerId'] = customerId!.toJson();

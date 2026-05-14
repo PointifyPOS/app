@@ -12,310 +12,544 @@ import '../../../controllers/shopcontroller.dart';
 import '../../functions/functions.dart';
 import '../../screens/receipts/pdf/sales/purchases_report.dart';
 import '../../widgets/alert.dart';
-import '../../widgets/textbutton.dart';
 
 class PurchasesReport extends StatelessWidget {
   final String? title;
   final String? type;
-  PurchasesReport({super.key, this.title, this.type});
+
+  PurchasesReport({
+    super.key,
+    this.title,
+    this.type,
+  });
 
   final ShopController shopController = Get.find<ShopController>();
+
   final PurchaseController purchaseController = Get.find<PurchaseController>();
+
   final ReportsController reportsController = Get.find<ReportsController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xfff7f7fb),
+      appBar: AppBar(
+        elevation: 0,
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          centerTitle: false,
-          titleSpacing: 0.4,
-          leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: Icon(
-              Icons.clear,
-              color: AppColors.mainColor,
+        surfaceTintColor: Colors.white,
+        centerTitle: false,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+            size: 20,
+          ),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title ?? "Purchases",
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          title: Text(
-            title!,
-            style: TextStyle(color: AppColors.mainColor),
-          ),
-          actions: [
-            Center(
-                child: textBtn(
-                    vPadding: 5,
-                    hPadding: 20,
-                    text: "Print",
-                    bgColor: AppColors.mainColor,
-                    color: Colors.white,
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              content: const Text(
-                                  "Only 50 items will show in the pdf, if the record is more than that, enter your email to get the port in your email address"),
-                              actions: [
-                                TextField(
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(),
-                                    focusedBorder: OutlineInputBorder(),
-                                    enabledBorder: OutlineInputBorder(),
-                                    hintText: "Enter your email",
-                                  ),
-                                  controller:
-                                      purchaseController.emailController,
-                                ),
-                                Row(
-                                  children: [
-                                    TextButton(
-                                        onPressed: () {
-                                          Get.back();
-                                        },
-                                        child: const Text("Cancel")),
-                                    TextButton(
-                                        onPressed: () {
-                                          Get.back();
-                                          Get.to(() => Scaffold(
-                                                appBar: AppBar(
-                                                  title: Text(
-                                                      "${type.toString().capitalizeFirst} Purchases"),
-                                                ),
-                                                body: PdfPreview(
-                                                  build: (context) =>
-                                                      purchasesReportPdf(
-                                                          "receipts",
-                                                          "${type!.toUpperCase()} PURCHASES"),
-                                                ),
-                                              ));
-                                        },
-                                        child: const Text("Print")),
-                                    TextButton(
-                                        onPressed: () {
-                                          if (purchaseController.emailController
-                                              .text.isNotEmpty) {
-                                            purchaseController.sendReportEmail(
-                                                email: purchaseController
-                                                    .emailController.text,
-                                                fromDate: reportsController
-                                                    .filterStartDate.value,
-                                                toDate: reportsController
-                                                    .filterEndDate.value,
-                                                shop: userController.currentUser
-                                                    .value!.primaryShop!.id!,
-                                                // paymentTag: reportsController
-                                                //     .cashsalesfilterSelected
-                                                //     .value,
-                                                status: "cashed");
-                                          } else {
-                                            generalAlert(
-                                                message:
-                                                    "Please enter your email");
-                                          }
-                                        },
-                                        child: const Text("Send to email")),
-                                  ],
-                                ),
-                              ],
-                            );
-                          });
-                    })),
-            const SizedBox(
-              width: 10,
-            )
+            const SizedBox(height: 2),
+            Text(
+              "Purchase invoices & reports",
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 11,
+              ),
+            ),
           ],
         ),
-        body: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              child: TextFormField(
-                controller: purchaseController.searchInvoiceController,
-                onChanged: (value) {
-                  if (value == "") {
-                    purchaseController.filteredInvoices.value =
-                        purchaseController.invoices
-                            .where((p0) =>
-                                p0.paymentType ==
-                                purchaseController.selectedItem.value)
-                            .toList();
-                  } else {
-                    purchaseController.filteredInvoices.value =
-                        purchaseController.invoices
-                            .where((p0) =>
-                                p0.paymentType ==
-                                        purchaseController.selectedItem.value &&
-                                    p0.purchaseNo
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ||
-                                p0.items!.any((element) => element
-                                    .product!.name!
-                                    .toLowerCase()
-                                    .contains(value.toLowerCase())))
-                            .toList();
-                  }
-                },
-                decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.fromLTRB(10, 2, 0, 2),
-                  suffixIcon: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.search),
-                  ),
-                  hintText: ""
-                      "Search by invoice number",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(
+              right: 14,
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () {
+                _showPrintDialog(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.mainColor,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(
+                      Icons.print_outlined,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      "Print",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            if (type!.toLowerCase() != "credit")
-              Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Obx(() => Wrap(
-                        direction: Axis.horizontal,
-                        spacing: 8,
-                        runSpacing: 12,
-                        children: List.generate(
-                            purchaseController.reportpaymentMethods.length,
-                            (index) => InkWell(
-                                  onTap: () {
-                                    purchaseController.selectedItem.value =
-                                        purchaseController
-                                            .reportpaymentMethods[index]
-                                            .toString()
-                                            .toLowerCase();
-                                    purchaseController.filteredInvoices.value =
-                                        purchaseController.invoices
-                                            .where((p0) =>
-                                                p0.paymentType ==
-                                                purchaseController
-                                                    .reportpaymentMethods[index]
-                                                    .toString()
-                                                    .toLowerCase())
-                                            .toList();
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.only(
-                                        top: 5, bottom: 5, left: 10, right: 15),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                            width: 1,
-                                            color: AppColors.mainColor),
-                                        color: purchaseController
-                                                    .selectedItem.value ==
-                                                purchaseController
-                                                    .reportpaymentMethods[index]
-                                                    .toString()
-                                                    .toLowerCase()
-                                            ? AppColors.mainColor
-                                            : Colors.white),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          "${purchaseController.reportpaymentMethods[index]}:",
-                                          style: TextStyle(
-                                              color: purchaseController
-                                                          .selectedItem.value ==
-                                                      purchaseController
-                                                          .reportpaymentMethods[
-                                                              index]
-                                                          .toString()
-                                                          .toLowerCase()
-                                                  ? Colors.white
-                                                  : AppColors.mainColor,
-                                              fontSize: 12),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Obx(
-                                          () => Text(
-                                            htmlPrice(purchaseController
-                                                .totals[purchaseController
-                                                    .reportpaymentMethods[index]
-                                                    .toString()
-                                                    .toLowerCase()]
-                                                .toStringAsFixed(2)
-                                                .toString()),
-                                            style: TextStyle(
-                                                color: purchaseController
-                                                            .selectedItem
-                                                            .value ==
-                                                        purchaseController
-                                                            .reportpaymentMethods[
-                                                                index]
-                                                            .toString()
-                                                            .toLowerCase()
-                                                    ? Colors.white
-                                                    : AppColors.mainColor),
-                                          ),
-                                        )
-                                      ],
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // SEARCH
+          Container(
+            margin: const EdgeInsets.fromLTRB(
+              16,
+              14,
+              16,
+              10,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: TextFormField(
+              controller: purchaseController.searchInvoiceController,
+              onChanged: (value) {
+                if (value == "") {
+                  purchaseController.filteredInvoices.value = purchaseController
+                      .invoices
+                      .where((p0) =>
+                          p0.paymentType ==
+                          purchaseController.selectedItem.value)
+                      .toList();
+                } else {
+                  purchaseController.filteredInvoices.value = purchaseController
+                      .invoices
+                      .where((p0) =>
+                          p0.paymentType ==
+                                  purchaseController.selectedItem.value &&
+                              p0.purchaseNo
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase()) ||
+                          p0.items!.any(
+                            (element) =>
+                                element.product!.name!.toLowerCase().contains(
+                                      value.toLowerCase(),
                                     ),
-                                  ),
-                                )),
-                      )),
+                          ))
+                      .toList();
+                }
+              },
+              decoration: InputDecoration(
+                hintText: "Search by invoice number",
+                hintStyle: TextStyle(
+                  color: Colors.grey.shade500,
+                ),
+                prefixIcon: Icon(
+                  Icons.search_rounded,
+                  color: Colors.grey.shade500,
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    purchaseController.searchInvoiceController.clear();
+
+                    purchaseController.filteredInvoices.value =
+                        purchaseController.invoices;
+                  },
+                  icon: const Icon(Icons.close),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  borderSide: BorderSide(
+                    color: AppColors.mainColor,
+                  ),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+
+          // FILTERS
+          if (type!.toLowerCase() != "credit")
+            Container(
+              margin: const EdgeInsets.only(
+                bottom: 10,
+              ),
+              height: 48,
+              child: Obx(
+                () => ListView.separated(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                  ),
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    final method =
+                        purchaseController.reportpaymentMethods[index];
+
+                    final selected = purchaseController.selectedItem.value ==
+                        method.toString().toLowerCase();
+
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        purchaseController.selectedItem.value =
+                            method.toString().toLowerCase();
+
+                        purchaseController.filteredInvoices.value =
+                            purchaseController.invoices
+                                .where((p0) =>
+                                    p0.paymentType ==
+                                    method.toString().toLowerCase())
+                                .toList();
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: selected ? AppColors.mainColor : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: selected
+                                ? AppColors.mainColor
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              method.toString().capitalizeFirst!,
+                              style: TextStyle(
+                                color: selected ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? Colors.white.withOpacity(.15)
+                                    : AppColors.mainColor.withOpacity(.08),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Text(
+                                htmlPrice(
+                                  purchaseController
+                                      .totals[method.toString().toLowerCase()]
+                                      .toStringAsFixed(2),
+                                ),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: selected
+                                      ? Colors.white
+                                      : AppColors.mainColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  separatorBuilder: (_, __) => const SizedBox(
+                    width: 10,
+                  ),
+                  itemCount: purchaseController.reportpaymentMethods.length,
                 ),
               ),
-            Obx(() {
+            ),
+
+          // LIST
+          Expanded(
+            child: Obx(() {
               return purchaseController.isLoadingPurchases.isTrue
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
                   : purchaseController.filteredInvoices.isEmpty
-                      ? Center(child: noItemsFound(context, true))
-                      : Expanded(
-                          child: ListView.builder(
-                              itemCount:
-                                  purchaseController.filteredInvoices.length +
-                                      1,
-                              physics: const ScrollPhysics(),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                if (index <
-                                    purchaseController.invoices.length) {
-                                  return invoiceCard(
-                                    invoice: purchaseController.invoices[index],
-                                  );
-                                }
-                                if (!purchaseController.hasMore.value) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: purchaseController.isLoadingMore.value
-                                      ? const Center(
-                                          child: CircularProgressIndicator())
-                                      : ElevatedButton(
-                                          onPressed: () {
-                                            purchaseController.getPurchases(
-                                              shopid: userController.currentUser
-                                                  .value!.primaryShop!.id,
-                                              loadMore: true,
-                                              fromDate: reportsController
-                                                  .filterStartDate.value,
-                                              toDate: reportsController
-                                                  .filterEndDate.value,
-                                            );
-                                          },
-                                          child: const Text("Load More"),
+                      ? Center(
+                          child: noItemsFound(
+                            context,
+                            true,
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(
+                            16,
+                            0,
+                            16,
+                            20,
+                          ),
+                          itemCount:
+                              purchaseController.filteredInvoices.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index <
+                                purchaseController.filteredInvoices.length) {
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 12,
+                                ),
+                                child: invoiceCard(
+                                  invoice: purchaseController
+                                      .filteredInvoices[index],
+                                ),
+                              );
+                            }
+
+                            if (!purchaseController.hasMore.value) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: purchaseController.isLoadingMore.value
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : SizedBox(
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          elevation: 0,
+                                          backgroundColor: AppColors.mainColor,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
                                         ),
-                                );
-                              }),
+                                        onPressed: () {
+                                          purchaseController.getPurchases(
+                                            shopid: userController.currentUser
+                                                .value!.primaryShop!.id,
+                                            loadMore: true,
+                                            fromDate: reportsController
+                                                .filterStartDate.value,
+                                            toDate: reportsController
+                                                .filterEndDate.value,
+                                          );
+                                        },
+                                        child: const Text(
+                                          "Load More",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            );
+                          },
                         );
             }),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  // PRINT DIALOG
+  // ─────────────────────────────────────────────
+
+  void _showPrintDialog(
+    BuildContext context,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(28),
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                "Print Purchases Report",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Only 50 items will appear in the PDF. For larger reports, send to email.",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: purchaseController.emailController,
+                decoration: InputDecoration(
+                  hintText: "Enter email address",
+                  prefixIcon: const Icon(Icons.email),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.back();
+                      },
+                      child: const Text("Cancel"),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: AppColors.mainColor,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.back();
+
+                        Get.to(
+                          () => Scaffold(
+                            appBar: AppBar(
+                              title: Text(
+                                "${type.toString().capitalizeFirst} Purchases",
+                              ),
+                            ),
+                            body: PdfPreview(
+                              build: (context) => purchasesReportPdf(
+                                "receipts",
+                                "${type!.toUpperCase()} PURCHASES",
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "Print",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (purchaseController.emailController.text.isNotEmpty) {
+                      purchaseController.sendReportEmail(
+                        email: purchaseController.emailController.text,
+                        fromDate: reportsController.filterStartDate.value,
+                        toDate: reportsController.filterEndDate.value,
+                        shop:
+                            userController.currentUser.value!.primaryShop!.id!,
+                        status: "cashed",
+                      );
+                    } else {
+                      generalAlert(
+                        message: "Please enter your email",
+                      );
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.email_outlined,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    "Send To Email",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/widgets/alert.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PrinterController extends GetxController {
   Future<List<int>> printSalesReceipt({
@@ -159,5 +163,107 @@ class PrinterController extends GetxController {
     bytes += generator.cut();
 
     return bytes;
+  }
+
+  Future<bool> ensurePrinterConnected() async {
+    try {
+      final bool isConnected = await PrintBluetoothThermal.connectionStatus;
+
+      if (isConnected) {
+        return true;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final savedMac = prefs.getString('saved_printer_mac');
+
+      if (savedMac == null || savedMac.isEmpty) {
+        return false;
+      }
+
+      final bool result = await PrintBluetoothThermal.connect(
+        macPrinterAddress: savedMac,
+      );
+
+      return result;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> printIosBleBytes(List<int> bytes) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedId = prefs.getString("ios_ble_printer_id");
+
+      if (savedId == null || savedId.isEmpty) {
+        generalAlert(
+          title: "Printer Error",
+          message:
+              "No iPhone printer saved. Go to printer setup and connect first.",
+          function: () {},
+        );
+        return false;
+      }
+
+      final device = BluetoothDevice.fromId(savedId);
+
+      await device.connect(
+        license: License.free,
+        timeout: const Duration(seconds: 12),
+        autoConnect: false,
+      );
+
+      final services = await device.discoverServices();
+
+      BluetoothCharacteristic? writeChar;
+
+      for (final service in services) {
+        for (final c in service.characteristics) {
+          if (c.properties.write || c.properties.writeWithoutResponse) {
+            writeChar = c;
+            break;
+          }
+        }
+        if (writeChar != null) break;
+      }
+
+      if (writeChar == null) {
+        generalAlert(
+          title: "Printer Error",
+          message: "Printer connected but no writable channel found.",
+          function: () {},
+        );
+        return false;
+      }
+
+      const int chunkSize = 180;
+
+      for (int i = 0; i < bytes.length; i += chunkSize) {
+        final chunk = bytes.sublist(
+          i,
+          i + chunkSize > bytes.length ? bytes.length : i + chunkSize,
+        );
+
+        await writeChar.write(
+          chunk,
+          withoutResponse: writeChar.properties.writeWithoutResponse,
+        );
+
+        await Future.delayed(const Duration(milliseconds: 40));
+      }
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      await device.disconnect();
+
+      return true;
+    } catch (e) {
+      print("iOS BLE print failed: $e");
+      generalAlert(
+        title: "Printer Error",
+        message: "iPhone printer failed: $e",
+        function: () {},
+      );
+      return false;
+    }
   }
 }

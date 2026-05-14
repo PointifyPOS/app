@@ -127,7 +127,7 @@ class SuppliersPage extends StatelessWidget {
 }
 
 class Suppliers extends StatelessWidget {
-  Suppliers({Key? key, this.from = "", this.function}) : super(key: key);
+  Suppliers({super.key, this.from = "", this.function});
   final CustomerController customersController = Get.find<CustomerController>();
   final ShopController shopController = Get.find<ShopController>();
   final SupplierController supplierController = Get.find<SupplierController>();
@@ -145,30 +145,71 @@ class Suppliers extends StatelessWidget {
             if (from == "addproduct" || from == "purchases")
               Column(
                 children: [
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      children: [
+                        IconButton(
                           icon: const Icon(
                             Icons.arrow_back_ios_new_rounded,
                             color: Colors.black,
                           ),
                           onPressed: () {
                             Get.back();
-                          }),
-                      Center(
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          child: majorTitle(
-                              title: "Select Supplier",
-                              color: Colors.black,
-                              size: 16.0),
+                          },
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: majorTitle(
+                            title: "Select Supplier",
+                            color: Colors.black,
+                            size: 16.0,
+                          ),
+                        ),
+                        InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () async {
+                            await Get.to(
+                              () => CreateSuppliers(
+                                page: "purchases",
+                              ),
+                            );
+
+                            supplierController.getSuppliers("all");
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.mainColor,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                  size: 15,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  "Add",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(height: 10),
                 ],
               ),
             Container(
@@ -228,7 +269,6 @@ class Suppliers extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
             Expanded(
               child: Obx(() => supplierController.loadingsuppliers.isTrue
                   ? const Center(
@@ -237,6 +277,7 @@ class Suppliers extends StatelessWidget {
                   : supplierController.filteredSuppliers.isEmpty
                       ? noItemsFound(context, true)
                       : ListView.builder(
+                          padding: EdgeInsets.zero,
                           itemCount:
                               supplierController.filteredSuppliers.length,
                           itemBuilder: (context, index) {

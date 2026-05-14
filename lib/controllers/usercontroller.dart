@@ -119,6 +119,7 @@ class UserController {
   }
 
   getAttendants() async {
+    if (attendantsloading.isTrue) return;
     attendantsloading.value = true;
     List<dynamic> response = await User.getAttendants();
     attendants.value = response.map((e) => UserModel.fromJson(e)).toList();
@@ -160,29 +161,71 @@ class UserController {
     }
   }
 
-  Future<void> updateAttendant(
-      {List<dynamic>? permissions,
-      required UserModel userModel,
-      required String type,
-      String? lastAppRatingDate}) async {
-    profileupdateLoading.value = true;
-    attendants.clear();
-    if (type == "other") {
-      await User().atendantUpdate({
-        "username": nameController.text,
-        "password": passwordController.text,
-        "lastAppRatingDate": lastAppRatingDate,
-      }, userModel.id!);
-    } else if (type == "permissions") {
-      await User().atendantUpdate({
-        "permissions": permissions ?? permissions?.map((e) => e).toList(),
-      }, userModel.id!);
-    }
-    attendants.refresh();
+  Future<void> updateAttendant({
+    List<dynamic>? permissions,
+    required UserModel userModel,
+    required String type,
+    String? lastAppRatingDate,
+  }) async {
+    try {
+      profileupdateLoading.value = true;
 
-    List<dynamic> attendantResponse = await User.getAttendants();
-    attendants.addAll(attendantResponse.map((e) => UserModel.fromJson(e)));
-    profileupdateLoading.value = false;
+      LoadingDialog.showLoadingDialog(
+        context: Get.context!,
+        title: "Updating attendant...",
+        key: _keyLoader,
+      );
+
+      attendants.clear();
+
+      if (type == "other") {
+        await User().atendantUpdate(
+          {
+            "username": nameController.text,
+            "password": passwordController.text,
+            "lastAppRatingDate": lastAppRatingDate,
+          },
+          userModel.id!,
+        );
+      } else if (type == "permissions") {
+        await User().atendantUpdate(
+          {
+            "permissions": permissions ?? permissions?.map((e) => e).toList(),
+          },
+          userModel.id!,
+        );
+      }
+
+      attendants.refresh();
+
+      List<dynamic> attendantResponse = await User.getAttendants();
+
+      attendants.addAll(
+        attendantResponse.map((e) => UserModel.fromJson(e)),
+      );
+
+      profileupdateLoading.value = false;
+
+      // CLOSE LOADER
+      Get.back();
+
+      generalAlert(
+          title: "Success",
+          message: "Attendant updated successfully",
+          function: () {
+            Get.back();
+          });
+    } catch (e) {
+      profileupdateLoading.value = false;
+
+      // CLOSE LOADER
+      Get.back();
+
+      generalAlert(
+        title: "Error",
+        message: e.toString(),
+      );
+    }
   }
 
   void sendVerificationEmail() async {

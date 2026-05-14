@@ -23,10 +23,15 @@ import 'attendants_page.dart';
 class AttendantDetails extends StatelessWidget {
   final UserModel? userModel;
 
-  AttendantDetails({super.key, required this.userModel}) {
+  AttendantDetails({
+    super.key,
+    required this.userModel,
+  }) {
     if (userModel != null) {
       userController.nameController.text = userModel!.username ?? "";
+
       userController.attendantId.text = userModel!.uniqueDigits.toString();
+
       userController.getRoles(userModel!);
     } else {
       userController.attendantId.text = Random().nextInt(30000).toString();
@@ -37,77 +42,13 @@ class AttendantDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Helper(
-      widget: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 5,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(10),
-                  child: userDetails(context),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              if (userModel != null)
-                InkWell(
-                  onTap: () {
-                    if (isSmallScreen(context)) {
-                      Get.to(() => Permissions(userModel: userModel));
-                    } else {
-                      Get.find<HomeController>().selectedWidget.value =
-                          Permissions(userModel: userModel);
-                    }
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 1,
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              majorTitle(
-                                  title: "Update Permissions",
-                                  color: Colors.black,
-                                  size: 16.0),
-                              minorTitle(
-                                title: "update roles and permissions",
-                                color: Colors.grey,
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          const Icon(Icons.lock)
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+    return Scaffold(
+      backgroundColor: const Color(0xfff7f7fb),
       appBar: AppBar(
-        elevation: 0.0,
-        titleSpacing: 0.0,
-        centerTitle: false,
+        elevation: 0,
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        centerTitle: false,
         leading: IconButton(
           onPressed: () {
             if (isSmallScreen(context)) {
@@ -118,209 +59,433 @@ class AttendantDetails extends StatelessWidget {
             }
           },
           icon: const Icon(
-            Icons.arrow_back_ios,
+            Icons.arrow_back_ios_new_rounded,
             color: Colors.black,
+            size: 20,
           ),
         ),
-        title: Padding(
-          padding: const EdgeInsets.only(right: 30.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              majorTitle(
-                  title: userModel == null
-                      ? "New Attendant"
-                      : userModel?.username ?? userModel?.username,
-                  color: Colors.black,
-                  size: 16.0),
-            ],
-          ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              userModel == null ? "New Attendant" : userModel?.username ?? "",
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              userModel == null
+                  ? "Create shop attendant"
+                  : "Manage attendant account",
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 11,
+              ),
+            ),
+          ],
         ),
+        actions: [
+          if (userModel != null && isSmallScreen(context))
+            Padding(
+              padding: const EdgeInsets.only(
+                right: 14,
+              ),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () {
+                  deleteDialog(
+                    context: context,
+                    onPressed: () {
+                      userController.deleteAttendant(
+                        userModel: userModel,
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: Colors.red.shade700,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        child: userModel == null || !isSmallScreen(context)
-            ? Container(
-                height: 0,
-              )
-            : Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                child: InkWell(
-                  onTap: () {
-                    deleteDialog(
-                        context: context,
-                        onPressed: () {
-                          userController.deleteAttendant(userModel: userModel);
-                        });
-                  },
-                  child: SizedBox(
+      bottomNavigationBar: _buildBottomBar(context),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 650,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                12,
+                16,
+                120,
+              ),
+              child: Column(
+                children: [
+                  Container(
                     width: double.infinity,
-                    height: 30,
-                    child: Center(
-                      child: majorTitle(
-                          title: "Remove Attendant",
-                          color: Colors.red,
-                          size: 16.0),
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: Colors.grey.shade200,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: AppColors.mainColor.withOpacity(.08),
+                                borderRadius: BorderRadius.circular(
+                                  16,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.person_outline,
+                                color: AppColors.mainColor,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    userModel == null
+                                        ? "New Attendant"
+                                        : userModel?.username ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    "Manage account access",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        attendantUserInputs(
+                          name: "Username",
+                          controller: userController.nameController,
+                        ),
+                        const SizedBox(height: 18),
+                        if (userModel == null) ...[
+                          _fieldLabel("Password"),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: userController.passwordController,
+                            obscureText: true,
+                            decoration: _modernInputDecoration(
+                              hint: "Enter password",
+                              icon: Icons.lock_outline,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                        ],
+                        attendantUserInputs(
+                          name: "User ID",
+                          controller: userController.attendantId,
+                          enabled: false,
+                        ),
+                        const SizedBox(height: 20),
+                        if (userModel != null)
+                          InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () {
+                              _showPasswordDialog(context);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.mainColor.withOpacity(.05),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.lock_reset,
+                                    color: AppColors.mainColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      "Reset Password",
+                                      style: TextStyle(
+                                        color: AppColors.mainColor,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 15,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (userModel != null) ...[
+                          const SizedBox(height: 14),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () {
+                              Get.to(
+                                () => Permissions(
+                                  userModel: userModel,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 14,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.admin_panel_settings_outlined,
+                                    color: AppColors.mainColor,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          "Permissions",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          "Roles and access control",
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 15,
+                                    color: Colors.grey.shade500,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                )),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
-      floatButton: Container(),
     );
   }
 
-  Widget userDetails(context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        attendantUserInputs(
-            name: "Username", controller: userController.nameController),
-        const SizedBox(height: 15),
-        if (userModel == null)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              majorTitle(title: "Password", color: Colors.black, size: 14.0),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: userController.passwordController,
-                enabled: true,
-                keyboardType: TextInputType.visiblePassword,
-                decoration: InputDecoration(
-                  isDense: true,
-                  contentPadding: const EdgeInsets.all(15),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1)),
+  Widget _buildBottomBar(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(
+          16,
+          10,
+          16,
+          16,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.04),
+              blurRadius: 10,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          height: 54,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: AppColors.mainColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            onPressed: () async {
+              if (userModel == null) {
+                Get.to(
+                  () => Permissions(),
+                );
+              } else {
+                await userController.updateAttendant(
+                  userModel: userModel!,
+                  type: "other",
+                );
+              }
+            },
+            child: Text(
+              userModel == null ? "Continue" : "Update Attendant",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _fieldLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontWeight: FontWeight.w700,
+        color: Colors.grey.shade700,
+      ),
+    );
+  }
+
+  InputDecoration _modernInputDecoration({
+    required String hint,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      prefixIcon: Icon(icon),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: Colors.grey.shade300,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: AppColors.mainColor,
+        ),
+      ),
+    );
+  }
+
+  void _showPasswordDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text(
+            "Reset Password",
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          content: TextFormField(
+            controller: userController.passwordController,
+            obscureText: true,
+            decoration: _modernInputDecoration(
+              hint: "Enter new password",
+              icon: Icons.lock_outline,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey.shade700,
                 ),
               ),
-            ],
-          ),
-        const SizedBox(height: 15),
-        attendantUserInputs(
-            name: "User ID",
-            controller: userController.attendantId, //81975
-            enabled: false),
-        const SizedBox(height: 15),
-        if (userModel == null)
-          SizedBox(
-              height: 50,
-              child: InkWell(
-                onTap: () {
-                  Get.to(() => Permissions());
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 3, color: AppColors.mainColor),
-                      borderRadius: BorderRadius.circular(40)),
-                  child: Center(
-                      child: majorTitle(
-                          title: "Next",
-                          color: AppColors.mainColor,
-                          size: 18.0)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: AppColors.mainColor,
+              ),
+              onPressed: () async {
+                if (userController.passwordController.text.length < 6) {
+                  generalAlert(
+                    title: "Error",
+                    message: "Password must be at least 6 characters",
+                  );
+
+                  return;
+                }
+
+                await userController.updateAttendant(
+                  userModel: userModel!,
+                  type: "other",
+                );
+              },
+              child: const Text(
+                "Update",
+                style: TextStyle(
+                  color: Colors.white,
                 ),
-              )),
-        if (userModel != null)
-          Align(
-              alignment: Alignment.centerRight,
-              child: InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (_) {
-                        return AlertDialog(
-                          title: majorTitle(
-                              title: "Update Password",
-                              color: Colors.black,
-                              size: 16.0),
-                          content: SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.15,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                attendantUserInputs(
-                                    name: "New Password",
-                                    controller:
-                                        userController.passwordController),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                              ],
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                child: majorTitle(
-                                    title: "Cancel",
-                                    color: AppColors.mainColor,
-                                    size: 13.0)),
-                            TextButton(
-                                onPressed: () async {
-                                  if (userController
-                                          .passwordController.text.length <
-                                      6) {
-                                    generalAlert(
-                                        title: "Error",
-                                        message:
-                                            "password must be between 6 and 128 characters",
-                                        negativeText: "");
-                                    return;
-                                  }
-                                  await userController.updateAttendant(
-                                      userModel: userModel!, type: "other");
-                                },
-                                child: majorTitle(
-                                    title: "Okay",
-                                    color: AppColors.mainColor,
-                                    size: 13.0))
-                          ],
-                        );
-                      });
-                },
-                child: majorTitle(
-                    title: "Reset Password",
-                    color: AppColors.mainColor,
-                    size: 17.0),
-              )),
-        const SizedBox(
-          height: 10,
-        ),
-        if (userModel != null)
-          Center(
-            child: SizedBox(
-                height: 50,
-                width: isSmallScreen(context) ? double.infinity : 200,
-                child: InkWell(
-                  onTap: () async {
-                    await userController.updateAttendant(
-                        userModel: userModel!, type: "other");
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        border:
-                            Border.all(width: 3, color: AppColors.mainColor),
-                        borderRadius: BorderRadius.circular(40)),
-                    child: Center(
-                        child: majorTitle(
-                            title: "Update",
-                            color: AppColors.mainColor,
-                            size: 18.0)),
-                  ),
-                )),
-          ),
-      ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

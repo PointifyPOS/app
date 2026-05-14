@@ -10,7 +10,6 @@ import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/sqlite/helper.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';

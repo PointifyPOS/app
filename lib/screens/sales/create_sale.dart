@@ -607,15 +607,25 @@ class CreateSale extends StatelessWidget {
                                 ),
                                 InkWell(
                                   onTap: () async {
+                                    // if (salesController.receipt.value == null ||
+                                    //     salesController
+                                    //         .receipt.value!.items!.isEmpty) {
+                                    //   generalAlert(title: "No items to pay");
+                                    //   return;
+                                    // }
+                                    // await salesController.saveSale(
+                                    //     screen: page ?? "admin",
+                                    //     status: "hold");
                                     if (salesController.receipt.value == null ||
                                         salesController
                                             .receipt.value!.items!.isEmpty) {
                                       generalAlert(title: "No items to pay");
                                       return;
                                     }
-                                    await salesController.saveSale(
-                                        screen: page ?? "admin",
-                                        status: "hold");
+
+                                    Get.to(() => SalePreview(
+                                          page: page,
+                                        ));
                                   },
                                   child: Container(
                                     width:

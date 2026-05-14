@@ -148,13 +148,58 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
     );
   }
 
-  Future<void> checkPrinterConnection() async {
-    final bool? isConnected = await PrintBluetoothThermal.connectionStatus;
-    await PrintBluetoothThermal.pairedBluetooths;
-    if (isConnected == true) {
-      connected = true;
-    }
-  }
+  // Future<void> checkPrinterConnection() async {
+  //   final bool? isConnected = await PrintBluetoothThermal.connectionStatus;
+  //   await PrintBluetoothThermal.pairedBluetooths;
+  //   if (isConnected == true && mounted) {
+  //     setState(() {
+  //       connected = true;
+  //     });
+  //   }
+  // }
+
+  // Future<void> initPlatformState() async {
+  //   String platformVersion;
+  //   int porcentbatery = 0;
+
+  //   try {
+  //     platformVersion = await PrintBluetoothThermal.platformVersion;
+  //     porcentbatery = await PrintBluetoothThermal.batteryLevel;
+  //   } on PlatformException {
+  //     platformVersion = 'Failed to get platform version.';
+  //   }
+
+  //   final bool isBtEnabled = await PrintBluetoothThermal.bluetoothEnabled;
+  //   await checkPrinterConnection();
+  //   if (isBtEnabled) {
+  //     _msj = "Bluetooth enabled, checking saved printer...";
+
+  //     // ✅ Try reconnect to saved printer
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final savedMac = prefs.getString('saved_printer_mac');
+
+  //     if (savedMac != null) {
+  //       final bool result = await PrintBluetoothThermal.connect(
+  //         macPrinterAddress: savedMac,
+  //       );
+  //       if (result && mounted) {
+  //         setState(() {
+  //           connected = true;
+  //         });
+
+  //         print("Auto-reconnected to $savedMac");
+  //       }
+  //     }
+  //   } else {
+  //     _msj = "Bluetooth not enabled";
+  //   }
+
+  //   if (!mounted) return;
+
+  //   setState(() {
+  //     _info = "$platformVersion ($porcentbatery% battery)";
+  //   });
+  // }
 
   Future<void> initPlatformState() async {
     String platformVersion;
@@ -168,31 +213,52 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
     }
 
     final bool isBtEnabled = await PrintBluetoothThermal.bluetoothEnabled;
-    await checkPrinterConnection();
-    if (isBtEnabled) {
-      _msj = "Bluetooth enabled, checking saved printer...";
-
-      // ✅ Try reconnect to saved printer
-      final prefs = await SharedPreferences.getInstance();
-      final savedMac = prefs.getString('saved_printer_mac');
-
-      if (savedMac != null) {
-        final bool result = await PrintBluetoothThermal.connect(
-          macPrinterAddress: savedMac,
-        );
-        if (result) {
-          connected = true;
-          print("Auto-reconnected to $savedMac");
-        }
-      }
-    } else {
-      _msj = "Bluetooth not enabled";
-    }
 
     if (!mounted) return;
 
     setState(() {
       _info = "$platformVersion ($porcentbatery% battery)";
+      _msj = isBtEnabled
+          ? "Bluetooth enabled, checking saved printer..."
+          : "Bluetooth not enabled";
+    });
+
+    if (!isBtEnabled) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final savedMac = prefs.getString('saved_printer_mac');
+
+    if (savedMac == null || savedMac.isEmpty) {
+      return;
+    }
+
+    final bool alreadyConnected = await PrintBluetoothThermal.connectionStatus;
+
+    if (alreadyConnected) {
+      if (!mounted) return;
+      setState(() {
+        connected = true;
+      });
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _progress = true;
+      _msjprogress = "Connecting...";
+    });
+
+    final bool result = await PrintBluetoothThermal.connect(
+      macPrinterAddress: savedMac,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      connected = result;
+      _progress = false;
+      _msj = result
+          ? "Printer connected automatically"
+          : "Saved printer found but failed to connect";
     });
   }
 
@@ -229,21 +295,26 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       connected = false;
     });
 
+    await Future.delayed(const Duration(milliseconds: 800));
+
     final bool result = await PrintBluetoothThermal.connect(
       macPrinterAddress: mac,
     );
 
+    if (!mounted) return;
+
     if (result) {
-      connected = true;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('saved_printer_mac', mac);
     }
 
     setState(() {
+      connected = result;
       _progress = false;
+      _msj = result ? "Printer connected" : "Failed to connect printer";
     });
 
-    print("state connected $result");
+    print("result status connect: $result");
   }
 
   Future<void> disconnect() async {
@@ -284,7 +355,10 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
     List<int> bytes = [];
 
     final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
+    final generator = Generator(
+      optionprinttype == "80 mm" ? PaperSize.mm80 : PaperSize.mm58,
+      profile,
+    );
 
     bytes += generator.reset();
     bytes += generator.text(
@@ -314,8 +388,9 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       'Item        Qty  Price   Total',
       styles: const PosStyles(align: PosAlign.left, bold: true),
     );
-    bytes += generator.text('-' * 32);
-
+    bytes += generator.text(
+      optionprinttype == "80 mm" ? '-' * 48 : '-' * 32,
+    );
     double subtotal = 0;
 
     for (var item in items) {
@@ -325,19 +400,36 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       final total = qty * price;
       subtotal += total;
 
-      // Format fields to exact widths
-      final nameStr = name.toString().padRight(12).substring(0, 12);
-      final qtyStr = qty.toString().padLeft(3);
-      final priceStr = price.toStringAsFixed(2).padLeft(7);
-      final totalStr = total.toStringAsFixed(2).padLeft(10);
+      if (optionprinttype == "80 mm") {
+        final nameStr = name.toString().padRight(20).substring(
+              0,
+              name.toString().length > 20 ? 20 : name.toString().length,
+            );
 
-      // Concatenate with no extra spaces
-      final line = '$nameStr$qtyStr$priceStr$totalStr';
-      bytes += generator.text(line);
+        final qtyStr = qty.toString().padLeft(4);
+        final priceStr = price.toStringAsFixed(2).padLeft(10);
+        final totalStr = total.toStringAsFixed(2).padLeft(12);
+
+        final line = '$nameStr$qtyStr$priceStr$totalStr';
+        bytes += generator.text(line);
+      } else {
+        final nameStr = name.toString().padRight(12).substring(
+              0,
+              name.toString().length > 12 ? 12 : name.toString().length,
+            );
+
+        final qtyStr = qty.toString().padLeft(3);
+        final priceStr = price.toStringAsFixed(2).padLeft(7);
+        final totalStr = total.toStringAsFixed(2).padLeft(10);
+
+        final line = '$nameStr$qtyStr$priceStr$totalStr';
+        bytes += generator.text(line);
+      }
     }
 
-    bytes += generator.text('-' * 32);
-
+    bytes += generator.text(
+      optionprinttype == "80 mm" ? '-' * 48 : '-' * 32,
+    );
     double vat = subtotal * 0.16;
     double totalDue = subtotal + vat;
 
