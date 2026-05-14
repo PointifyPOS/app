@@ -231,10 +231,7 @@ class Reports extends StatelessWidget {
         onPresssed();
       },
       child: Container(
-        margin: EdgeInsets.only(
-            top: 10,
-            right: isSmallScreen(Get.context) ? 0 : 15,
-            left: isSmallScreen(Get.context) ? 0 : 15),
+        margin: EdgeInsets.only(top: 10, right: 0, left: 0),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
             color: Colors.deepPurple.withOpacity(0.1),

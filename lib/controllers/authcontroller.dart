@@ -437,11 +437,7 @@ class AuthController {
       await initUser();
       clearDataFromTextFields();
       if (userController.currentUser.value?.primaryShop == null) {
-        if (isSmallScreen(context)) {
-          Get.offAll(() => CreateShop(page: "home", clearInputs: true));
-        } else {
-          Get.offAll(() => CreateShop(page: "home", clearInputs: true));
-        }
+        Get.offAll(() => CreateShop(page: "home", clearInputs: true));
       }
 
       signuserLoad.value = false;

@@ -33,8 +33,8 @@ class ExpensePage extends StatelessWidget {
   }
   final SalesController salesController = Get.find<SalesController>();
   final ExpenseController expenseController = Get.find<ExpenseController>();
-  final  ShopController shopController = Get.find<ShopController>();
-  final  ReportsController reportsController = Get.find<ReportsController>();
+  final ShopController shopController = Get.find<ShopController>();
+  final ReportsController reportsController = Get.find<ReportsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +45,9 @@ class ExpensePage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         leading: IconButton(
           onPressed: () {
-            if (!isSmallScreen(context)) {
-              Get.find<HomeController>().selectedWidget.value = FinancialPage();
-            } else {
-              Get.back();
-            }
+            Get.back();
           },
-          icon:  Icon(
+          icon: Icon(
             Icons.arrow_back_ios,
             color: AppColors.mainColor,
           ),
@@ -103,8 +99,7 @@ class ExpensePage extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                           Icon(Icons.credit_card,
-                              color: AppColors.mainColor),
+                          Icon(Icons.credit_card, color: AppColors.mainColor),
                           const SizedBox(width: 10),
                           Obx(
                             () => Text(
@@ -112,7 +107,7 @@ class ExpensePage extends StatelessWidget {
                                   0,
                                   (previousValue, element) =>
                                       previousValue + element.amount!)),
-                              style:  TextStyle(
+                              style: TextStyle(
                                   color: AppColors.mainColor, fontSize: 21),
                             ),
                           )
@@ -152,60 +147,17 @@ class ExpensePage extends StatelessWidget {
                           color: Colors.grey,
                           size: 13.0),
                     )
-                  : isSmallScreen(context)
-                      ? Expanded(
-                          child: ListView.builder(
-                              itemCount: expenseController.expenses.length,
-                              itemBuilder: (context, index) {
-                                ExpenseModel expenseModel =
-                                    expenseController.expenses.elementAt(index);
+                  : Expanded(
+                      child: ListView.builder(
+                          itemCount: expenseController.expenses.length,
+                          itemBuilder: (context, index) {
+                            ExpenseModel expenseModel =
+                                expenseController.expenses.elementAt(index);
 
-                                return expenseCard(
-                                    context: context, expense: expenseModel);
-                              }),
-                        )
-                      : Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 15, vertical: 10),
-                          width: double.infinity,
-                          child: Theme(
-                            data: Theme.of(context)
-                                .copyWith(dividerColor: Colors.grey),
-                            child: DataTable(
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                width: 1,
-                                color: Colors.black,
-                              )),
-                              columnSpacing: 30.0,
-                              columns: [
-                                const DataColumn(
-                                    label: Text('Name',
-                                        textAlign: TextAlign.center)),
-                                const DataColumn(
-                                    label: Text('Category',
-                                        textAlign: TextAlign.center)),
-                                DataColumn(
-                                    label: Text(
-                                        'Amount(${userController.currentUser.value!.primaryShop?.currency})',
-                                        textAlign: TextAlign.center)),
-                              ],
-                              rows: List.generate(
-                                  expenseController.expenses.length, (index) {
-                                ExpenseModel expenseModel =
-                                    expenseController.expenses.elementAt(index);
-                                final y = expenseModel.name;
-                                final x = expenseModel.category!.name;
-
-                                return DataRow(cells: [
-                                  DataCell(Text(y!)),
-                                  DataCell(Text(x.toString())),
-                                  DataCell(Text("${expenseModel.amount}")),
-                                ]);
-                              }),
-                            ),
-                          ),
-                        );
+                            return expenseCard(
+                                context: context, expense: expenseModel);
+                          }),
+                    );
             }),
           ],
         ),
@@ -219,13 +171,7 @@ class ExpensePage extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            if (isSmallScreen(Get.context)) {
-              Get.to(() => CreateExpense());
-            } else {
-              Get.find<HomeController>().selectedWidget.value = CreateExpense(
-                from: "ExpensePage",
-              );
-            }
+            Get.to(() => CreateExpense());
           },
           child: Container(
             padding: const EdgeInsets.all(10),
@@ -242,12 +188,7 @@ class ExpensePage extends StatelessWidget {
         ),
         InkWell(
           onTap: () {
-            if (isSmallScreen(Get.context)) {
-              Get.to(() => ExpensesCategories());
-            } else {
-              Get.find<HomeController>().selectedWidget.value =
-                  ExpensesCategories();
-            }
+            Get.to(() => ExpensesCategories());
           },
           child: Container(
             padding: const EdgeInsets.all(10),

@@ -41,117 +41,113 @@ class PaymentHistory extends StatelessWidget {
               color: Colors.black,
             )),
       ),
-      body: ResponsiveWidget(
-        largeScreen: Container(),
-        smallScreen: Obx(() {
-          return paymentController.isPaymentLoading.value
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : paymentController.payments.isEmpty
-                  ? noItemsFound(context, false)
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: ListView.builder(
-                          itemCount: paymentController.payments.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            Payment payHistory =
-                                paymentController.payments.elementAt(index);
-                            return InkWell(
-                              onTap: () {
-                                Get.to(() => CashReceipt(
-                                    receipt: payHistory,
-                                    saleId: saleId,
-                                    customer: customerModel));
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 3)
-                                        .copyWith(bottom: 5),
-                                decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.grey,
-                                          offset: Offset(1, 1),
-                                          blurRadius: 1)
-                                    ]),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Paid: ",
-                                              style: TextStyle(
+      body: Obx(() {
+        return paymentController.isPaymentLoading.value
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : paymentController.payments.isEmpty
+                ? noItemsFound(context, false)
+                : Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ListView.builder(
+                        itemCount: paymentController.payments.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          Payment payHistory =
+                              paymentController.payments.elementAt(index);
+                          return InkWell(
+                            onTap: () {
+                              Get.to(() => CashReceipt(
+                                  receipt: payHistory,
+                                  saleId: saleId,
+                                  customer: customerModel));
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              margin: const EdgeInsets.symmetric(horizontal: 3)
+                                  .copyWith(bottom: 5),
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.grey,
+                                        offset: Offset(1, 1),
+                                        blurRadius: 1)
+                                  ]),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            "Paid: ",
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          Text(
+                                            htmlPrice(payHistory.amount ?? 0),
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      if (payHistory.date != null)
+                                        Text(
+                                            "On: ${DateFormat("dd-MM-yyyy HH:mm").format(DateTime.parse(payHistory.date!).toLocal())}",
+                                            style: const TextStyle(
                                                 color: Colors.black,
-                                              ),
-                                            ),
-                                            Text(
-                                              htmlPrice(payHistory.amount ?? 0),
-                                              style: const TextStyle(
-                                                color: Colors.green,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        if (payHistory.date != null)
-                                          Text(
-                                              "On: ${DateFormat("dd-MM-yyyy HH:mm").format(DateTime.parse(payHistory.date!).toLocal())}",
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 11)),
-                                      ],
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        if (payHistory.attendantId?.username !=
-                                            null)
-                                          Text(
-                                              "by: ${payHistory.attendantId!.username}",
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 11)),
-                                        if (payHistory.paymentType!.isNotEmpty)
-                                          Text(
-                                              "paid via : ${payHistory.paymentType}",
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 11)),
-                                        if (payHistory.mpesaCode!.isNotEmpty)
-                                          Text(
-                                              "Mpesa Code: ${payHistory.mpesaCode}",
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 11)),
-                                      ],
-                                    )
-                                  ],
-                                ),
+                                                fontSize: 11)),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (payHistory.attendantId?.username !=
+                                          null)
+                                        Text(
+                                            "by: ${payHistory.attendantId!.username}",
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 11)),
+                                      if (payHistory.paymentType!.isNotEmpty)
+                                        Text(
+                                            "paid via : ${payHistory.paymentType}",
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 11)),
+                                      if (payHistory.mpesaCode!.isNotEmpty)
+                                        Text(
+                                            "Mpesa Code: ${payHistory.mpesaCode}",
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 11)),
+                                    ],
+                                  )
+                                ],
                               ),
-                            );
-                          }),
-                    );
-        }),
-      ),
+                            ),
+                          );
+                        }),
+                  );
+      }),
     );
   }
 }

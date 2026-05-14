@@ -154,17 +154,7 @@ class BanksTransactions extends StatelessWidget {
       titleTextStyle: const TextStyle(color: Colors.black),
       leading: IconButton(
         onPressed: () {
-          if (isSmallScreen(context)) {
-            Get.back();
-          } else {
-            if (page == "CashFlowCategories") {
-              Get.find<HomeController>().selectedWidget.value =
-                  CashFlowCategories();
-            } else {
-              Get.find<HomeController>().selectedWidget.value =
-                  CashFlowManager();
-            }
-          }
+          Get.back();
         },
         icon: const Icon(
           Icons.arrow_back_ios,
@@ -230,20 +220,13 @@ class BanksTransactions extends StatelessWidget {
                 children: [
                   InkWell(
                     onTap: () {
-                      isSmallScreen(context)
-                          ? Get.to(() => CategoryTransactions(
-                                cashFlowCategory: cashFlowCategory,
-                                page: "bank",
-                                bank: bankModel,
-                              ))
-                          : Get.find<HomeController>().selectedWidget.value =
-                              CategoryTransactions(
-                              cashFlowCategory: cashFlowCategory,
-                              page: "bank",
-                              bank: bankModel,
-                            );
+                      Get.to(() => CategoryTransactions(
+                            cashFlowCategory: cashFlowCategory,
+                            page: "bank",
+                            bank: bankModel,
+                          ));
                     },
-                    child:  Text(
+                    child: Text(
                       "View Bank Slips",
                       style: TextStyle(color: AppColors.mainColor),
                     ),
@@ -267,16 +250,12 @@ class BanksTransactions extends StatelessWidget {
   showBottomSheet(BuildContext context, BankModel bankModel) {
     return showModalBottomSheet(
         context: context,
-        backgroundColor:
-            isSmallScreen(context) ? Colors.white : Colors.transparent,
+        backgroundColor: Colors.white,
         builder: (_) {
           return Container(
             color: Colors.white,
             height: MediaQuery.of(context).size.height * 0.3,
-            margin: EdgeInsets.only(
-                left: isSmallScreen(context)
-                    ? 0
-                    : MediaQuery.of(context).size.width * 0.2),
+            margin: EdgeInsets.only(left: 0),
             child: Column(
               children: [
                 Container(
@@ -336,7 +315,7 @@ class BanksTransactions extends StatelessWidget {
                                           },
                                           child: Text(
                                             "Cancel".toUpperCase(),
-                                            style:  TextStyle(
+                                            style: TextStyle(
                                                 color: AppColors.mainColor),
                                           )),
                                       const SizedBox(
@@ -350,7 +329,7 @@ class BanksTransactions extends StatelessWidget {
                                           },
                                           child: Text(
                                             "Save".toUpperCase(),
-                                            style:  TextStyle(
+                                            style: TextStyle(
                                                 color: AppColors.mainColor),
                                           )),
                                     ],
@@ -453,7 +432,7 @@ class BanksTransactions extends StatelessWidget {
                                     child: Text(
                                       "Cancel".toUpperCase(),
                                       style:
-                                           TextStyle(color: AppColors.mainColor),
+                                          TextStyle(color: AppColors.mainColor),
                                     )),
                                 const SizedBox(
                                   width: 10,
@@ -465,7 +444,7 @@ class BanksTransactions extends StatelessWidget {
                                     child: Text(
                                       "Save".toUpperCase(),
                                       style:
-                                           TextStyle(color: AppColors.mainColor),
+                                          TextStyle(color: AppColors.mainColor),
                                     )),
                               ],
                             )

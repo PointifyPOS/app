@@ -210,9 +210,7 @@ class CustomerController extends GetxController
       await CustomerService.deleteCustomer(customerModel: customerModel);
       getCustomersInShop('');
       Get.back();
-      isSmallScreen(Get.context)
-          ? Get.back()
-          : Get.find<HomeController>().selectedWidget.value = CustomersPage();
+      Get.back();
     } catch (e) {
       Navigator.of(Get.context!, rootNavigator: true).pop();
     }

@@ -31,38 +31,16 @@ class EditCustomer extends StatelessWidget {
         ),
         leading: IconButton(
             onPressed: () {
-              if (isSmallScreen(context)) {
-                Get.back();
-              } else {
-                Get.find<HomeController>().selectedWidget.value =
-                    CustomerInfoPage();
-              }
+              Get.back();
             },
             icon: const Icon(
               Icons.arrow_back_ios,
               color: Colors.black,
             )),
         backgroundColor: Colors.transparent,
-        actions: [
-          if (!isSmallScreen(context))
-            TextButton(
-                onPressed: () {
-                  Get.find<HomeController>().selectedWidget.value =
-                      CustomerInfoPage();
-                  customersController.updateCustomer(
-                      context, customersController.currentCustomer.value!);
-                },
-                child: Text("Save Changes".toUpperCase(),
-                    style:  TextStyle(
-                        color: AppColors.mainColor, fontWeight: FontWeight.bold)))
-        ],
       ),
       body: Container(
-        padding: EdgeInsets.only(
-            left: isSmallScreen(context) ? 10 : 25,
-            right: isSmallScreen(context) ? 10 : 25,
-            top: 10,
-            bottom: 3),
+        padding: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 3),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -74,7 +52,7 @@ class EditCustomer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5))),
             ),
             SizedBox(
-              height: isSmallScreen(context) ? 7 : 25,
+              height: 7,
             ),
             TextFormField(
               controller: customersController.phoneController,
@@ -86,7 +64,7 @@ class EditCustomer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5))),
             ),
             SizedBox(
-              height: isSmallScreen(context) ? 7 : 25,
+              height: 7,
             ),
             TextFormField(
               controller: customersController.emailController,
@@ -96,7 +74,7 @@ class EditCustomer extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5))),
             ),
             SizedBox(
-              height: isSmallScreen(context) ? 7 : 25,
+              height: 7,
             ),
             TextFormField(
               controller: customersController.addressController,
@@ -128,8 +106,9 @@ class EditCustomer extends StatelessWidget {
                   },
                   child: Text(
                     "Cancel".toUpperCase(),
-                    style:  TextStyle(
-                        color: AppColors.mainColor, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: AppColors.mainColor,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
                 TextButton(
@@ -139,8 +118,9 @@ class EditCustomer extends StatelessWidget {
                           context, customersController.currentCustomer.value!);
                     },
                     child: Text("Save Changes".toUpperCase(),
-                        style:  TextStyle(
-                            color: AppColors.mainColor, fontWeight: FontWeight.bold)))
+                        style: TextStyle(
+                            color: AppColors.mainColor,
+                            fontWeight: FontWeight.bold)))
               ],
             )
           ],

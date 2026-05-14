@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -23,17 +22,15 @@ class CashInLayout extends StatelessWidget {
 
   final CashFlowController cashflowController = Get.find<CashFlowController>();
   final ExpenseController expenseController = Get.find<ExpenseController>();
-  final
-  ShopController shopController = Get.find<ShopController>();
+  final ShopController shopController = Get.find<ShopController>();
 
   final CashFlowController cashFlowController = Get.find<CashFlowController>();
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: true,
-      onPopInvoked: (val)  {
+      onPopInvoked: (val) {
         cashflowController.clearInputs();
-
       },
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -58,28 +55,6 @@ class CashInLayout extends StatelessWidget {
                 cashflowController.clearInputs();
               },
               icon: const Icon(Icons.arrow_back_ios)),
-          actions: [
-            if (!isSmallScreen(context))
-              InkWell(
-                onTap: () {
-                  saveFunction(context: context);
-                },
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 10).copyWith(right: 10),
-                  height: kTextTabBarHeight * 0.5,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  decoration: BoxDecoration(
-                      color: AppColors.mainColor,
-                      border: Border.all(color: AppColors.mainColor),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: const Text(
-                    "Save",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              )
-          ],
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -173,7 +148,8 @@ class CashInLayout extends StatelessWidget {
                                       decoration: InputDecoration(
                                           hintText:
                                               "eg.Loan,Capital,Contribution etc",
-                                          hintStyle: const TextStyle(fontSize: 12),
+                                          hintStyle:
+                                              const TextStyle(fontSize: 12),
                                           border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10),
@@ -186,7 +162,8 @@ class CashInLayout extends StatelessWidget {
                                     },
                                     child: Text(
                                       "Cancel".toUpperCase(),
-                                      style: const TextStyle(color: Colors.blue),
+                                      style:
+                                          const TextStyle(color: Colors.blue),
                                     ),
                                   ),
                                   TextButton(
@@ -197,7 +174,8 @@ class CashInLayout extends StatelessWidget {
                                     },
                                     child: Text(
                                       "Save now".toUpperCase(),
-                                      style: const TextStyle(color: Colors.blue),
+                                      style:
+                                          const TextStyle(color: Colors.blue),
                                     ),
                                   ),
                                 ],
@@ -211,7 +189,7 @@ class CashInLayout extends StatelessWidget {
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                   color: AppColors.mainColor, width: 2)),
-                          child:  Text(
+                          child: Text(
                             "+ Add",
                             style: TextStyle(color: AppColors.mainColor),
                           )),
@@ -255,7 +233,7 @@ class CashInLayout extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
-                height: isSmallScreen(context) ? kToolbarHeight * 1.5 : 0.0,
+                height: kToolbarHeight * 1.5,
                 child: InkWell(
                   onTap: () {
                     saveFunction(context: context);
@@ -291,14 +269,10 @@ class CashInLayout extends StatelessWidget {
   saveFunction({required context}) async {
     if (cashflowController.textEditingControllerName.text.isEmpty ||
         cashflowController.textEditingControllerAmount.text.isEmpty) {
-      isSmallScreen(context)
-          ? showSnackBar(message: "Please fill all fields", color: Colors.black)
-          : generalAlert(title: "Error", message: "Please fill all fields");
+      showSnackBar(message: "Please fill all fields", color: Colors.black);
     } else {
       if (cashflowController.selectedcashFlowCategoty.value == null) {
-        isSmallScreen(context)
-            ? showSnackBar(message: "Select Category", color: Colors.black)
-            : generalAlert(title: "Error", message: "Select Category");
+        showSnackBar(message: "Select Category", color: Colors.black);
       } else {
         await cashFlowController.createCashFlow(
           cashflowController.selectedcashFlowCategoty.value!,

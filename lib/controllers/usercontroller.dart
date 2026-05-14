@@ -153,12 +153,8 @@ class UserController {
     userController.roles.clear();
     userController.nameController.clear();
     userController.passwordController.clear();
-    if (isSmallScreen(Get.context)) {
-      Get.back();
-      Get.back();
-    } else {
-      Get.find<HomeController>().selectedWidget.value = AttendantsPage();
-    }
+    Get.back();
+    Get.back();
   }
 
   Future<void> updateAttendant({

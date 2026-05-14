@@ -6,7 +6,6 @@ import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/salemodel.dart';
 import 'package:pointify/widgets/minor_title.dart';
 
-import '../../../responsive/responsiveness.dart';
 import '../../../utils/colors.dart';
 import '../../../widgets/delete_dialog.dart';
 import '../../../widgets/major_title.dart';
@@ -17,8 +16,7 @@ showBottomSheet(BuildContext context, OrderItem salesModel) {
   SalesController salesController = Get.find<SalesController>();
   return showModalBottomSheet(
       context: context,
-      backgroundColor:
-          isSmallScreen(context) ? Colors.white : Colors.transparent,
+      backgroundColor: Colors.white,
       builder: (_) {
         return Container(
           color: Colors.white,
