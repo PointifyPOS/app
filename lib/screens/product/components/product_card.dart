@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/screens/product/barcode_scanner_page.dart';
+import 'package:pointify/services/product_service.dart';
 import 'package:pointify/widgets/minor_title.dart';
 import 'package:pointify/widgets/product_image.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -124,7 +126,7 @@ Widget productCard(
                                                 },
                                                 child: Text(
                                                   "Cancel".toUpperCase(),
-                                                  style:  TextStyle(
+                                                  style: TextStyle(
                                                     color: AppColors.mainColor,
                                                     fontWeight: FontWeight.bold,
                                                   ),
@@ -136,7 +138,7 @@ Widget productCard(
                                                 },
                                                 child: Text(
                                                   "Okay".toUpperCase(),
-                                                  style:  TextStyle(
+                                                  style: TextStyle(
                                                     color: AppColors.mainColor,
                                                     fontWeight: FontWeight.bold,
                                                   ),
@@ -643,6 +645,98 @@ showProductModal(context, Product product) {
                         });
                   },
                   title: const Text('Adjust Stock')),
+            if (verifyPermission(category: "products", permission: "edit"))
+              ListTile(
+                leading: const Icon(Icons.qr_code_scanner),
+                onTap: () async {
+                  Get.back();
+
+                  final barcode = await Get.to(
+                    () => const BarcodeScannerPage(),
+                  );
+
+                  if (barcode == null) {
+                    return;
+                  }
+
+                  showDialog(
+                    context: Get.context!,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: const Text(
+                          "Update Barcode",
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.name ?? "",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            const Text("Scanned Barcode"),
+                            const SizedBox(height: 5),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                barcode.toString(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: const Text(
+                              "Cancel",
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await ProductService.updateBarcode(
+                                {
+                                  "barcode": barcode,
+                                },
+                                product.sId!,
+                              );
+
+                              product.barcode = barcode;
+
+                              productController.products.refresh();
+                              productController.filteredProducts.refresh();
+
+                              Get.back();
+
+                              showSnackBar(
+                                message: "Barcode updated successfully",
+                                color: Colors.green,
+                              );
+                            },
+                            child: const Text(
+                              "Update",
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                title: const Text('Update Barcode'),
+              ),
             if (userController.currentUser.value?.usertype == "admin")
               ListTile(
                   leading: const Icon(Icons.code),

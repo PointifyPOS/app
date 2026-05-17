@@ -23,6 +23,7 @@ import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/snackBars.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/customer.dart';
 import '../models/product.dart';
@@ -695,18 +696,16 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       'batchTrack': shop?.allowbatchtracking ?? false,
       'allownegativeselling': shop?.allownegativeselling ?? false,
       'mpesaTransId': mpesaTransId.text.isNotEmpty ? mpesaTransId.text : '',
-      'mpesaTotal': _splitChannelAmount(
-        channel: 'Mpesa',
-        controller: mpesaCashPaid,
-      ),
+      'mpesaTotal': paymentType.value?.toLowerCase() == 'mpesa'
+          ? _parseOrZero(amountPaid.text)
+          : 0.0,
       'bankTotal': _splitChannelAmount(
         channel: 'Bank',
         controller: bankCashPaid,
       ),
       'amountPaid': _parseOrZero(amountPaid.text),
       'outstandingBalance': receiptData.outstandingBalance,
-      'paymentType':
-          isFullyPaid || isSplit ? 'cash' : paymentType.value?.toLowerCase(),
+      'paymentType': isSplit ? 'cash' : paymentType.value?.toLowerCase(),
       'paymentTag': isSplit ? 'split' : paymentType.value?.toLowerCase(),
       'totalDiscount': receiptData.items?.fold<double>(
         0.0,
@@ -943,6 +942,11 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
             })
         .toList();
 
+    final prefs = await SharedPreferences.getInstance();
+
+    final paperSize = prefs.getString('printer_paper_size') ?? '58 mm';
+    print("saleModel.extraCharges ${saleModel.extraCharges}");
+
     final ticket = await Get.find<PrinterController>().printSalesReceipt(
       items: items,
       storeName: shop?.name ?? 'Pointify',
@@ -955,8 +959,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       customer: saleModel.customerId?.name ?? '',
       date: saleModel.createdAt ?? '',
       receiptUrl: 'https://store.pointifypos.com',
+      is80mm: paperSize == '80 mm',
+      extraCharges: saleModel.extraCharges,
     );
-
     if (Platform.isIOS) {
       await Get.find<PrinterController>().printIosBleBytes(ticket);
       return;

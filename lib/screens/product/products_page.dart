@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/models/productcategory.dart';
+import 'package:pointify/screens/product/barcode_scanner_page.dart';
 import 'package:pointify/screens/product/components/service_card.dart';
 import 'package:pointify/utils/constants.dart';
 import 'package:pointify/widgets/no_items_found.dart';
@@ -19,8 +21,17 @@ import 'components/product_card.dart';
 class ProductPage extends StatelessWidget {
   final Function? function;
   String? type;
-  ProductPage({super.key, this.function, this.type = "all"}) {
+  bool? refetch;
+  ProductPage({super.key, this.function, this.type = "all", this.refetch}) {
     productController.searchProductController.text = "";
+    productController.getProductCategiories();
+    if (refetch == true) {
+      productController.getProductsBySort(
+          type: type!,
+          showLoader: false,
+          loadMore: true,
+          clearafterloading: true);
+    }
   }
 
   final ShopController createShopController = Get.find<ShopController>();
@@ -65,6 +76,213 @@ class ProductPage extends StatelessWidget {
         ),
       );
     });
+  }
+
+  void showCategorySheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (_) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: MediaQuery.of(context).size.height * 0.7,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Select Category",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Expanded(
+                child: Obx(() {
+                  List<ProductCategory> categories = [
+                    ProductCategory(name: "All"),
+                    ...productController.productCategories,
+                  ];
+
+                  return GridView.builder(
+                    itemCount: categories.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisExtent: 60,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemBuilder: (_, index) {
+                      final category = categories[index];
+
+                      final isSelected =
+                          productController.selectedCategory.value == category;
+
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          Get.back();
+
+                          productController.selectedCategory.value = category;
+
+                          productController.getProductsBySort(
+                            type: 'all',
+                            category: category,
+                            page: 1,
+                            limit: 50,
+                            showLoader: false,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.mainColor
+                                : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.mainColor
+                                  : Colors.grey.shade300,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            category.name ?? "",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showSortDialog(BuildContext context) {
+    final titles = Constants().sortOrder;
+    final values = Constants().sortOrderList;
+
+    final itemCount =
+        titles.length > values.length ? values.length : titles.length;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Sort Products",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: const Icon(Icons.close),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView(
+                    children: List.generate(
+                      itemCount,
+                      (index) {
+                        final title = titles[index];
+
+                        final value = values[index];
+
+                        final isSelected =
+                            productController.selectedSortOrder.value == title;
+
+                        return ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          tileColor: isSelected
+                              ? AppColors.mainColor.withOpacity(0.1)
+                              : null,
+                          leading: Icon(
+                            isSelected
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                            color:
+                                isSelected ? AppColors.mainColor : Colors.grey,
+                          ),
+                          title: Text(title),
+                          onTap: () {
+                            Get.back();
+
+                            productController.selectedSortOrder.value = title;
+
+                            productController.selectedSortOrderSearch.value =
+                                value;
+
+                            productController.getProductsBySort(
+                              type: "",
+                              text: productController
+                                  .searchProductController.text,
+                              sort: value,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -188,124 +406,55 @@ class ProductPage extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                    onPressed: () async {
-                      // productController.scanQR(
-                      //     type: "product", context: context);
-                    },
-                    icon: const Icon(Icons.qr_code))
+                  onPressed: () async {
+                    final barcode = await Get.to(
+                      () => const BarcodeScannerPage(),
+                    );
+
+                    if (barcode != null) {
+                      productController.searchProductController.text = barcode;
+
+                      await productController.getProductsBySort(
+                        type: "search",
+                        barcodeId: barcode,
+                        page: 1,
+                        scanningFrom: "sale",
+                        limit: 50,
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.qr_code),
+                )
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 8,
+            ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Sort List By"),
-                if (userController.currentUser.value!.primaryShop!.production ==
-                    true)
-                  InkWell(
+                Expanded(
+                  child: Obx(() => filterButton(
+                        title: productController.selectedCategory.value?.name ??
+                            "Categories",
+                        icon: Icons.category_outlined,
+                        onTap: () {
+                          showCategorySheet(context);
+                        },
+                      )),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: filterButton(
+                    title: productController.selectedSortOrder.value,
+                    icon: Icons.swap_vert,
                     onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (_) {
-                            return SimpleDialog(
-                              children: List.generate(
-                                  Constants().productionOrder.length,
-                                  (index) => SimpleDialogOption(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          productController
-                                                  .selectedSortOrder.value =
-                                              Constants()
-                                                  .productionOrder
-                                                  .elementAt(index);
-                                          productController.getProductsBySort(
-                                              type: productController
-                                                  .selectedSortOrder.value
-                                                  .toLowerCase(),
-                                              text: productController
-                                                  .searchProductController.text,
-                                              sort: productController
-                                                  .selectedSortOrderSearch
-                                                  .value);
-                                        },
-                                        child: Text(
-                                          Constants()
-                                              .productionOrder
-                                              .elementAt(index),
-                                        ),
-                                      )),
-                            );
-                          });
+                      showSortDialog(context);
                     },
-                    child: Row(
-                      children: [
-                        Obx(() {
-                          return Text(productController.selectedSortOrder.value,
-                              style: TextStyle(color: AppColors.mainColor));
-                        }),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: AppColors.mainColor,
-                        )
-                      ],
-                    ),
                   ),
-                if (userController.currentUser.value!.primaryShop!.production ==
-                    false)
-                  InkWell(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (_) {
-                            return SimpleDialog(
-                              children: List.generate(
-                                  Constants().sortOrder.length,
-                                  (index) => SimpleDialogOption(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          productController
-                                                  .selectedSortOrder.value =
-                                              Constants()
-                                                  .sortOrder
-                                                  .elementAt(index);
-                                          productController
-                                                  .selectedSortOrderSearch
-                                                  .value =
-                                              Constants()
-                                                  .sortOrderList
-                                                  .elementAt(index);
-                                          productController.getProductsBySort(
-                                              type: "",
-                                              text: productController
-                                                  .searchProductController.text,
-                                              sort: productController
-                                                  .selectedSortOrderSearch
-                                                  .value);
-                                        },
-                                        child: Text(
-                                          Constants()
-                                              .sortOrder
-                                              .elementAt(index),
-                                        ),
-                                      )),
-                            );
-                          });
-                    },
-                    child: Row(
-                      children: [
-                        Obx(() {
-                          return Text(productController.selectedSortOrder.value,
-                              style: TextStyle(color: AppColors.mainColor));
-                        }),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: AppColors.mainColor,
-                        )
-                      ],
-                    ),
-                  ),
+                ),
               ],
             ),
           ),
@@ -384,6 +533,53 @@ class ProductPage extends StatelessWidget {
                 )
               : const SizedBox.shrink()),
         ],
+      ),
+    );
+  }
+
+  Widget filterButton({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        height: 45,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: AppColors.mainColor,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: Colors.grey.shade700,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -134,7 +134,7 @@ class SalesSummary extends StatelessWidget {
                                               .value = key;
                                           Get.to(() => SalesReport(
                                                 title:
-                                                    "${key.toString().capitalizeFirst} sales",
+                                                    "All ${key.toString().capitalizeFirst} sales",
                                                 keyFrom: key,
                                               ));
                                         }

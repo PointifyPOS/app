@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:pointify/models/product.dart';
+import 'package:pointify/models/productcategory.dart';
 import 'package:pointify/models/wahoureinvoice.dart';
 
 import '../main.dart';
@@ -63,6 +64,13 @@ class ProductService {
     return response;
   }
 
+  static updateBarcode(Map<String, dynamic> product, String productid) async {
+    var response = await DbBase().databaseRequest(
+        "${EndPoints.barcode}/$productid", DbBase().putRequestType,
+        body: product);
+    return response;
+  }
+
   static deleteProduct(String productid) async {
     var response = await DbBase().databaseRequest(
         "${EndPoints.products}/$productid?shop=${userController.currentUser.value?.primaryShop?.id}&useWarehouse=${userController.currentUser.value?.primaryShop?.useWarehouse}",
@@ -80,13 +88,14 @@ class ProductService {
       String? adminId = "",
       String? date = "",
       String? productType = "",
+      ProductCategory? category,
       String? productid = "",
       String? shopId = "",
       String? sort = "",
       String? reason = "",
       String barcodeid = ""}) async {
     var response = await DbBase().databaseRequest(
-        "${EndPoints.products}${reason == "download" ? "?" : "?page=$page&"}reason=$reason&date=$date&limit=$limit&name=$text&shopid=$shopId&type=$type&sort=$sort&productid=$productid&barcodeid=$barcodeid&productType=$productType&useWarehouse=$useWarehouse&warehouse=$warehouse&adminid=$adminId",
+        "${EndPoints.products}${reason == "download" ? "?" : "?page=$page&"}reason=$reason&date=$date&limit=$limit&name=$text&shopid=$shopId&type=$type&sort=$sort&productid=$productid&barcodeid=$barcodeid&productType=$productType&useWarehouse=$useWarehouse&warehouse=$warehouse&adminid=$adminId&${category?.id != null ? "categoryId=${category?.id}" : ""}",
         DbBase().getRequestType);
     return response;
   }

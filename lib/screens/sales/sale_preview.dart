@@ -9,11 +9,6 @@ import '../../utils/colors.dart';
 import '../../widgets/alert.dart';
 import '../customers/customers_page.dart';
 
-/// Preview screen shown after items are added to the cart.
-///
-/// All single-channel payments (Cash, Mpesa, Bank, Wallet, Credit) collect
-/// their inputs inline on this page. Split Payment uses a bottom sheet since
-/// it needs three separate channel fields.
 class SalePreview extends StatefulWidget {
   final String? page;
 
@@ -33,15 +28,27 @@ class _SalePreviewState extends State<SalePreview> {
 
     salesController.paymentType.value = 'Cash';
 
-    // Clear any stale extra charges from a previous (abandoned) sale.
+    // Clear any stale extra charges from a previous sale.
     salesController.extraCharges.clear();
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Future.delayed(
-    //     const Duration(milliseconds: 250),
-    //     _showPaymentMethodsSheet,
-    //   );
-    // });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(
+        const Duration(milliseconds: 250),
+        () {
+          _showPaymentMethodsSheet();
+          // final method = salesController.paymentType.value ?? 'Cash';
+
+          // if (method == 'Split Payment') {
+          //   _confirmSplitPayment(
+          //     'cashed',
+          //     paymentType: method,
+          //   );
+          // } else {
+          //   _showSinglePaymentSheet(method);
+          // }
+        },
+      );
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -225,7 +232,11 @@ class _SalePreviewState extends State<SalePreview> {
             iconResolver: _paymentIcon,
             onTap: _showPaymentMethodsSheet,
           ),
-          if (method != 'Split Payment') _buildInlinePaymentCard(method),
+          if (method != 'Split Payment')
+            _buildInlinePaymentCard(
+              method,
+              openSheetOnTap: true,
+            ),
           _buildChangeMethodLink(),
         ],
       );
@@ -264,7 +275,11 @@ class _SalePreviewState extends State<SalePreview> {
   // INLINE PAYMENT CARD — used by Cash / Mpesa / Bank / Wallet / Credit
   // ─────────────────────────────────────────────────────────────────────────
 
-  Widget _buildInlinePaymentCard(String method) {
+  Widget _buildInlinePaymentCard(
+    String method, {
+    bool openSheetOnTap = false,
+    FocusNode? amountFocus,
+  }) {
     final needsCustomer = method == 'Credit' || method == 'Wallet';
     final isWallet = method == 'Wallet';
     final isMpesa = method == 'Mpesa';
@@ -291,7 +306,11 @@ class _SalePreviewState extends State<SalePreview> {
           ],
           _buildInlineExtraCharges(),
           const SizedBox(height: 12),
-          _buildAmountPaidField(method: method),
+          _buildAmountPaidField(
+            method: method,
+            openSheetOnTap: openSheetOnTap,
+            focusNode: amountFocus,
+          ),
           if (isMpesa) ...[
             const SizedBox(height: 10),
             _buildMpesaTransIdField(),
@@ -491,6 +510,7 @@ class _SalePreviewState extends State<SalePreview> {
                       onTap: () {
                         salesController.removeExtraCharge(index);
                         salesController.getTotalCredit();
+                        salesController.receipt.refresh();
                       },
                       child: const Icon(
                         Icons.close,
@@ -548,13 +568,20 @@ class _SalePreviewState extends State<SalePreview> {
 
   // ─── amount paid field ─────────────────────────────────────────────────
 
-  Widget _buildAmountPaidField({required String method}) {
+  Widget _buildAmountPaidField({
+    required String method,
+    bool openSheetOnTap = false,
+    FocusNode? focusNode,
+  }) {
     if (salesController.amountPaid.text == '0.0') {
       salesController.amountPaid.clear();
     }
 
-    return TextFormField(
+    final field = TextFormField(
+      focusNode: focusNode,
+      autofocus: focusNode != null,
       controller: salesController.amountPaid,
+      readOnly: openSheetOnTap,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       onChanged: (_) {
         salesController.getTotalCredit();
@@ -562,9 +589,25 @@ class _SalePreviewState extends State<SalePreview> {
       },
       decoration: InputDecoration(
         labelText: _amountLabelFor(method),
-        hintText: 'Enter amount',
-        prefixIcon: const Icon(Icons.payments_outlined),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+        hintText: openSheetOnTap ? 'Tap to enter amount' : 'Enter amount',
+        suffixIcon:
+            openSheetOnTap ? const Icon(Icons.keyboard_arrow_up_rounded) : null,
+        prefixIcon: Icon(
+          openSheetOnTap ? Icons.open_in_new_rounded : Icons.payments_outlined,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+    );
+
+    if (!openSheetOnTap) return field;
+
+    return InkWell(
+      onTap: () => _showSinglePaymentSheet(method),
+      borderRadius: BorderRadius.circular(14),
+      child: IgnorePointer(
+        child: field,
       ),
     );
   }
@@ -731,12 +774,19 @@ class _SalePreviewState extends State<SalePreview> {
     Get.back();
 
     // Split Payment still uses its dedicated bottom sheet.
-    if (method == 'Split Payment') {
-      Future.delayed(
-        const Duration(milliseconds: 150),
-        () => _confirmSplitPayment('cashed', paymentType: method),
-      );
-    }
+    Future.delayed(
+      const Duration(milliseconds: 150),
+      () {
+        if (method == 'Split Payment') {
+          _confirmSplitPayment(
+            'cashed',
+            paymentType: method,
+          );
+        } else {
+          _showSinglePaymentSheet(method);
+        }
+      },
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -834,23 +884,154 @@ class _SalePreviewState extends State<SalePreview> {
     }
   }
 
+  // void _onCompletePressed(String method) {
+  //   // Make sure latest typed amount is reflected on the receipt model.
+  //   salesController.getTotalCredit();
+
+  //   switch (method) {
+  //     case 'Credit':
+  //       _handleCreditSale(status: 'cashed', paymentType: method);
+  //       break;
+  //     case 'Split Payment':
+  //       _confirmSplitPayment('cashed', paymentType: method);
+  //       break;
+  //     default:
+  //       salesController.saveSale(
+  //         screen: widget.page ?? 'admin',
+  //         status: 'cashed',
+  //       );
+  //   }
+  // }
   void _onCompletePressed(String method) {
-    // Make sure latest typed amount is reflected on the receipt model.
     salesController.getTotalCredit();
 
-    switch (method) {
-      case 'Credit':
-        _handleCreditSale(status: 'cashed', paymentType: method);
-        break;
-      case 'Split Payment':
-        _confirmSplitPayment('cashed', paymentType: method);
-        break;
-      default:
-        salesController.saveSale(
-          screen: widget.page ?? 'admin',
-          status: 'cashed',
-        );
+    if (method == 'Split Payment') {
+      _confirmSplitPayment(
+        'cashed',
+        paymentType: method,
+      );
+      return;
     }
+
+    _showSinglePaymentSheet(method);
+  }
+
+  void _showSinglePaymentSheet(String method) {
+    final amountFocus = FocusNode();
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 70,
+          bottom: MediaQuery.of(Get.context!).viewInsets.bottom + 20,
+        ),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(24),
+          ),
+        ),
+        child: StatefulBuilder(
+          builder: (context, setState) => ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * .82,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 40),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _buildSheetHandle(),
+                            const SizedBox(height: 12),
+                            Text(
+                              method,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      InkWell(
+                        onTap: Get.back,
+                        borderRadius: BorderRadius.circular(30),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close, size: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  _buildInlinePaymentCard(
+                    method,
+                    openSheetOnTap: false,
+                    amountFocus: amountFocus,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: Obx(() {
+                      final state = _validate(method);
+
+                      return ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.mainColor,
+                          disabledBackgroundColor:
+                              AppColors.mainColor.withOpacity(.4),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        onPressed: !state.canComplete
+                            ? null
+                            : () {
+                                Get.back();
+
+                                if (method == 'Credit') {
+                                  _handleCreditSale(
+                                    status: 'cashed',
+                                    paymentType: method,
+                                  );
+                                } else {
+                                  salesController.saveSale(
+                                    screen: widget.page ?? 'admin',
+                                    status: 'cashed',
+                                  );
+                                }
+                              },
+                        child: Text(
+                          state.buttonLabel,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _handleCreditSale(
@@ -939,6 +1120,7 @@ class _SalePreviewState extends State<SalePreview> {
 
               salesController.addExtraCharge(name: name, amount: parsed);
               salesController.getTotalCredit();
+              salesController.receipt.refresh();
               Get.back();
             },
             child: const Text('Add'),

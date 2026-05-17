@@ -56,9 +56,18 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
                       child: Text(option),
                     );
                   }).toList(),
-                  onChanged: (String? newValue) {
+                  onChanged: (String? newValue) async {
+                    if (newValue == null) return;
+
+                    final prefs = await SharedPreferences.getInstance();
+
+                    await prefs.setString(
+                      'printer_paper_size',
+                      newValue,
+                    );
+
                     setState(() {
-                      optionprinttype = newValue!;
+                      optionprinttype = newValue;
                     });
                   },
                 ),
@@ -226,6 +235,13 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
     if (!isBtEnabled) return;
 
     final prefs = await SharedPreferences.getInstance();
+    final savedPaperSize = prefs.getString('printer_paper_size');
+
+    if (savedPaperSize != null && mounted) {
+      setState(() {
+        optionprinttype = savedPaperSize;
+      });
+    }
     final savedMac = prefs.getString('saved_printer_mac');
 
     if (savedMac == null || savedMac.isEmpty) {

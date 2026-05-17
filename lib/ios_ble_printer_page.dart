@@ -204,8 +204,14 @@ class _IosBlePrinterPageState extends State<IosBlePrinterPage> {
     }
 
     final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
+    final prefs = await SharedPreferences.getInstance();
 
+    final paperSize = prefs.getString('printer_paper_size') ?? '58 mm';
+
+    final generator = Generator(
+      paperSize == '80 mm' ? PaperSize.mm80 : PaperSize.mm58,
+      profile,
+    );
     List<int> bytes = [];
 
     bytes += generator.reset();

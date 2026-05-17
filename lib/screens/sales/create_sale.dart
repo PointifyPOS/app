@@ -478,7 +478,7 @@ class CreateSale extends StatelessWidget {
                                           "add items",
                                           style: TextStyle(
                                               color: AppColors.mainColor,
-                                              fontSize: 21),
+                                              fontSize: 18),
                                         ),
                                       ],
                                     ),

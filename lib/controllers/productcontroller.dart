@@ -42,6 +42,7 @@ class ProductController extends GetxController {
   RxList<Product> productDownloadss = RxList([]);
   RxList<Batch> filteredBatches = RxList([]);
   RxList<ProductCategory> productCategories = RxList([]);
+  Rxn<ProductCategory> selectedCategory = Rxn(null);
   RxString activeAdjustmentFilter = RxString('today');
   RxList<TransferItem> productHistoryList = RxList([]);
   RxList<SaleItem> productInvoices = RxList([]);
@@ -245,14 +246,22 @@ class ProductController extends GetxController {
   void filterProductsLocally(String query) {
     if (query.isEmpty) {
       filteredProducts.value = products;
-      getProductsBySort(
-          type: "all", text: query, page: 1, limit: 50, showLoader: false);
-    } else {
-      filteredProducts.value = products
-          .where((product) =>
-              product.name!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      return;
     }
+
+    final q = query.toLowerCase();
+
+    filteredProducts.value = products.where((product) {
+      final name = product.name?.toLowerCase() ?? '';
+
+      final barcode = product.barcode?.toLowerCase() ?? '';
+
+      final manufacturer = product.manufacturer?.toLowerCase() ?? '';
+
+      return name.contains(q) ||
+          barcode.contains(q) ||
+          manufacturer.contains(q);
+    }).toList();
   }
 
   Future<void> importProducts(List<List<dynamic>> excelData) async {
@@ -721,11 +730,13 @@ class ProductController extends GetxController {
       String shop = "",
       bool warehouse = false,
       bool useWarehouse = false,
+      ProductCategory? category,
       int page = 1,
       int limit = 50,
       String reason = "",
       String productid = "",
       bool loadMore = false,
+      bool clearafterloading = false,
       bool showLoader = true,
       String barcodeId = ""}) async {
     if (reason != "download") {
@@ -756,6 +767,7 @@ class ProductController extends GetxController {
       response = await ProductService.getProductsBySort(
           type: type,
           text: text,
+          category: category,
           productType: productType,
           adminId: userController.currentUser.value?.id,
           useWarehouse:
@@ -803,6 +815,9 @@ class ProductController extends GetxController {
         }).toList();
       } else {
         if (loadMore == true) {
+          if (clearafterloading == true) {
+            products.clear();
+          }
           products.addAll(allproducts.map((e) {
             return Product.fromJson(e);
           }).toList());

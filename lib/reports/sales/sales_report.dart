@@ -58,101 +58,443 @@ class _SalesReportState extends State<SalesReport> {
         centerTitle: false,
         actions: [
           if (userController.currentUser.value?.usertype == "admin")
-            Center(
-              child: textBtn(
-                vPadding: 5,
-                hPadding: 20,
-                text: "Print",
-                bgColor: AppColors.mainColor,
-                color: Colors.white,
-                onPressed: () {
-                  if (widget.keyFrom == "dues") {
-                    Get.to(() => Scaffold(
-                          appBar: AppBar(
-                            title: const Text("Due Sales Report"),
-                          ),
-                          body: PdfPreview(
-                            build: (context) =>
-                                salesReportPdf("dues", "DUE SALES REPORT"),
-                          ),
-                        ));
-                  } else {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            content: const Text(
-                                "Only 50 items will show in the pdf, if the record is more than that, enter your email to get the port in your email address"),
-                            actions: [
-                              TextField(
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(),
-                                  focusedBorder: OutlineInputBorder(),
-                                  enabledBorder: OutlineInputBorder(),
-                                  hintText: "Enter your email",
-                                ),
-                                controller: salesController.emailController,
-                              ),
-                              Row(
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Get.back();
-                                      },
-                                      child: const Text("Cancel")),
-                                  TextButton(
-                                      onPressed: () {
-                                        Get.back();
-                                        Get.to(() => Scaffold(
-                                              appBar: AppBar(
-                                                title:
-                                                    const Text("Sales Report"),
-                                              ),
-                                              body: PdfPreview(
-                                                build: (context) =>
-                                                    allSalesReportPdf(
-                                                        "receipts",
-                                                        "SALES REPORT "),
-                                              ),
-                                            ));
-                                      },
-                                      child: const Text("Print")),
-                                  TextButton(
-                                      onPressed: () {
-                                        if (salesController
-                                            .emailController.text.isNotEmpty) {
-                                          salesController.sendReportEmail(
-                                              email: salesController
-                                                  .emailController.text,
-                                              fromDate: reportsController
-                                                  .filterStartDate.value,
-                                              toDate: reportsController
-                                                  .filterEndDate.value,
-                                              shop: userController.currentUser
-                                                  .value!.primaryShop!.id!,
-                                              paymentTag: reportsController
-                                                  .cashsalesfilterSelected
-                                                  .value,
-                                              status: "cashed");
-                                        } else {
-                                          generalAlert(
-                                              message:
-                                                  "Please enter your email");
-                                        }
-                                      },
-                                      child: const Text("Send to email")),
-                                ],
-                              ),
-                            ],
-                          );
-                        });
-                  }
-                },
+            PopupMenuButton<String>(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.more_vert),
               ),
-            ),
-          const SizedBox(
-            width: 10,
-          )
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: "report",
+                  child: Text("Generate Report"),
+                ),
+              ],
+              onSelected: (value) async {
+                DateTime fromDate = DateTime.now();
+                DateTime toDate = DateTime.now();
+
+                String paymentType = "all";
+                String exportType = "excel";
+                String reportMode = "summary";
+
+                await Get.bottomSheet(
+                  StatefulBuilder(
+                    builder: (context, setState) {
+                      return SafeArea(
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(28),
+                            ),
+                          ),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 50,
+                                    height: 5,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade300,
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  "Generate Sales Report",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  "Export your sales data as Excel or PDF",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                const SizedBox(height: 25),
+                                const Text(
+                                  "Report Type",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            reportMode = "summary";
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 14,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: reportMode == "summary"
+                                                ? AppColors.mainColor
+                                                : Colors.grey.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Text(
+                                            "Summary",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: reportMode == "summary"
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            reportMode = "full";
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 14,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: reportMode == "full"
+                                                ? AppColors.mainColor
+                                                : Colors.grey.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Text(
+                                            "Full Report",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: reportMode == "full"
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 25),
+                                const Text(
+                                  "Date Range",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          DateTime? picked =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: fromDate,
+                                            firstDate: DateTime(2020),
+                                            lastDate: DateTime.now(),
+                                          );
+
+                                          if (picked != null) {
+                                            setState(() {
+                                              fromDate = picked;
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(14),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "From",
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                DateFormat(
+                                                  "yyyy-MM-dd",
+                                                ).format(
+                                                  fromDate,
+                                                ),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          DateTime? picked =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: toDate,
+                                            firstDate: DateTime(2020),
+                                            lastDate: DateTime.now(),
+                                          );
+
+                                          if (picked != null) {
+                                            setState(() {
+                                              toDate = picked;
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(14),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.grey.shade300,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "To",
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                DateFormat(
+                                                  "yyyy-MM-dd",
+                                                ).format(
+                                                  toDate,
+                                                ),
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (reportMode == "full") ...[
+                                  const SizedBox(height: 25),
+                                  const Text(
+                                    "Paid Via",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  DropdownButtonFormField<String>(
+                                    value: paymentType,
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: Colors.grey.shade100,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                    ),
+                                    items: [
+                                      "all",
+                                      "cash",
+                                      "mpesa",
+                                      "bank",
+                                      "credit",
+                                      "wallet",
+                                    ]
+                                        .map(
+                                          (e) => DropdownMenuItem(
+                                            value: e,
+                                            child: Text(
+                                              e[0].toUpperCase() +
+                                                  e.substring(1),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    onChanged: (value2) {
+                                      setState(() {
+                                        paymentType = value2 ?? "all";
+                                      });
+                                    },
+                                  ),
+                                ],
+                                const SizedBox(height: 25),
+                                const Text(
+                                  "Export As",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            exportType = "excel";
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 14,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: exportType == "excel"
+                                                ? AppColors.mainColor
+                                                : Colors.grey.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Text(
+                                            "Excel",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: exportType == "excel"
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            exportType = "pdf";
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 14,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: exportType == "pdf"
+                                                ? AppColors.mainColor
+                                                : Colors.grey.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                          ),
+                                          child: Text(
+                                            "PDF",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: exportType == "pdf"
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 30),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 55,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.mainColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      Get.back();
+
+                                      await reportsController.salesExcelReport(
+                                          fromDate: DateFormat(
+                                            "yyyy-MM-dd",
+                                          ).format(fromDate),
+                                          toDate: DateFormat(
+                                            "yyyy-MM-dd",
+                                          ).format(toDate),
+                                          shop: userController.currentUser
+                                              .value!.primaryShop!.id!,
+                                          paymentType: paymentType == "all"
+                                              ? ""
+                                              : paymentType,
+                                          status: "cashed",
+                                          reportType: exportType,
+                                          reportMode: reportMode);
+                                    },
+                                    child: const Text(
+                                      "Generate Report",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  isScrollControlled: true,
+                );
+              },
+            )
         ],
         title: Text(
           widget.title!,

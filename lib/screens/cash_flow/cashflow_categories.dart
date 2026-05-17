@@ -115,12 +115,7 @@ class CashFlowCategories extends StatelessWidget {
           leading: IconButton(
               onPressed: () {
                 cashflowController.getCashFlowCategoryWithTotals("all");
-                if (MediaQuery.of(context).size.width > 600) {
-                  Get.find<HomeController>().selectedWidget.value =
-                      CashFlowManager();
-                } else {
-                  Get.back();
-                }
+                Get.back();
               },
               icon: const Icon(Icons.arrow_back_ios)),
         ),
@@ -134,7 +129,7 @@ class CashInUi extends StatelessWidget {
   final ShopController createShopController = Get.find<ShopController>();
   final CashFlowController cashflowController = Get.find<CashFlowController>();
 
-  CashInUi({Key? key, required this.type}) : super(key: key);
+  CashInUi({super.key, required this.type});
 
   @override
   Widget build(BuildContext context) {

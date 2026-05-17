@@ -100,7 +100,7 @@ class NetProfitReport extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                   Icon(Icons.credit_card,
+                                  Icon(Icons.credit_card,
                                       color: AppColors.mainColor),
                                   const SizedBox(width: 10),
                                   Column(
@@ -112,7 +112,7 @@ class NetProfitReport extends StatelessWidget {
                                                     .analysis.value!.debtPaid) -
                                             salesController
                                                 .analysis.value!.totalExpenses),
-                                        style:  TextStyle(
+                                        style: TextStyle(
                                             color: AppColors.mainColor,
                                             fontSize: 21),
                                       ),
@@ -160,7 +160,7 @@ class NetProfitReport extends StatelessWidget {
                                         salesController.filterStartDate.value,
                                     toDate:
                                         salesController.filterEndDate.value);
-                                Get.to(SalesSummary());
+                                Get.to(() => SalesSummary());
                               }),
                           summaryCard(
                               title: "Debt Collected",
@@ -254,7 +254,7 @@ class NetProfitReport extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title:  Text(
+        title: Text(
           "Analysis ",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -287,7 +287,7 @@ class NetProfitReport extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon:  Icon(
+          icon: Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),

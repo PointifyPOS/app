@@ -34,6 +34,7 @@ class EndPoints {
   static const report = "${apiEndPoint}product/report";
   static const productcategories = "${apiEndPoint}product/category";
   static const products = "${apiEndPoint}product/";
+  static const barcode = "${products}bardcode";
   static const productCount = "${apiEndPoint}counts";
   static const warehouserequest = "${apiEndPoint}warehouse";
   static const warehouserequests = "${apiEndPoint}warehouse/request";
@@ -66,6 +67,8 @@ class EndPoints {
   static const debtorexcel = "${apiEndPoint}customers/customers/debtors/excel";
   static const purchasesreport = "${apiEndPoint}analysis/report/purchases";
   static const backupnow = "${apiEndPoint}analysis/backup/download";
+  static const reports = "${apiEndPoint}reports/";
+  static const salesreportexcel = "${reports}/sales/excel/";
 
   // SUPPLIERS
   static const supplier = "${apiEndPoint}suppliers/";

@@ -10,10 +10,12 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pointify/controllers/salescontroller.dart';
+import 'package:pointify/functions/functions.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/stockreport.dart';
 import 'package:pointify/services/end_points.dart';
 import 'package:pointify/services/reports.dart';
+import 'package:pointify/widgets/snackbars.dart';
 
 import '../main.dart';
 import '../models/debtor.dart';
@@ -31,7 +33,7 @@ class ReportsController extends GetxController {
   TextEditingController searchProductSoldController = TextEditingController();
   TextEditingController textEndDate = TextEditingController();
   TextEditingController searchProductController = TextEditingController();
-
+  RxBool exportingReport = RxBool(false);
   RxList<String> salesFilter =
       RxList(['Wholesale', 'Retail', 'Dealer', "Receipt"]);
   RxList<String> paymentypes = RxList(['cash', 'mpesa', 'bank']);
@@ -49,6 +51,8 @@ class ReportsController extends GetxController {
   RxList<SaleItem> discountsReport = RxList([]);
   RxList<SaleItem> productsReportFiltered = RxList([]);
   RxList<SaleItem> discountReportFiltered = RxList([]);
+  String paymentType = "all";
+  String exportType = "excel";
   RxBool isPaymentLoading = false.obs;
   getStockReport(
       {String? shopid, int page = 1, int limit = 50, String? name = ""}) async {
@@ -416,5 +420,77 @@ class ReportsController extends GetxController {
       }
     }
     filterPaymentTypeTotals.value = data;
+  }
+
+  Future<void> salesExcelReport({
+    required String fromDate,
+    required String toDate,
+    required String shop,
+    String? paymentType,
+    required String status,
+    required String reportType,
+    required String reportMode,
+  }) async {
+    try {
+      Get.dialog(
+        PopScope(
+          canPop: false,
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        barrierDismissible: false,
+      );
+
+      final directory = await getApplicationDocumentsDirectory();
+
+      final extension = reportType == "pdf" ? "pdf" : "xlsx";
+
+      final filePath =
+          '${directory.path}/sales-report-${DateTime.now().millisecondsSinceEpoch}.$extension';
+
+      var response = await ReportsService().salesExcelReport(
+        fromDate: fromDate,
+        toDate: toDate,
+        shop: shop,
+        paymentType: paymentType,
+        status: status,
+        reportType: reportType,
+        reportMode: reportMode,
+      );
+
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      if (response != null) {
+        File file = File(filePath);
+
+        await file.writeAsBytes(response);
+
+        await OpenFile.open(filePath);
+
+        showSnackBar(
+          message: "Sales report generated successfully",
+          color: Colors.green,
+        );
+      } else {
+        showSnackBar(
+          message: "Failed to generate report",
+          color: Colors.red,
+        );
+      }
+    } catch (e) {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      debugPrintMessage(e);
+
+      showSnackBar(
+        message: e.toString(),
+        color: Colors.red,
+      );
+    }
   }
 }
