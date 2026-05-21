@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/productcategory.dart';
-import 'package:pointify/screens/product/barcode_scanner_page.dart';
+import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/screens/product/components/service_card.dart';
 import 'package:pointify/utils/constants.dart';
 import 'package:pointify/widgets/no_items_found.dart';
 import 'package:share_plus/share_plus.dart';
-
-import '../../controllers/productcontroller.dart';
 import '../../controllers/shopcontroller.dart';
 import '../../models/product.dart';
 import '../../services/end_points.dart';
@@ -16,6 +15,319 @@ import '../../utils/colors.dart';
 import '../../utils/helper.dart';
 import '../../widgets/major_title.dart';
 import 'components/product_card.dart';
+
+class ProductTopSection extends StatelessWidget {
+  final ProductNewController productController;
+  final String? type;
+  final VoidCallback onCategoryTap;
+  final VoidCallback onQrTap;
+
+  const ProductTopSection({
+    super.key,
+    required this.productController,
+    required this.type,
+    required this.onCategoryTap,
+    required this.onQrTap,
+  });
+  Widget categoryMiniChip({
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(50),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 5,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.mainColor.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.category_outlined,
+              size: 15,
+              color: AppColors.mainColor,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              "Categories",
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.mainColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        10,
+        8,
+        10,
+        4,
+      ),
+      child: Column(
+        children: [
+          // SEARCH
+          TextFormField(
+            controller: productController.searchProductController,
+            onChanged: (value) async {
+              productController.filterProductsLocally(value);
+
+              if (productController.productlist.isEmpty &&
+                  value.trim().isNotEmpty) {
+                await productController.getProducts(
+                  type: "all",
+                  name: value,
+                  shop: userController.currentUser.value?.primaryShop?.id ?? "",
+                  page: 1,
+                  limit: 40,
+                );
+              }
+            },
+            decoration: InputDecoration(
+              hintText: "Search products...",
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 12,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: Colors.grey.shade300,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: Colors.grey.shade300,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(
+                  color: AppColors.mainColor,
+                ),
+              ),
+
+              // SEARCH + QR
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.search,
+                    color: Colors.grey,
+                  ),
+                  if (type != "salemodule")
+                    IconButton(
+                      onPressed: onQrTap,
+                      icon: const Icon(
+                        Icons.qr_code_scanner,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // FILTERS + STATS
+          SizedBox(
+            height: 30,
+            child: Obx(
+              () => Center(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: categoryMiniChip(
+                        onTap: onCategoryTap,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: inventoryMiniStat(
+                        title: "Available",
+                        value:
+                            "${productController.productStats['instock'] ?? 0}",
+                        color: Colors.green,
+                        selected:
+                            productController.stockMode.value == "instock",
+                        onTap: () async {
+                          if (productController.stockMode.value == "instock") {
+                            productController.stockMode.value = "";
+                          } else {
+                            productController.stockMode.value = "instock";
+                          }
+
+                          await productController.getProducts(
+                            refresh: true,
+                            shop: userController
+                                    .currentUser.value?.primaryShop?.id ??
+                                "",
+                            stockMode: productController.stockMode.value,
+                            page: 1,
+                            limit: 40,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: inventoryMiniStat(
+                        title: "Out",
+                        value:
+                            "${productController.productStats['outofstock'] ?? 0}",
+                        color: Colors.red,
+                        selected:
+                            productController.stockMode.value == "outofstock",
+                        onTap: () async {
+                          if (productController.stockMode.value ==
+                              "outofstock") {
+                            productController.stockMode.value = "";
+                          } else {
+                            productController.stockMode.value = "outofstock";
+                          }
+
+                          await productController.getProducts(
+                            refresh: true,
+                            shop: userController
+                                    .currentUser.value?.primaryShop?.id ??
+                                "",
+                            stockMode: productController.stockMode.value,
+                            page: 1,
+                            limit: 40,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget inventoryMiniStat({
+    required String title,
+    required String value,
+    required Color color,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(50),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 5,
+        ),
+        decoration: BoxDecoration(
+          color: selected ? color.withOpacity(0.18) : color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(50),
+          border: Border.all(
+            color: selected ? color : Colors.transparent,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.grey.shade700,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 11,
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget filterChip({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Container(
+        height: 42,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 12,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.grey.shade300,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: AppColors.mainColor,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 // ignore: must_be_immutable
 class ProductPage extends StatelessWidget {
@@ -26,57 +338,18 @@ class ProductPage extends StatelessWidget {
     productController.searchProductController.text = "";
     productController.getProductCategiories();
     if (refetch == true) {
-      productController.getProductsBySort(
-          type: type!,
-          showLoader: false,
-          loadMore: true,
-          clearafterloading: true);
+      productController.getProducts(
+        shop: userController.currentUser.value?.primaryShop?.id ?? "",
+        stockMode: "instock",
+        page: 1,
+        limit: 40,
+      );
     }
   }
 
   final ShopController createShopController = Get.find<ShopController>();
-  final ProductController productController = Get.find<ProductController>();
-
-  Widget outOfStockCollapsible({
-    required ProductController controller,
-    String? type,
-    Function? function,
-  }) {
-    return Obx(() {
-      final items = controller.outOfStockProducts;
-
-      if (items.isEmpty) return const SizedBox.shrink();
-
-      return Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: ExpansionTile(
-          leading: const Icon(Icons.warning, color: Colors.red),
-          title: const Text(
-            "Out of Stock",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          trailing: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              items.length.toString(),
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
-          ),
-          children: items.map((product) {
-            return productCard(
-              product: product,
-              type: type,
-              function: function,
-            );
-          }).toList(),
-        ),
-      );
-    });
-  }
+  final ProductNewController productController =
+      Get.put(ProductNewController());
 
   void showCategorySheet(BuildContext context) {
     showModalBottomSheet(
@@ -143,12 +416,14 @@ class ProductPage extends StatelessWidget {
 
                           productController.selectedCategory.value = category;
 
-                          productController.getProductsBySort(
+                          productController.getProducts(
                             type: 'all',
                             category: category,
                             page: 1,
                             limit: 50,
-                            showLoader: false,
+                            shop: userController
+                                    .currentUser.value?.primaryShop?.id ??
+                                "",
                           );
                         },
                         child: Container(
@@ -265,10 +540,13 @@ class ProductPage extends StatelessWidget {
                             productController.selectedSortOrderSearch.value =
                                 value;
 
-                            productController.getProductsBySort(
+                            productController.getProducts(
                               type: "",
-                              text: productController
+                              name: productController
                                   .searchProductController.text,
+                              shop: userController
+                                      .currentUser.value?.primaryShop?.id ??
+                                  "",
                               sort: value,
                             );
                           },
@@ -285,9 +563,59 @@ class ProductPage extends StatelessWidget {
     );
   }
 
+  Widget statItem({
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // print(productController.normalProducts.length);
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
       appBar: AppBar(
@@ -309,32 +637,67 @@ class ProductPage extends StatelessWidget {
         actions: [
           IconButton(
               onPressed: () async {
-                showBottomSheet(context);
-              },
-              icon: Icon(
-                Icons.download,
-                color: AppColors.mainColor,
-              )),
-          IconButton(
-              onPressed: () async {
-                productController.getProductsBySort(type: "all");
+                productController.getProducts(
+                    type: "all",
+                    shop:
+                        userController.currentUser.value?.primaryShop?.id ?? "",
+                    stockMode: productController.stockMode.value);
               },
               icon: Icon(
                 Icons.refresh,
                 color: AppColors.mainColor,
               )),
-          IconButton(
-              onPressed: () async {
+          PopupMenuButton<String>(
+            icon: Icon(
+              Icons.more_vert,
+              color: AppColors.mainColor,
+            ),
+            onSelected: (value) async {
+              if (value == "sort") {
+                showSortDialog(context);
+              } else if (value == "download") {
+                showBottomSheet(context);
+              } else if (value == "share") {
                 Share.share(
                   '$storeurl?shopid=${userController.currentUser.value?.primaryShop?.id}&adminid=${userController.currentUser.value?.id}',
                   subject: "Share Inventory",
-                  sharePositionOrigin: Rect.fromLTWH(0, 0, 0, 0),
+                  sharePositionOrigin: const Rect.fromLTWH(0, 0, 0, 0),
                 );
-              },
-              icon: Icon(
-                Icons.share,
-                color: AppColors.mainColor,
-              ))
+              }
+            },
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                value: "sort",
+                child: Row(
+                  children: [
+                    Icon(Icons.swap_vert),
+                    SizedBox(width: 10),
+                    Text("Sort"),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: "download",
+                child: Row(
+                  children: [
+                    Icon(Icons.download),
+                    SizedBox(width: 10),
+                    Text("Download"),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: "share",
+                child: Row(
+                  children: [
+                    Icon(Icons.share),
+                    SizedBox(width: 10),
+                    Text("Share"),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
         title: Padding(
           padding: const EdgeInsets.only(right: 10.0),
@@ -352,186 +715,93 @@ class ProductPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: productController.searchProductController,
-                    onChanged: (value) {
-                      productController.filterProductsLocally(
-                          productController.searchProductController.text);
-                    },
-                    decoration: InputDecoration(
-                      suffixIconConstraints:
-                          const BoxConstraints(maxWidth: 100),
-                      suffixIcon: Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          margin: const EdgeInsets.only(right: 5),
-                          decoration: BoxDecoration(
-                            color: AppColors.mainColor,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              productController.getProductsBySort(
-                                  type: productController
-                                      .selectedSortOrder.value
-                                      .toLowerCase(),
-                                  text: productController
-                                      .searchProductController.text,
-                                  page: 1,
-                                  limit: 50);
-                            },
-                            child: const Text(
-                              "Search",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
-                      hintText: "Quick Search Item",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    final barcode = await Get.to(
-                      () => const BarcodeScannerPage(),
+          ProductTopSection(
+            productController: productController,
+            type: type,
+            onCategoryTap: () {
+              showCategorySheet(context);
+            },
+            onQrTap: () async {
+              Get.to(
+                () => BarcodeScannerPage(
+                  popAfterScan: true,
+                  onScanned: (barcode) async {
+                    await productController.getProducts(
+                      type: "search",
+                      barcodeId: barcode,
+                      page: 1,
+                      shop: userController.currentUser.value?.primaryShop?.id ??
+                          "",
+                      limit: 50,
                     );
-
-                    if (barcode != null) {
-                      productController.searchProductController.text = barcode;
-
-                      await productController.getProductsBySort(
-                        type: "search",
-                        barcodeId: barcode,
-                        page: 1,
-                        scanningFrom: "sale",
-                        limit: 50,
-                      );
-                    }
                   },
-                  icon: const Icon(Icons.qr_code),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Obx(() => filterButton(
-                        title: productController.selectedCategory.value?.name ??
-                            "Categories",
-                        icon: Icons.category_outlined,
-                        onTap: () {
-                          showCategorySheet(context);
-                        },
-                      )),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: filterButton(
-                    title: productController.selectedSortOrder.value,
-                    icon: Icons.swap_vert,
-                    onTap: () {
-                      showSortDialog(context);
-                    },
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
           const SizedBox(height: 10),
           Expanded(
             child: Obx(() {
-              if (productController.loadingproducts.value) {
-                return const Center(child: CircularProgressIndicator());
+              if (productController.loading.value &&
+                  productController.productlist.isEmpty) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               }
 
-              if (productController.filteredProducts.isEmpty) {
+              if (productController.productlist.isEmpty) {
                 return noItemsFound(context, true);
               }
 
-              return ListView(
-                controller: productController.scrollController,
-                children: [
-                  if (productController.selectedSortOrderSearch.value ==
-                      "outofstock")
-                    ...productController.outOfStockProducts.map((productModel) {
-                      return productCard(
-                        product: productModel,
-                        type: type,
-                        function: function != null
-                            ? (Product p) => function!(p)
-                            : null,
-                      );
-                    }),
-                  if (productController.selectedSortOrderSearch.value ==
-                      "runninglow")
-                    ...productController.outOfStockProducts.map((productModel) {
-                      return productCard(
-                        product: productModel,
-                        type: type,
-                        function: function != null
-                            ? (Product p) => function!(p)
-                            : null,
-                      );
-                    }),
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await productController.getProducts(
+                    type: "all",
+                    page: 1,
+                    limit: 40,
+                    shop:
+                        userController.currentUser.value?.primaryShop?.id ?? "",
+                  );
+                },
+                child: ListView.builder(
+                  controller: productController.scrollController,
+                  itemCount: productController.productlist.length + 1,
+                  itemBuilder: (context, index) {
+                    // LOADING MORE
+                    if (index == productController.productlist.length) {
+                      return Obx(() => productController.loadingMore.isTrue
+                          ? const Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : const SizedBox.shrink());
+                    }
 
-                  // 🔴 COLLAPSIBLE OUT-OF-STOCK SECTION
-                  if (productController.selectedSortOrderSearch.value !=
-                          "outofstock" &&
-                      productController.selectedSortOrderSearch.value !=
-                          "runninglow")
-                    outOfStockCollapsible(
-                      controller: productController,
-                      type: type,
-                      function: function,
-                    ),
+                    final productModel = productController.productlist[index];
 
-                  // ✅ NORMAL PRODUCTS
-                  ...productController.normalProducts.map((productModel) {
                     if (productModel.type == "service") {
                       return serviceCard(
                         type: type,
-                        product: productModel,
-                        function: (Product p) => function!(p),
+                        product: productModel.toProduct(),
+                        function: function != null
+                            ? (Product p) => function!(p)
+                            : null,
                       );
                     }
 
                     return productCard(
-                      product: productModel,
+                      product: productModel.toProduct(),
                       type: type,
                       function:
                           function != null ? (Product p) => function!(p) : null,
                     );
-                  }).toList(),
-                ],
+                  },
+                ),
               );
             }),
           ),
-          Obx(() => productController.loadingMoreProducts.isTrue
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : const SizedBox.shrink()),
         ],
       ),
     );

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/purchase_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/stockcontroller.dart';
 import 'package:pointify/controllers/warehousecontroller.dart';
@@ -41,7 +42,6 @@ class ProductController extends GetxController {
   RxList<Product> products = RxList([]);
   RxList<Product> productDownloadss = RxList([]);
   RxList<Batch> filteredBatches = RxList([]);
-  RxList<ProductCategory> productCategories = RxList([]);
   Rxn<ProductCategory> selectedCategory = Rxn(null);
   RxString activeAdjustmentFilter = RxString('today');
   RxList<TransferItem> productHistoryList = RxList([]);
@@ -57,11 +57,10 @@ class ProductController extends GetxController {
   RxBool loadingMoreProducts = RxBool(false);
   RxBool loadingproducts = RxBool(false);
   RxBool showBadStockWidget = RxBool(false);
-  RxBool transferAll = RxBool(false);
-  RxBool loadingproductCategories = RxBool(false);
   RxBool saveBadstockLoad = RxBool(false);
   Rxn<Product> selectedBadStock = Rxn(null);
   Rxn<ProductCategory> selecteProductCategoty = Rxn(null);
+  TextEditingController descriptionController = TextEditingController();
   RxList<BadStock> badstocks = RxList([]);
   RxString productType = RxString("product");
   RxString fromDate = RxString("");
@@ -129,7 +128,6 @@ class ProductController extends GetxController {
   RxString selectedSortOrderCount = RxString("All");
   RxString selectedSortOrderSearch = RxString("all");
   RxString selectedSortOrderCountSearch = RxString("all");
-  RxMap<String, dynamic> countHistoryData = RxMap({});
   RxString supplierName = RxString("None");
   Rxn<Supplier> supplierId = Rxn(null);
   Rxn<Map<String, dynamic>> productAnalysis =
@@ -158,8 +156,6 @@ class ProductController extends GetxController {
   TextEditingController measureController = TextEditingController();
   TextEditingController expiryController = TextEditingController();
   TextEditingController manufacturerController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController categoryName = TextEditingController();
   TextEditingController category = TextEditingController();
   TextEditingController searchProductController = TextEditingController();
   TextEditingController searchBatchController = TextEditingController();
@@ -223,6 +219,56 @@ class ProductController extends GetxController {
         !loadingProducts.value) {
       print("Load more data");
       _loadMoreData();
+    }
+  }
+
+  Future<Map<String, dynamic>> updateBarcode({
+    required String productId,
+    required String barcode,
+  }) async {
+    try {
+      var response = await ProductService.updateBarcode(
+        {
+          "barcode": barcode,
+        },
+        productId,
+      );
+
+      if (response["error"] != null) {
+        return {
+          "success": false,
+          "message": response["error"],
+        };
+      }
+
+      int index = products.indexWhere(
+        (e) => e.sId == productId,
+      );
+
+      if (index != -1) {
+        products[index].barcode = barcode;
+      }
+
+      int filteredIndex = filteredProducts.indexWhere(
+        (e) => e.sId == productId,
+      );
+
+      if (filteredIndex != -1) {
+        filteredProducts[filteredIndex].barcode = barcode;
+      }
+
+      products.refresh();
+      filteredProducts.refresh();
+
+      return {
+        "success": true,
+        "message": "Barcode updated successfully",
+      };
+    } catch (e) {
+      return {
+        "success": false,
+        "message": "Failed to update barcode",
+      };
     }
   }
 
@@ -720,6 +766,9 @@ class ProductController extends GetxController {
     selectedImages.value = [];
   }
 
+// new version
+
+  // to be remove in the future
   getProductsBySort(
       {required String type,
       String text = "",
@@ -840,6 +889,12 @@ class ProductController extends GetxController {
       if (scanningFrom == "sale" && products.isNotEmpty) {
         Get.find<SalesController>().addToCart(products.first);
       }
+      if (scanningFrom == "purchase" && products.isNotEmpty) {
+        Get.find<PurchaseController>().addNewPurchase(products.first);
+      }
+      if (scanningFrom == "count" && products.isNotEmpty) {
+        Get.find<StockController>().selectedProductCount.value = products.first;
+      }
     }
     loadingproducts.value = false;
     loadingMoreProducts.value = false;
@@ -881,6 +936,7 @@ class ProductController extends GetxController {
   // }
 
   deleteProduct({required Product product}) async {
+    print("deleteProduct");
     var i = products.indexWhere((element) => element.sId == product.sId);
     products.removeAt(i);
     await ProductService.deleteProduct(product.sId!);
@@ -1023,21 +1079,7 @@ class ProductController extends GetxController {
     productMonthPurchases.refresh();
   }
 
-  Future<void> getProductCategiories() async {
-    loadingproductCategories.value = true;
-    productCategories.clear();
-    List<dynamic> productCategoriesResponse = await ProductService()
-        .getProductCategories(userController.currentUser.value!.id!);
-    productCategories.addAll(productCategoriesResponse
-        .map((e) => ProductCategory.fromJson(e))
-        .toList());
-    loadingproductCategories.value = false;
-  }
-
-  Future<void> getProductStats(String shop) async {
-    var productsHistory = await ProductService.getProductStats(shop);
-    countHistoryData.value = productsHistory;
-  }
+  
 
   Future<void> getProductPurchaseHistory(Product? product,
       {required String fromDate, required String toDate}) async {
@@ -1074,59 +1116,6 @@ class ProductController extends GetxController {
     countHistory.removeWhere((element) => element.sId == sId);
     countHistory.refresh();
     await ProductService.deleteProductCount(sId);
-  }
-
-  Future<void> transferProducts(List<Map<String, dynamic>> value, toShop,
-      {all = false}) async {
-    // print(Get.find<StockController>().transferall.value);
-    // return;
-    LoadingDialog.showLoadingDialog(
-      context: Get.context!,
-      title: "Please wait...",
-      key: _keyLoader,
-    );
-    var response = await ProductService.transferProducts(value, toShop, all);
-    Get.back();
-    generalAlert(
-        title: "Success",
-        message: response["message"],
-        negativeCallback: () {
-          Get.back();
-        },
-        function: () {
-          Get.back();
-        });
-  }
-
-  void createCategory() async {
-    LoadingDialog.showLoadingDialog(
-      context: Get.context!,
-      title: "Adding please wait...",
-      key: _keyLoader,
-    );
-    if (categoryName.text.isEmpty) {
-      showSnackBar(message: "enter category name", color: Colors.red);
-      return;
-    }
-    var response = await ProductService.createCategory({
-      "name": categoryName.text,
-      "admin": userController.currentUser.value!.id!
-    });
-    Get.back();
-    if (response["message"] != null) {
-      generalAlert(
-          title: "Success",
-          message: response["message"],
-          negativeCallback: () {
-            Get.back();
-          },
-          function: () {
-            Get.back();
-          });
-      getProductCategiories();
-    } else {
-      showSnackBar(message: response["error"], color: Colors.red);
-    }
   }
 
   generateReport(

@@ -1429,6 +1429,8 @@ PODS:
     - Flutter
   - printing (1.0.0):
     - Flutter
+  - qr_code_scanner_plus (0.2.6):
+    - Flutter
   - SDWebImage (5.21.0):
     - SDWebImage/Core (= 5.21.0)
   - SDWebImage/Core (5.21.0)
@@ -1507,6 +1509,7 @@ DEPENDENCIES:
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - print_bluetooth_thermal (from `.symlinks/plugins/print_bluetooth_thermal/ios`)
   - printing (from `.symlinks/plugins/printing/ios`)
+  - qr_code_scanner_plus (from `.symlinks/plugins/qr_code_scanner_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
@@ -1591,6 +1594,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/print_bluetooth_thermal/ios"
   printing:
     :path: ".symlinks/plugins/printing/ios"
+  qr_code_scanner_plus:
+    :path: ".symlinks/plugins/qr_code_scanner_plus/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
@@ -1648,6 +1653,7 @@ SPEC CHECKSUMS:
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   print_bluetooth_thermal: 28adf527ac4c47e42e268c13d21e5f2abf48ecdd
   printing: 54ff03f28fe9ba3aa93358afb80a8595a071dd07
+  qr_code_scanner_plus: 1fb59fd4576edb53ec7560c3746f454dee54300c
   SDWebImage: f84b0feeb08d2d11e6a9b843cb06d75ebf5b8868
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb

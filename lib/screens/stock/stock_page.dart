@@ -190,7 +190,9 @@ class StockPage extends StatelessWidget {
                                 if (shopController.checkSubscription() ==
                                     true) {
                                   shopController.getShops();
-                                  Get.to(() => StockTransfer());
+                                  Get.to(() => StockTransfer(
+                                        type: "transfer",
+                                      ));
                                 }
                               }
                           }

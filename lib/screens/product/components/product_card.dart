@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/barcode_scanner_page.dart';
-import 'package:pointify/services/product_service.dart';
+import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/widgets/minor_title.dart';
 import 'package:pointify/widgets/product_image.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -96,74 +95,74 @@ Widget productCard(
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              if (product.bundleItems!.isNotEmpty)
-                                InkWell(
-                                  onTap: () {
-                                    showDialog(
-                                        context: Get.context!,
-                                        builder: (_) {
-                                          return AlertDialog(
-                                            title: const Center(
-                                              child: Text(
-                                                "Items Included",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16),
-                                              ),
-                                            ),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: List.generate(
-                                                  product.bundleItems!.length,
-                                                  (index) => Text(
-                                                      "${product.bundleItems![index].product!.name!.capitalizeFirst!} - ${product.bundleItems![index].quantity} ${product.bundleItems![index].product!.measureUnit}")),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Get.back();
-                                                },
-                                                child: Text(
-                                                  "Cancel".toUpperCase(),
-                                                  style: TextStyle(
-                                                    color: AppColors.mainColor,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Get.back();
-                                                },
-                                                child: Text(
-                                                  "Okay".toUpperCase(),
-                                                  style: TextStyle(
-                                                    color: AppColors.mainColor,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: AppColors.mainColor,
-                                    ),
-                                    child: Text(
-                                      "${userController.currentUser.value!.primaryShop!.production == true ? "Raw Materials" : "Bundle"} (${product.bundleItems?.length}) items",
-                                      style: const TextStyle(
-                                          fontSize: 11.0, color: Colors.white),
-                                      softWrap: false,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
+                              // if (product.bundleItems!.isNotEmpty)
+                              //   InkWell(
+                              //     onTap: () {
+                              //       showDialog(
+                              //           context: Get.context!,
+                              //           builder: (_) {
+                              //             return AlertDialog(
+                              //               title: const Center(
+                              //                 child: Text(
+                              //                   "Items Included",
+                              //                   style: TextStyle(
+                              //                       color: Colors.black,
+                              //                       fontWeight: FontWeight.bold,
+                              //                       fontSize: 16),
+                              //                 ),
+                              //               ),
+                              //               content: Column(
+                              //                 mainAxisSize: MainAxisSize.min,
+                              //                 children: List.generate(
+                              //                     product.bundleItems!.length,
+                              //                     (index) => Text(
+                              //                         "${product.bundleItems![index].product!.name!.capitalizeFirst!} - ${product.bundleItems![index].quantity} ${product.bundleItems![index].product!.measureUnit}")),
+                              //               ),
+                              //               actions: [
+                              //                 TextButton(
+                              //                   onPressed: () {
+                              //                     Get.back();
+                              //                   },
+                              //                   child: Text(
+                              //                     "Cancel".toUpperCase(),
+                              //                     style: TextStyle(
+                              //                       color: AppColors.mainColor,
+                              //                       fontWeight: FontWeight.bold,
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //                 TextButton(
+                              //                   onPressed: () {
+                              //                     Get.back();
+                              //                   },
+                              //                   child: Text(
+                              //                     "Okay".toUpperCase(),
+                              //                     style: TextStyle(
+                              //                       color: AppColors.mainColor,
+                              //                       fontWeight: FontWeight.bold,
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //               ],
+                              //             );
+                              //           });
+                              //     },
+                              //     child: Container(
+                              //       padding: const EdgeInsets.symmetric(
+                              //           horizontal: 5),
+                              //       decoration: BoxDecoration(
+                              //         borderRadius: BorderRadius.circular(5),
+                              //         color: AppColors.mainColor,
+                              //       ),
+                              //       child: Text(
+                              //         "${userController.currentUser.value!.primaryShop!.production == true ? "Raw Materials" : "Bundle"} (${product.bundleItems?.length}) items",
+                              //         style: const TextStyle(
+                              //             fontSize: 11.0, color: Colors.white),
+                              //         softWrap: false,
+                              //         overflow: TextOverflow.ellipsis,
+                              //       ),
+                              //     ),
+                              //   ),
                             ],
                           ),
                         ),
@@ -292,7 +291,7 @@ Widget productCard(
                                   category: "stocks",
                                   permission: "view_buying_price"))
                                 Text(
-                                  "BP/= ${htmlPrice(product.getBuyingPrice())}",
+                                  "BP/= ${htmlPrice(product.buyingPrice)}",
                                   style: const TextStyle(color: Colors.black),
                                 ),
                               const SizedBox(height: 5),
@@ -707,24 +706,73 @@ showProductModal(context, Product product) {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              await ProductService.updateBarcode(
-                                {
-                                  "barcode": barcode,
+                              showDialog(
+                                context: Get.context!,
+                                barrierDismissible: false,
+                                builder: (_) {
+                                  return const AlertDialog(
+                                    content: Row(
+                                      children: [
+                                        CircularProgressIndicator(),
+                                        SizedBox(width: 15),
+                                        Expanded(
+                                          child: Text(
+                                            "Updating barcode...",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
-                                product.sId!,
                               );
 
-                              product.barcode = barcode;
-
-                              productController.products.refresh();
-                              productController.filteredProducts.refresh();
-
-                              Get.back();
-
-                              showSnackBar(
-                                message: "Barcode updated successfully",
-                                color: Colors.green,
+                              final result =
+                                  await productController.updateBarcode(
+                                productId: product.sId!,
+                                barcode: barcode,
                               );
+
+                              Get.back(); // close loader
+
+                              if (result["success"] == true) {
+                                Get.back(); // close update dialog
+
+                                showDialog(
+                                  context: Get.context!,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      title: const Text("Success"),
+                                      content: Text(result["message"]),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                showDialog(
+                                  context: Get.context!,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      title: const Text("Error"),
+                                      content: Text(result["message"]),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
                             },
                             child: const Text(
                               "Update",

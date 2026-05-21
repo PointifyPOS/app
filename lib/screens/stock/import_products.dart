@@ -25,12 +25,12 @@ class ImportProducts extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon:  Icon(
+          icon: Icon(
             Icons.arrow_back,
             color: AppColors.mainColor,
           ),
         ),
-        title:  Text(
+        title: Text(
           "Import Products",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -82,7 +82,7 @@ class ImportProducts extends StatelessWidget {
                 List<List<String>>? excelData =
                     await readExcel(result.files.single.path!);
                 if (excelData.isNotEmpty) {
-                  Get.find<ProductController>().importProducts(excelData);
+                  productController.importProducts(excelData);
                 } else {
                   generalAlert(
                       message:
@@ -140,7 +140,7 @@ class ImportProducts extends StatelessWidget {
                   await exportToExcel(productController.sampledata, "sample");
               await openFile(filePath!);
             },
-            child:  Text(
+            child: Text(
               "Download sample template",
               style: TextStyle(
                   color: AppColors.mainColor, fontWeight: FontWeight.bold),

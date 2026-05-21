@@ -32,23 +32,25 @@ class AttendantsPage extends StatelessWidget {
                 createAttendantWidget(context),
                 const Divider(),
                 Obx(() {
-                  return userController.attendants.isEmpty
-                      ? noItemsFound(context, true)
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: userController.attendants.length,
-                          itemBuilder: (context, index) {
-                            UserModel attendantModel =
-                                userController.attendants.elementAt(index);
-                            return attendantCard(
-                                userModel: attendantModel,
-                                function: type != "switch"
-                                    ? null
-                                    : (UserModel userModel) {
-                                        switchInit(usermodel: userModel);
-                                      });
-                          });
+                  return userController.attendantsloading.isTrue
+                      ? const Center(child: CircularProgressIndicator())
+                      : userController.attendants.isEmpty
+                          ? noItemsFound(context, true)
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: userController.attendants.length,
+                              itemBuilder: (context, index) {
+                                UserModel attendantModel =
+                                    userController.attendants.elementAt(index);
+                                return attendantCard(
+                                    userModel: attendantModel,
+                                    function: type != "switch"
+                                        ? null
+                                        : (UserModel userModel) {
+                                            switchInit(usermodel: userModel);
+                                          });
+                              });
                 }),
               ],
             ),

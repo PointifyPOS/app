@@ -7,6 +7,7 @@ import 'package:pointify/controllers/authcontroller.dart';
 import 'package:pointify/controllers/chat_controller.dart';
 import 'package:pointify/controllers/customercontroller.dart';
 import 'package:pointify/controllers/plancontroller.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/purchase_controller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
@@ -53,7 +54,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -70,6 +70,9 @@ class _MyAppState extends State<MyApp> {
 
   ProductController productController = Get.put<ProductController>(
     ProductController(),
+  );
+  ProductNewController productNewController = Get.put<ProductNewController>(
+    ProductNewController(),
   );
 
   CustomerController customerController = Get.put<CustomerController>(

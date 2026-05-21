@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
@@ -191,7 +192,7 @@ class AuthController {
     if (await isConnected()) {
       if (userController.currentUser.value != null &&
           userController.currentUser.value!.primaryShop != null) {
-        Get.find<ProductController>().getProductStats(
+        Get.find<ProductNewController>().getProductStats(
             userController.currentUser.value!.primaryShop!.id!);
         Get.find<SalesController>().getSalesByDate(
           type: "today",
@@ -222,7 +223,9 @@ class AuthController {
       Get.find<ShopController>().getShops();
     }
 
-    Get.find<ProductController>().getProductsBySort(type: "all");
+    Get.find<ProductNewController>().getProducts(
+        type: "all",
+        shop: userController.currentUser.value?.primaryShop?.id ?? "");
     Get.find<CustomerController>().getCustomersInShop('');
     Get.find<SalesController>().getOrders(
       fromDate: Get.find<ReportsController>().filterStartDate.value,

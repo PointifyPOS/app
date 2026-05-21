@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
+import 'package:pointify/main.dart';
 import 'package:pointify/models/productcategory.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/widgets/textbutton.dart';
@@ -12,28 +14,33 @@ class ProductCategories extends StatelessWidget {
     productController.getProductCategiories();
   }
 
-  final ProductController productController = Get.find<ProductController>();
+  final ProductNewController productController =
+      Get.find<ProductNewController>();
   Widget searchWidget() {
     return TextFormField(
       controller: productController.searchProductController,
       onChanged: (value) {
         if (value == "") {
-          productController.getProductsBySort(
+          productController.getProducts(
             type: "all",
+            shop: userController.currentUser.value?.primaryShop?.id ?? "",
           );
         } else {
-          productController.getProductsBySort(
-              type: "search",
-              text: productController.searchProductController.text);
+          productController.getProducts(
+            type: "search",
+            name: productController.searchProductController.text,
+            shop: userController.currentUser.value?.primaryShop?.id ?? "",
+          );
         }
       },
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
         suffixIcon: IconButton(
           onPressed: () {
-            productController.getProductsBySort(
+            productController.getProducts(
                 type: "search",
-                text: productController.searchProductController.text);
+                shop: userController.currentUser.value?.primaryShop?.id ?? "",
+                name: productController.searchProductController.text);
           },
           icon: const Icon(Icons.search),
         ),

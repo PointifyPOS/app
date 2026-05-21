@@ -832,4 +832,24 @@ class DatabaseHelper {
     }
     return null;
   }
+
+  Future<void> insertProductsBatch(
+    List<dynamic> products,
+  ) async {
+    final db = await database;
+
+    final batch = db.batch();
+
+    for (final product in products) {
+      batch.insert(
+        "products",
+        product,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+
+    await batch.commit(
+      noResult: true,
+    );
+  }
 }

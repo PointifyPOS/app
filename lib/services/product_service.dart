@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:pointify/models/product.dart';
 import 'package:pointify/models/productcategory.dart';
+import 'package:pointify/models/shop.dart';
 import 'package:pointify/models/wahoureinvoice.dart';
 
 import '../main.dart';
@@ -216,14 +217,17 @@ class ProductService {
     return response;
   }
 
-  static transferProducts(
-      List<Map<String, dynamic>> products, toShop, bool all) async {
+  static transferProducts(List<Map<String, dynamic>> products, toShop,
+      Shop fromShop, bool all, bool resetQuantity) async {
     String url = EndPoints.producttransferimport;
     var response =
         await DbBase().databaseRequest(url, DbBase().postRequestType, body: {
-      'products': products,
-      "all": all,
+      'products': all ? [] : products,
+      "importall": all,
+      'resetQuantity': resetQuantity,
       "shopId": userController.currentUser.value?.primaryShop?.id,
+      "attendantId": userController.currentUser.value?.attendantId?.sId,
+      "fromShop": fromShop.id,
       "toShop": toShop
     });
     return response;
@@ -365,5 +369,37 @@ class ProductService {
         "${EndPoints.products}/remove/bundle/item?itemId=$s&productId=${product.sId}",
         DbBase().putRequestType);
     return response;
+  }
+
+  static Future<dynamic> getProducts({
+    required String shop,
+    String? type,
+    String stockMode = "instock",
+    required String name,
+    required String sort,
+    ProductCategory? category,
+    required int page,
+    required int limit,
+    required String reason,
+    required String productid,
+    required String barcodeId,
+  }) async {
+    String url = "${EndPoints.products_v2_list}"
+        "?shop=$shop"
+        "&name=$name"
+        "&type=$type"
+        "&stockMode=$stockMode"
+        "&sort=$sort"
+        "&limit=$limit"
+        "&page=$page"
+        "&reason=$reason"
+        "&productid=$productid"
+        "&categoryId=${category?.id}"
+        "&barcodeid=$barcodeId";
+
+    return await DbBase().databaseRequest(
+      url,
+      DbBase().getRequestType,
+    );
   }
 }

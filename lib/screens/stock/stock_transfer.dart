@@ -75,7 +75,7 @@ class StockTransfer extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: majorTitle(
-                      title: "Select Shop to transfer to",
+                      title: "Select Shop import from",
                       color: Colors.black,
                       size: 16.0),
                 ),
@@ -97,7 +97,7 @@ class StockTransfer extends StatelessWidget {
                                 onPressed: () {},
                                 icon: const Icon(Icons.search),
                               ),
-                              hintText: "Search shop to transfer to",
+                              hintText: "Search shop to import from",
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10))),
                         ),

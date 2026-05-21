@@ -10,7 +10,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/widgets/textbutton.dart';
 import 'package:printing/printing.dart';
-
+import 'package:barcode_widget/barcode_widget.dart';
 import '../../../controllers/productcontroller.dart';
 import '../../../models/product.dart';
 
@@ -31,7 +31,7 @@ class BarcodeGenerator extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon:  Icon(
+          icon: Icon(
             Icons.clear,
             color: AppColors.mainColor,
             size: 30,
@@ -119,13 +119,13 @@ class BarcodeGenerator extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return Column(
                           children: [
-                            pw.BarcodeWidget(
-                              barcode: pw.Barcode.code128(escapes: true),
-                              data: product.barcode!,
+                            BarcodeWidget(
+                              barcode: Barcode.code128(),
+                              data: product.barcode ?? product.name!,
                               drawText: true,
-                              // width: 350,
                               height: 80,
-                            ) as Widget,
+                              width: 120,
+                            ),
                           ],
                         );
                       }),

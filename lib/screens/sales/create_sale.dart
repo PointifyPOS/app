@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/screens/product/products_page.dart';
 import 'package:pointify/screens/sales/onholdsales.dart';
 import 'package:pointify/screens/sales/sale_preview.dart';
@@ -440,6 +441,26 @@ class CreateSale extends StatelessWidget {
                                         ),
                                       ),
                                     ),
+                                    IconButton(
+                                      onPressed: () async {
+                                        Get.to(
+                                          () => BarcodeScannerPage(
+                                            popAfterScan: false,
+                                            onScanned: (barcode) async {
+                                              await productController
+                                                  .getProductsBySort(
+                                                type: "search",
+                                                barcodeId: barcode,
+                                                page: 1,
+                                                scanningFrom: 'sale',
+                                                limit: 50,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.qr_code),
+                                    )
                                   ],
                                 ),
                                 const SizedBox(
