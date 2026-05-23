@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/widgets/minor_title.dart';
 import 'package:pointify/widgets/product_image.dart';
@@ -106,7 +107,7 @@ Widget serviceCard({
 }
 
 showProductModal(context, Product product) {
-  ProductController productController = Get.find<ProductController>();
+  ProductNewController productController = Get.find<ProductNewController>();
   SalesController salesController = Get.find<SalesController>();
 
   return showModalBottomSheet<void>(

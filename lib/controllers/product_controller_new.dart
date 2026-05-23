@@ -4,6 +4,7 @@ import 'package:pointify/main.dart';
 import 'package:pointify/models/product.dart';
 import 'package:pointify/models/productcategory.dart';
 import 'package:pointify/models/shop.dart';
+import 'package:pointify/services/firestore_files_access_service.dart';
 import 'package:pointify/services/product_service.dart';
 import 'package:pointify/widgets/alert.dart';
 import 'package:pointify/widgets/loading_dialog.dart';
@@ -28,7 +29,7 @@ class ProductNewController extends GetxController {
 
   RxList<ProductCategory> productCategories = RxList([]);
   RxBool loading = RxBool(false);
-
+RxBool isSearching = false.obs;
   RxBool loadingMore = RxBool(false);
   var filteredProducts = <ProductDisplay>[].obs;
   RxString selectedSortOrder = RxString("All");
@@ -80,6 +81,67 @@ class ProductNewController extends GetxController {
     }
   }
 
+  Future<Map<String, dynamic>> updateBarcode({
+    required String productId,
+    required String barcode,
+  }) async {
+    try {
+      var response = await ProductService.updateBarcode(
+        {
+          "barcode": barcode,
+        },
+        productId,
+      );
+
+      if (response["error"] != null) {
+        return {
+          "success": false,
+          "message": response["error"],
+        };
+      }
+
+      int index = productlist.indexWhere(
+        (e) => e.sId == productId,
+      );
+
+      if (index != -1) {
+        productlist[index].barcode = barcode;
+      }
+
+      int filteredIndex = filteredProducts.indexWhere(
+        (e) => e.sId == productId,
+      );
+
+      if (filteredIndex != -1) {
+        filteredProducts[filteredIndex].barcode = barcode;
+      }
+
+      productlist.refresh();
+      filteredProducts.refresh();
+
+      return {
+        "success": true,
+        "message": "Barcode updated successfully",
+      };
+    } catch (e) {
+      return {
+        "success": false,
+        "message": "Failed to update barcode",
+      };
+    }
+  }
+
+  deleteProduct({required Product product}) async {
+    var i = productlist.indexWhere((element) => element.sId == product.sId);
+    productlist.removeAt(i);
+    await ProductService.deleteProduct(product.sId!);
+    if (product.images != null && product.images!.isNotEmpty) {
+      for (int i = 0; i < product.images!.length; i++) {
+        FirestoreFilesAccess().deleteFileFromPath("${product.sId!}_$i");
+      }
+    }
+  }
+
   void addToList(
     ProductDisplay productModel, {
     type = "",
@@ -107,11 +169,14 @@ class ProductNewController extends GetxController {
   Future<void> getProductStats(
     String shop,
   ) async {
-    var response = await ProductService.getProductStats(shop);
+    try {
+      var response = await ProductService.getProductStats(shop);
+      if (response == null) return;
+      productStats.value = response["stats"] ?? {};
 
-    productStats.value = response["stats"] ?? {};
-
-    productStats["fastmoving"] = response["fastmoving"] ?? [];
+      productStats["fastmoving"] = response["fastmoving"] ?? [];
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   Future<void> refreshProducts({
@@ -154,6 +219,27 @@ class ProductNewController extends GetxController {
     } else {
       showSnackBar(message: response["error"], color: Colors.red);
     }
+  }
+
+  void adjustStock(
+      {required Product product, required int quantity, required String type}) {
+    LoadingDialog.showLoadingDialog(
+      context: Get.context!,
+      title: "Please wait...",
+      key: _keyLoader,
+    );
+    ProductService.adjustStock(
+        product: product, quantity: quantity, type: type);
+    Get.back();
+    showSnackBar(message: "Stock adjusted successfully", color: Colors.green);
+    getProducts(
+        type: "all",
+        name: "",
+        page: 1,
+        limit: 50,
+        stockMode: stockMode.value,
+        shop: userController.currentUser.value!.primaryShop!.id!,
+        refresh: false);
   }
 
   Future<void> loadMoreProducts() async {

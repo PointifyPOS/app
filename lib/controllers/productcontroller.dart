@@ -45,30 +45,27 @@ class ProductController extends GetxController {
   Rxn<ProductCategory> selectedCategory = Rxn(null);
   RxString activeAdjustmentFilter = RxString('today');
   RxList<TransferItem> productHistoryList = RxList([]);
-  RxList<SaleItem> productInvoices = RxList([]);
-  RxList<CountHistory> countHistory = RxList([]);
   RxList<ProductTrasferHistory> historytrasfer = RxList([]);
   RxList<Adjustment> adjustment = RxList([]);
   RxList<BundleItem> bundledProducts = RxList([]);
-  RxList<InvoiceItem> productPurchases = RxList([]);
-  RxList<Map<String, dynamic>> productMonthPurchases = RxList([]);
-  RxList<Map<String, dynamic>> monthlyBadStocks = RxList([]);
   Rxn<Supplier> pickedSupplier = Rxn(null);
   RxBool loadingMoreProducts = RxBool(false);
   RxBool loadingproducts = RxBool(false);
+  RxInt currentYear = RxInt(DateTime.now().year);
   RxBool showBadStockWidget = RxBool(false);
-  RxBool saveBadstockLoad = RxBool(false);
+  RxList<BadStock> badstocks = RxList([]);
   Rxn<Product> selectedBadStock = Rxn(null);
   Rxn<ProductCategory> selecteProductCategoty = Rxn(null);
   TextEditingController descriptionController = TextEditingController();
-  RxList<BadStock> badstocks = RxList([]);
   RxString productType = RxString("product");
-  RxString fromDate = RxString("");
-  RxString toDate = RxString("");
-
   RxString badstockFromDate = RxString("");
+  RxBool saveBadstockLoad = RxBool(false);
   RxString badstockToDate = RxString("");
+  RxList<Map<String, dynamic>> monthlyBadStocks = RxList([]);
+  RxList<Map<String, dynamic>> productMonthPurchases = RxList([]);
+  RxList<CountHistory> countHistory = RxList([]);
 
+  RxList<SaleItem> productInvoices = RxList([]);
   RxList<List<Object?>> sampledata = RxList([
     [
       'Name',
@@ -116,7 +113,6 @@ class ProductController extends GetxController {
 
   RxList<CustomImage> selectedImages = RxList([]);
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
-  RxInt currentYear = RxInt(DateTime.now().year);
   RxBool creatingProductLoad = RxBool(false);
   RxBool getProductLoad = RxBool(false);
   RxBool getProductCountLoad = RxBool(false);
@@ -128,7 +124,11 @@ class ProductController extends GetxController {
   RxString selectedSortOrderCount = RxString("All");
   RxString selectedSortOrderSearch = RxString("all");
   RxString selectedSortOrderCountSearch = RxString("all");
+  RxString fromDate = RxString("");
+  RxString toDate = RxString("");
+  TextEditingController stockadjust = TextEditingController();
   RxString supplierName = RxString("None");
+  RxList<InvoiceItem> productPurchases = RxList([]);
   Rxn<Supplier> supplierId = Rxn(null);
   Rxn<Map<String, dynamic>> productAnalysis =
       Rxn({'profitEstimate': 0, 'totalStockValue': 0});
@@ -142,7 +142,6 @@ class ProductController extends GetxController {
       .obs;
 
   TextEditingController bundleQty = TextEditingController();
-  TextEditingController stockadjust = TextEditingController();
   TextEditingController itemNameController = TextEditingController();
   TextEditingController spoiltreasonController = TextEditingController();
   TextEditingController buyingPriceController = TextEditingController();
@@ -213,6 +212,12 @@ class ProductController extends GetxController {
     super.onInit();
   }
 
+  Future<void> deleteProductCount(String sId) async {
+    countHistory.removeWhere((element) => element.sId == sId);
+    countHistory.refresh();
+    await ProductService.deleteProductCount(sId);
+  }
+
   void _scrollListener() {
     if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent &&
@@ -222,54 +227,69 @@ class ProductController extends GetxController {
     }
   }
 
-  Future<Map<String, dynamic>> updateBarcode({
-    required String productId,
-    required String barcode,
-  }) async {
-    try {
-      var response = await ProductService.updateBarcode(
-        {
-          "barcode": barcode,
-        },
-        productId,
-      );
-
-      if (response["error"] != null) {
-        return {
-          "success": false,
-          "message": response["error"],
-        };
-      }
-
-      int index = products.indexWhere(
-        (e) => e.sId == productId,
-      );
-
-      if (index != -1) {
-        products[index].barcode = barcode;
-      }
-
-      int filteredIndex = filteredProducts.indexWhere(
-        (e) => e.sId == productId,
-      );
-
-      if (filteredIndex != -1) {
-        filteredProducts[filteredIndex].barcode = barcode;
-      }
-
-      products.refresh();
-      filteredProducts.refresh();
-
-      return {
-        "success": true,
-        "message": "Barcode updated successfully",
-      };
-    } catch (e) {
-      return {
-        "success": false,
-        "message": "Failed to update barcode",
-      };
+  Future<void> getProductPurchaseHistory(Product? product,
+      {required String fromDate, required String toDate}) async {
+    var response = await ProductService.getProductPurchasesHistory(
+        startDate: fromDate, toDate: toDate, product: product!.sId!);
+    if (response["error"] != null) {
+      showSnackBar(message: response["error"], color: Colors.red);
+    } else {
+      List purchses = response["purchases"];
+      productPurchases.value =
+          purchses.map((e) => InvoiceItem.fromJson(e)).toList();
     }
+  }
+
+  getProductsCountsHistory({required String product}) async {
+    countHistory.clear();
+    List allproducts = await ProductService.getProductsCountsHistory(product);
+    List<CountHistory> products =
+        allproducts.map((e) => CountHistory.fromJson(e)).toList();
+    countHistory.addAll(products);
+    countHistory.refresh();
+  }
+
+  updateQuantity(Map<String, dynamic> data,
+      {required String productId, required int index}) async {
+    countHistory.removeAt(index);
+    countHistory.refresh();
+    await ProductService.updateProduct(data, productId);
+  }
+
+  Future<void> getBadStockGroupedByMonth(
+      {required String year, required String product}) async {
+    monthlyBadStocks.clear();
+    var productsHistory = await ProductService.getBadStockGroupedByMonth(
+      product: product,
+      year: year,
+    );
+    List result = productsHistory["result"];
+    monthlyBadStocks.addAll(result
+        .map((e) => {
+              "month": e["month"],
+              "totalLost": e["totalLost"],
+              "count": e["count"],
+            })
+        .toList());
+    monthlyBadStocks.refresh();
+  }
+
+  getProductPurchasesGroupedByMonth(String product,
+      {String? fromDate, String? toDate}) async {
+    productMonthPurchases.clear();
+    var productsHistory =
+        await ProductService.getProductPurchasesGroupedByMonth(
+            product: product, startDate: fromDate, toDate: toDate);
+    List result = productsHistory;
+    productMonthPurchases.addAll(result
+        .map((e) => {
+              "month": e["month"],
+              "totalBuyingPrice": e["totalPurchases"],
+              "count": e["count"],
+              "totalQuantity": e["totalQuantity"]
+            })
+        .toList());
+    productMonthPurchases.refresh();
   }
 
   Future<void> _loadMoreData() async {
@@ -908,46 +928,6 @@ class ProductController extends GetxController {
     loadingproducts.value = false;
   }
 
-  getProductsCountsHistory({required String product}) async {
-    countHistory.clear();
-    List allproducts = await ProductService.getProductsCountsHistory(product);
-    List<CountHistory> products =
-        allproducts.map((e) => CountHistory.fromJson(e)).toList();
-    countHistory.addAll(products);
-    countHistory.refresh();
-  }
-
-  // Future<void> scanQR({required type, required context}) async {
-  //   String barcodeScanRes;
-  //   try {
-  //     var result = await FlutterBarcodeScanner.scanBarcode(
-  //         '#ff6666', 'Cancel', true, ScanMode.BARCODE);
-  //     barcodeScanRes = result == "-1" ? '' : result;
-  //     if (type == "count") {
-  //       searchProductCountController.text = barcodeScanRes;
-  //     }
-  //
-  //     getProductsBySort(
-  //         type: "search", barcodeId: barcodeScanRes, scanningFrom: type);
-  //   } on PlatformException {
-  //     showSnackBar(
-  //         message: 'Failed to get platform version.', color: Colors.red);
-  //   }
-  // }
-
-  deleteProduct({required Product product}) async {
-    print("deleteProduct");
-    var i = products.indexWhere((element) => element.sId == product.sId);
-    products.removeAt(i);
-    await ProductService.deleteProduct(product.sId!);
-    if (product.images != null && product.images!.isNotEmpty) {
-      for (int i = 0; i < product.images!.length; i++) {
-        FirestoreFilesAccess().deleteFileFromPath("${product.sId!}_$i");
-      }
-    }
-    // getProductsBySort(type: "all");
-  }
-
   assignTextFields(Product productModel) async {
     itemNameController.text = productModel.name!;
     qtyController.text = productModel.quantity!.toStringAsFixed(2);
@@ -1003,11 +983,22 @@ class ProductController extends GetxController {
         (storage.getString("print_barcode") ?? false) as bool;
   }
 
-  updateQuantity(Map<String, dynamic> data,
-      {required String productId, required int index}) async {
-    countHistory.removeAt(index);
-    countHistory.refresh();
-    await ProductService.updateProduct(data, productId);
+  getBadStock(
+      {shopId,
+      String? attendant,
+      String? product = "",
+      String? fromDate,
+      String? toDate}) async {
+    try {
+      saveBadstockLoad.value = true;
+      badstocks.clear();
+      List<dynamic> response = await ProductService.getBadStock(
+          product: product, fromDate: fromDate, toDate: toDate);
+      badstocks.addAll(response.map((e) => BadStock.fromJson(e)).toList());
+      saveBadstockLoad.value = false;
+    } catch (e) {
+      saveBadstockLoad.value = false;
+    }
   }
 
   saveBadStock({required page, required context}) async {
@@ -1041,81 +1032,6 @@ class ProductController extends GetxController {
     } catch (e) {
       saveBadstockLoad.value = false;
     }
-  }
-
-  getBadStock(
-      {shopId,
-      String? attendant,
-      String? product = "",
-      String? fromDate,
-      String? toDate}) async {
-    try {
-      saveBadstockLoad.value = true;
-      badstocks.clear();
-      List<dynamic> response = await ProductService.getBadStock(
-          product: product, fromDate: fromDate, toDate: toDate);
-      badstocks.addAll(response.map((e) => BadStock.fromJson(e)).toList());
-      saveBadstockLoad.value = false;
-    } catch (e) {
-      saveBadstockLoad.value = false;
-    }
-  }
-
-  getProductPurchasesGroupedByMonth(String product,
-      {String? fromDate, String? toDate}) async {
-    productMonthPurchases.clear();
-    var productsHistory =
-        await ProductService.getProductPurchasesGroupedByMonth(
-            product: product, startDate: fromDate, toDate: toDate);
-    List result = productsHistory;
-    productMonthPurchases.addAll(result
-        .map((e) => {
-              "month": e["month"],
-              "totalBuyingPrice": e["totalPurchases"],
-              "count": e["count"],
-              "totalQuantity": e["totalQuantity"]
-            })
-        .toList());
-    productMonthPurchases.refresh();
-  }
-
-  
-
-  Future<void> getProductPurchaseHistory(Product? product,
-      {required String fromDate, required String toDate}) async {
-    var response = await ProductService.getProductPurchasesHistory(
-        startDate: fromDate, toDate: toDate, product: product!.sId!);
-    if (response["error"] != null) {
-      showSnackBar(message: response["error"], color: Colors.red);
-    } else {
-      List purchses = response["purchases"];
-      productPurchases.value =
-          purchses.map((e) => InvoiceItem.fromJson(e)).toList();
-    }
-  }
-
-  Future<void> getBadStockGroupedByMonth(
-      {required String year, required String product}) async {
-    monthlyBadStocks.clear();
-    var productsHistory = await ProductService.getBadStockGroupedByMonth(
-      product: product,
-      year: year,
-    );
-    List result = productsHistory["result"];
-    monthlyBadStocks.addAll(result
-        .map((e) => {
-              "month": e["month"],
-              "totalLost": e["totalLost"],
-              "count": e["count"],
-            })
-        .toList());
-    monthlyBadStocks.refresh();
-  }
-
-  Future<void> deleteProductCount(String sId) async {
-    countHistory.removeWhere((element) => element.sId == sId);
-    countHistory.refresh();
-    await ProductService.deleteProductCount(sId);
   }
 
   generateReport(
@@ -1170,26 +1086,6 @@ class ProductController extends GetxController {
         },
       );
     }
-  }
-
-  void adjustStock(
-      {required Product product, required int quantity, required String type}) {
-    LoadingDialog.showLoadingDialog(
-      context: Get.context!,
-      title: "Please wait...",
-      key: _keyLoader,
-    );
-    ProductService.adjustStock(
-        product: product, quantity: quantity, type: type);
-    Get.back();
-    showSnackBar(message: "Stock adjusted successfully", color: Colors.green);
-    getProductsBySort(
-        type: "all",
-        text: "",
-        page: 1,
-        limit: 50,
-        shop: userController.currentUser.value!.primaryShop!.id!,
-        showLoader: false);
   }
 
   void getProductTrasferHistory(

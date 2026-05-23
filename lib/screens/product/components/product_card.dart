@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/widgets/minor_title.dart';
@@ -84,86 +85,12 @@ Widget productCard(
                   children: <Widget>[
                     Row(
                       children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "${product.name!.capitalizeFirst!} ${product.measureUnit ?? ""}",
-                                  style: const TextStyle(fontSize: 16.0),
-                                  softWrap: false,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              // if (product.bundleItems!.isNotEmpty)
-                              //   InkWell(
-                              //     onTap: () {
-                              //       showDialog(
-                              //           context: Get.context!,
-                              //           builder: (_) {
-                              //             return AlertDialog(
-                              //               title: const Center(
-                              //                 child: Text(
-                              //                   "Items Included",
-                              //                   style: TextStyle(
-                              //                       color: Colors.black,
-                              //                       fontWeight: FontWeight.bold,
-                              //                       fontSize: 16),
-                              //                 ),
-                              //               ),
-                              //               content: Column(
-                              //                 mainAxisSize: MainAxisSize.min,
-                              //                 children: List.generate(
-                              //                     product.bundleItems!.length,
-                              //                     (index) => Text(
-                              //                         "${product.bundleItems![index].product!.name!.capitalizeFirst!} - ${product.bundleItems![index].quantity} ${product.bundleItems![index].product!.measureUnit}")),
-                              //               ),
-                              //               actions: [
-                              //                 TextButton(
-                              //                   onPressed: () {
-                              //                     Get.back();
-                              //                   },
-                              //                   child: Text(
-                              //                     "Cancel".toUpperCase(),
-                              //                     style: TextStyle(
-                              //                       color: AppColors.mainColor,
-                              //                       fontWeight: FontWeight.bold,
-                              //                     ),
-                              //                   ),
-                              //                 ),
-                              //                 TextButton(
-                              //                   onPressed: () {
-                              //                     Get.back();
-                              //                   },
-                              //                   child: Text(
-                              //                     "Okay".toUpperCase(),
-                              //                     style: TextStyle(
-                              //                       color: AppColors.mainColor,
-                              //                       fontWeight: FontWeight.bold,
-                              //                     ),
-                              //                   ),
-                              //                 ),
-                              //               ],
-                              //             );
-                              //           });
-                              //     },
-                              //     child: Container(
-                              //       padding: const EdgeInsets.symmetric(
-                              //           horizontal: 5),
-                              //       decoration: BoxDecoration(
-                              //         borderRadius: BorderRadius.circular(5),
-                              //         color: AppColors.mainColor,
-                              //       ),
-                              //       child: Text(
-                              //         "${userController.currentUser.value!.primaryShop!.production == true ? "Raw Materials" : "Bundle"} (${product.bundleItems?.length}) items",
-                              //         style: const TextStyle(
-                              //             fontSize: 11.0, color: Colors.white),
-                              //         softWrap: false,
-                              //         overflow: TextOverflow.ellipsis,
-                              //       ),
-                              //     ),
-                              //   ),
-                            ],
+                        Flexible(
+                          child: Text(
+                            "${product.name!.capitalizeFirst!} ${product.measureUnit ?? ""}",
+                            style: const TextStyle(fontSize: 16.0),
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         if (counted == true)
@@ -316,6 +243,7 @@ Widget productCard(
 
 showProdctionProductModal(context, Product product) {
   ProductController productController = Get.find<ProductController>();
+  ProductNewController productNewController = Get.find<ProductNewController>();
   SalesController salesController = Get.find<SalesController>();
 
   return showModalBottomSheet<void>(
@@ -402,7 +330,7 @@ showProdctionProductModal(context, Product product) {
                                     children: [
                                       TextButton(
                                           onPressed: () {
-                                            productController.adjustStock(
+                                            productNewController.adjustStock(
                                               product: product,
                                               quantity: int.parse(
                                                   productController
@@ -419,7 +347,7 @@ showProdctionProductModal(context, Product product) {
                                           )),
                                       TextButton(
                                           onPressed: () {
-                                            productController.adjustStock(
+                                            productNewController.adjustStock(
                                               product: product,
                                               quantity: int.parse(
                                                   productController
@@ -457,7 +385,7 @@ showProdctionProductModal(context, Product product) {
                       deleteDialog(
                           context: context,
                           onPressed: () {
-                            productController.deleteProduct(
+                            productNewController.deleteProduct(
                               product: product,
                             );
                           });
@@ -477,6 +405,7 @@ showProdctionProductModal(context, Product product) {
 
 showProductModal(context, Product product) {
   ProductController productController = Get.find<ProductController>();
+  ProductNewController productNewController = Get.find<ProductNewController>();
   SalesController salesController = Get.find<SalesController>();
 
   return showModalBottomSheet<void>(
@@ -608,7 +537,7 @@ showProductModal(context, Product product) {
                                   children: [
                                     TextButton(
                                         onPressed: () {
-                                          productController.adjustStock(
+                                          productNewController.adjustStock(
                                             product: product,
                                             quantity: int.parse(
                                                 productController
@@ -624,7 +553,7 @@ showProductModal(context, Product product) {
                                         )),
                                     TextButton(
                                         onPressed: () {
-                                          productController.adjustStock(
+                                          productNewController.adjustStock(
                                             product: product,
                                             quantity: int.parse(
                                                 productController
@@ -727,7 +656,7 @@ showProductModal(context, Product product) {
                               );
 
                               final result =
-                                  await productController.updateBarcode(
+                                  await productNewController.updateBarcode(
                                 productId: product.sId!,
                                 barcode: barcode,
                               );
@@ -802,7 +731,7 @@ showProductModal(context, Product product) {
                     deleteDialog(
                         context: context,
                         onPressed: () {
-                          productController.deleteProduct(
+                          productNewController.deleteProduct(
                             product: product,
                           );
                         });

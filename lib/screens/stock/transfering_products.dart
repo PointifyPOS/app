@@ -211,16 +211,43 @@ class TransferProductsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                      child: Text(
-                        "$quantity",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                    SizedBox(
+                      width: 70,
+                      child: TextFormField(
+                        initialValue: quantity.toString(),
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                          ),
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
+                        onChanged: (value) {
+                          final entered = int.tryParse(value) ?? 1;
+
+                          int finalQty = entered;
+
+                          if (finalQty < 1) {
+                            finalQty = 1;
+                          }
+
+                          if (finalQty > (product.quantity ?? 0)) {
+                            finalQty = product.quantity?.toInt() ?? 0;
+                          }
+
+                          productController
+                                  .selectedTransferProducts[selectedIndex]
+                              ["quantity"] = finalQty;
+
+                          productController.selectedTransferProducts.refresh();
+                        },
                       ),
                     ),
                     InkWell(

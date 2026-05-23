@@ -22,13 +22,15 @@ class ProductTopSection extends StatelessWidget {
   final VoidCallback onCategoryTap;
   final VoidCallback onQrTap;
 
-  const ProductTopSection({
+  ProductTopSection({
     super.key,
     required this.productController,
     required this.type,
     required this.onCategoryTap,
     required this.onQrTap,
-  });
+  }) {
+    productController.isSearching.value = false;
+  }
   Widget categoryMiniChip({
     required VoidCallback onTap,
   }) {
@@ -82,16 +84,29 @@ class ProductTopSection extends StatelessWidget {
           TextFormField(
             controller: productController.searchProductController,
             onChanged: (value) async {
+              productController.isSearching.value = value.trim().isNotEmpty;
               productController.filterProductsLocally(value);
 
-              if (productController.productlist.isEmpty &&
-                  value.trim().isNotEmpty) {
+              if (value.trim().isNotEmpty) {
                 await productController.getProducts(
                   type: "all",
                   name: value,
                   shop: userController.currentUser.value?.primaryShop?.id ?? "",
                   page: 1,
                   limit: 40,
+
+                  // IMPORTANT
+                  stockMode: "all",
+                );
+              } else {
+                await productController.getProducts(
+                  type: "all",
+                  shop: userController.currentUser.value?.primaryShop?.id ?? "",
+                  page: 1,
+                  limit: 40,
+
+                  // restore selected tab
+                  stockMode: productController.stockMode.value,
                 );
               }
             },
@@ -145,10 +160,15 @@ class ProductTopSection extends StatelessWidget {
           const SizedBox(height: 10),
 
           // FILTERS + STATS
-          SizedBox(
-            height: 30,
-            child: Obx(
-              () => Center(
+          Obx(() {
+            final isSearching = productController.isSearching.value;
+
+            if (isSearching) {
+              return const SizedBox.shrink();
+            }
+            return SizedBox(
+              height: 30,
+              child: Center(
                 child: Row(
                   children: [
                     Expanded(
@@ -166,12 +186,7 @@ class ProductTopSection extends StatelessWidget {
                         selected:
                             productController.stockMode.value == "instock",
                         onTap: () async {
-                          if (productController.stockMode.value == "instock") {
-                            productController.stockMode.value = "";
-                          } else {
-                            productController.stockMode.value = "instock";
-                          }
-
+                          productController.stockMode.value = "instock";
                           await productController.getProducts(
                             refresh: true,
                             shop: userController
@@ -194,12 +209,7 @@ class ProductTopSection extends StatelessWidget {
                         selected:
                             productController.stockMode.value == "outofstock",
                         onTap: () async {
-                          if (productController.stockMode.value ==
-                              "outofstock") {
-                            productController.stockMode.value = "";
-                          } else {
-                            productController.stockMode.value = "outofstock";
-                          }
+                          productController.stockMode.value = "outofstock";
 
                           await productController.getProducts(
                             refresh: true,
@@ -216,8 +226,8 @@ class ProductTopSection extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );
@@ -641,7 +651,8 @@ class ProductPage extends StatelessWidget {
                     type: "all",
                     shop:
                         userController.currentUser.value?.primaryShop?.id ?? "",
-                    stockMode: productController.stockMode.value);
+                    stockMode: productController.stockMode.value,
+                    refresh: true);
               },
               icon: Icon(
                 Icons.refresh,
