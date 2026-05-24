@@ -84,31 +84,7 @@ class ProductTopSection extends StatelessWidget {
           TextFormField(
             controller: productController.searchProductController,
             onChanged: (value) async {
-              productController.isSearching.value = value.trim().isNotEmpty;
-              productController.filterProductsLocally(value);
-
-              if (value.trim().isNotEmpty) {
-                await productController.getProducts(
-                  type: "all",
-                  name: value,
-                  shop: userController.currentUser.value?.primaryShop?.id ?? "",
-                  page: 1,
-                  limit: 40,
-
-                  // IMPORTANT
-                  stockMode: "all",
-                );
-              } else {
-                await productController.getProducts(
-                  type: "all",
-                  shop: userController.currentUser.value?.primaryShop?.id ?? "",
-                  page: 1,
-                  limit: 40,
-
-                  // restore selected tab
-                  stockMode: productController.stockMode.value,
-                );
-              }
+              await _searchProduct(value);
             },
             decoration: InputDecoration(
               hintText: "Search products...",
@@ -141,9 +117,25 @@ class ProductTopSection extends StatelessWidget {
               suffixIcon: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.search,
-                    color: Colors.grey,
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: productController.searchProductController,
+                    builder: (context, value, child) {
+                      if (value.text.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return IconButton(
+                        onPressed: () async {
+                          productController.searchProductController.clear();
+                          productController.stockMode.value = "instock";
+                          await _searchProduct("");
+                        },
+                        icon: const Icon(
+                          Icons.clear,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
                   ),
                   if (type != "salemodule")
                     IconButton(
@@ -231,6 +223,34 @@ class ProductTopSection extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _searchProduct(String value) async {
+    productController.isSearching.value = value.trim().isNotEmpty;
+    productController.filterProductsLocally(value);
+
+    if (value.trim().isNotEmpty) {
+      await productController.getProducts(
+        type: "all",
+        name: value,
+        shop: userController.currentUser.value?.primaryShop?.id ?? "",
+        page: 1,
+        limit: 40,
+
+        // IMPORTANT
+        stockMode: "all",
+      );
+    } else {
+      await productController.getProducts(
+        type: "all",
+        shop: userController.currentUser.value?.primaryShop?.id ?? "",
+        page: 1,
+        limit: 40,
+
+        // restore selected tab
+        stockMode: productController.stockMode.value,
+      );
+    }
   }
 
   Widget inventoryMiniStat({

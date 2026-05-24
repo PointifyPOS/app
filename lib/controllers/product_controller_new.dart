@@ -29,7 +29,7 @@ class ProductNewController extends GetxController {
 
   RxList<ProductCategory> productCategories = RxList([]);
   RxBool loading = RxBool(false);
-RxBool isSearching = false.obs;
+  RxBool isSearching = false.obs;
   RxBool loadingMore = RxBool(false);
   var filteredProducts = <ProductDisplay>[].obs;
   RxString selectedSortOrder = RxString("All");
@@ -420,6 +420,8 @@ RxBool isSearching = false.obs;
     } finally {
       loading.value = false;
 
+      Get.find<ProductNewController>()
+          .getProductStats(userController.currentUser.value!.primaryShop!.id!);
       loadingMore.value = false;
     }
   }
