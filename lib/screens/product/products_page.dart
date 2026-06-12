@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/product_controller_new.dart';
@@ -69,6 +71,7 @@ class ProductTopSection extends StatelessWidget {
     );
   }
 
+  Timer? _searchDebounce;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -84,7 +87,14 @@ class ProductTopSection extends StatelessWidget {
           TextFormField(
             controller: productController.searchProductController,
             onChanged: (value) async {
-              await _searchProduct(value);
+              _searchDebounce?.cancel();
+
+              _searchDebounce = Timer(
+                const Duration(milliseconds: 500),
+                () async {
+                  await _searchProduct(value);
+                },
+              );
             },
             decoration: InputDecoration(
               hintText: "Search products...",
@@ -380,7 +390,6 @@ class ProductPage extends StatelessWidget {
   final ShopController createShopController = Get.find<ShopController>();
   final ProductNewController productController =
       Get.put(ProductNewController());
-
   void showCategorySheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -669,6 +678,7 @@ class ProductPage extends StatelessWidget {
               onPressed: () async {
                 productController.getProducts(
                     type: "all",
+                    name: productController.searchProductController.text,
                     shop:
                         userController.currentUser.value?.primaryShop?.id ?? "",
                     stockMode: productController.stockMode.value,

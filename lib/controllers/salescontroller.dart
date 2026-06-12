@@ -14,11 +14,13 @@ import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/analysis.dart';
 import 'package:pointify/models/cashflow.dart';
+import 'package:pointify/models/mpesa_payment.dart';
 import 'package:pointify/models/order.dart';
 import 'package:pointify/models/payment.dart';
 import 'package:pointify/models/salereturn.dart';
 import 'package:pointify/screens/sales/onholdsales.dart';
 import 'package:pointify/sqlite/helper.dart';
+import 'package:pointify/utils/formatter.dart';
 import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/snackBars.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
@@ -129,7 +131,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       TextEditingController();
   final TextEditingController receiptCoutController =
       TextEditingController(text: '1');
-
+  final RxString mpesaEntryMode = 'stk'.obs; // stk | paid | code
   // ─── reactive state: collections ───────────────────────────────────────
   final RxList<SaleModel> allSales = RxList([]);
   final RxList<SaleModel> allSalesFiltered = RxList([]);
@@ -228,7 +230,297 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   final GlobalKey<State> keyLoader = GlobalKey<State>();
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
 
-  // ─── lifecycle ─────────────────────────────────────────────────────────
+  final RxList<MpesaPayment> recentMpesaPayments = RxList([]);
+  final RxBool loadingMpesaPayments = RxBool(false);
+  final Rxn<MpesaPayment> selectedMpesaPayment = Rxn(null);
+  final RxString mpesaStatus =
+      'idle'.obs; // idle|sending|waiting|success|failed
+  final RxString mpesaError = ''.obs;
+  final RxnString mpesaRef = RxnString();
+  final TextEditingController mpesaPhone = TextEditingController();
+
+  String? _mpesaTxnId;
+  double _mpesaStkAmount = 0;
+  Timer? _mpesaPollTimer; // import 'dart:async'
+  int _mpesaFlowId = 0;
+
+  bool _mpesaSplitMode = false;
+
+  final RxList<MpesaPayment> selectedMpesaPayments = RxList([]);
+
+// Pure M-Pesa: accumulate
+  void addMpesaPayment(MpesaPayment p) {
+    if (!selectedMpesaPayments.any((x) => x.mpesaRef == p.mpesaRef)) {
+      selectedMpesaPayments.add(p);
+      _applyMpesaSelection();
+    }
+    Get.back();
+  }
+
+  void removeMpesaPayment(MpesaPayment p) {
+    selectedMpesaPayments.removeWhere((x) => x.mpesaRef == p.mpesaRef);
+    _applyMpesaSelection();
+  }
+
+  void _applyMpesaSelection() {
+    final sum = selectedMpesaPayments.fold<double>(0, (s, p) => s + p.amount);
+    amountPaid.text = sum.toStringAsFixed(2); // feeds _validate + mpesaTotal
+    mpesaTransId.text = selectedMpesaPayments.map((p) => p.mpesaRef).join(',');
+    receipt.refresh();
+  }
+
+// Split: the M-Pesa portion is a single pick (cashier covers the rest with cash/bank)
+  void selectMpesaForSplit(MpesaPayment p) {
+    mpesaCashPaid.text = p.amount.toStringAsFixed(2);
+    mpesaTransId.text = p.mpesaRef;
+    Get.back();
+  }
+
+  void resetMpesaFlow() {
+    _mpesaFlowId++; // invalidates any in-flight poll/callback
+    _mpesaPollTimer?.cancel();
+    _mpesaPollTimer = null;
+    _mpesaTxnId = null;
+    mpesaStatus.value = 'idle';
+    mpesaError.value = '';
+    mpesaRef.value = null;
+    mpesaEntryMode.value = 'stk';
+  }
+
+  Future<void> sendStkPushSplit() async {
+    if (_shopId == null) return;
+    final phone = normalizeKePhone(mpesaPhone.text);
+    if (phone == null || phone.length < 12) {
+      showSnackBar(message: 'Enter a valid phone number', color: Colors.red);
+      return;
+    }
+    final amount = double.tryParse(mpesaCashPaid.text) ?? 0;
+    if (amount <= 0) {
+      showSnackBar(
+          message: 'Enter the Mpesa amount first', color: Colors.orange);
+      return;
+    }
+    resetMpesaFlow();
+    _mpesaSplitMode = true;
+    final flowId = ++_mpesaFlowId;
+    mpesaStatus.value = 'sending';
+    try {
+      _mpesaStkAmount = amount;
+      final res = await SalesService.stkPush({
+        'shopId': _shopId,
+        'phone': phone,
+        'amount': amount,
+        'saleRef': 'sale-${DateTime.now().millisecondsSinceEpoch}',
+      });
+      if (flowId != _mpesaFlowId) return;
+      final txnId = res is Map ? res['transactionId'] : null;
+      if (txnId == null) {
+        mpesaStatus.value = 'failed';
+        mpesaError.value = 'No transaction id returned';
+        return;
+      }
+      _mpesaTxnId = txnId.toString();
+      mpesaStatus.value = 'waiting';
+      _startMpesaPolling(_mpesaTxnId!, flowId, const Duration(seconds: 90));
+    } catch (e) {
+      if (flowId != _mpesaFlowId) return;
+      mpesaStatus.value = 'failed';
+      mpesaError.value = 'Could not send STK push';
+    }
+  }
+
+  Future<void> sendStkPush() async {
+    if (_shopId == null) return;
+    final phone = normalizeKePhone(mpesaPhone.text);
+    if (phone == null || phone.length < 12) {
+      showSnackBar(message: 'Enter a valid phone number', color: Colors.red);
+      return;
+    }
+    resetMpesaFlow();
+    _mpesaSplitMode = false;
+    final flowId = ++_mpesaFlowId;
+    mpesaStatus.value = 'sending';
+    try {
+      final total = receipt.value?.totalWithDiscount ?? 0;
+      final alreadyPaid =
+          selectedMpesaPayments.fold<double>(0, (s, p) => s + p.amount);
+      final outstanding =
+          double.parse((total - alreadyPaid).toStringAsFixed(2));
+      if (outstanding <= 0) {
+        mpesaStatus.value = 'idle';
+        showSnackBar(
+            message: 'This sale is already fully paid', color: Colors.orange);
+        return;
+      }
+      _mpesaStkAmount = outstanding;
+      final res = await SalesService.stkPush({
+        'shopId': _shopId,
+        'phone': phone,
+        'amount': outstanding,
+        'saleRef': 'sale-${DateTime.now().millisecondsSinceEpoch}',
+      });
+      if (flowId != _mpesaFlowId) return;
+      final txnId = res is Map ? res['transactionId'] : null;
+      if (txnId == null) {
+        mpesaStatus.value = 'failed';
+        mpesaError.value = 'No transaction id returned';
+        return;
+      }
+      _mpesaTxnId = txnId.toString();
+      mpesaStatus.value = 'waiting';
+      _startMpesaPolling(_mpesaTxnId!, flowId, const Duration(seconds: 90));
+    } catch (e) {
+      if (flowId != _mpesaFlowId) return;
+      mpesaStatus.value = 'failed';
+      mpesaError.value = 'Could not send STK push';
+    }
+  }
+
+  void _startMpesaPolling(String txnId, int flowId, Duration timeout) {
+    final deadline = DateTime.now().add(timeout);
+    _mpesaPollTimer?.cancel();
+    _mpesaPollTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (flowId != _mpesaFlowId) {
+        timer.cancel();
+        return;
+      }
+      if (DateTime.now().isAfter(deadline)) {
+        timer.cancel();
+        if (flowId == _mpesaFlowId && mpesaStatus.value == 'waiting') {
+          mpesaStatus.value = 'failed';
+          mpesaError.value = 'Timed out waiting for payment';
+        }
+        return;
+      }
+      try {
+        final data = await SalesService.mpesaStatus(txnId);
+        if (flowId != _mpesaFlowId) {
+          timer.cancel();
+          return;
+        }
+        final status = (data is Map ? data['status'] : '')?.toString() ?? '';
+        if (['paid', 'completed', 'success'].contains(status)) {
+          timer.cancel();
+
+          final newRef =
+              (data['mpesaRef'] ?? data['settlementRef'])?.toString();
+          mpesaRef.value = newRef;
+
+          if (_mpesaSplitMode) {
+            // Split: just record the single ref; amounts are typed manually.
+            mpesaTransId.text = newRef ?? '';
+          } else {
+            // Normal Mpesa: merge pre-selected payments with this STK leg.
+            final priorPaid =
+                selectedMpesaPayments.fold<double>(0, (s, p) => s + p.amount);
+            final selectedRefs =
+                selectedMpesaPayments.map((p) => p.mpesaRef).join(',');
+            mpesaTransId.text = [
+              if (selectedRefs.isNotEmpty) selectedRefs,
+              if (newRef != null && newRef.isNotEmpty) newRef,
+            ].join(',');
+            amountPaid.text = (priorPaid + _mpesaStkAmount).toStringAsFixed(2);
+            receipt.refresh();
+          }
+          mpesaStatus.value = 'success';
+        } else if (['failed', 'cancelled'].contains(status)) {
+          timer.cancel();
+          mpesaStatus.value = 'failed';
+          mpesaError.value =
+              (data['resultDesc'] ?? 'Payment cancelled or failed').toString();
+        }
+        // any other status → keep polling
+      } catch (_) {/* transient — keep polling */}
+    });
+  }
+
+  bool get shopHasMpesa {
+    final id = userController.currentUser.value?.primaryShop?.sunpayMerchantId;
+    return id != null && id.trim().isNotEmpty;
+  }
+
+  Future<void> fetchRecentMpesaPayments() async {
+    if (_shopId == null) return;
+    loadingMpesaPayments.value = true;
+    try {
+      recentMpesaPayments
+          .assignAll(await SalesService.lookupRecentMpesa(shopId: _shopId!));
+    } catch (e) {
+      showSnackBar(
+          message: 'Could not load M-Pesa payments: $e', color: Colors.red);
+    } finally {
+      loadingMpesaPayments.value = false;
+    }
+  }
+
+  void selectMpesaPayment(MpesaPayment p) {
+    selectedMpesaPayment.value = p;
+    mpesaTransId.text = p.mpesaRef; // feeds _buildSalePayload
+    if (paymentType.value == 'Split Payment') {
+      mpesaCashPaid.text =
+          p.amount.toStringAsFixed(2); // split → M-Pesa channel
+    } else {
+      amountPaid.text = p.amount.toStringAsFixed(2); // pure M-Pesa sale
+    }
+    Get.back();
+  }
+
+  Future<void> openMpesaPaymentPicker({void Function(MpesaPayment)? onSelect}) {
+    fetchRecentMpesaPayments(); // loads the recent list
+
+    return Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Recent M-Pesa payments',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 12),
+            Obx(() {
+              if (loadingMpesaPayments.value) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (recentMpesaPayments.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('No unallocated payments found yet.',
+                      textAlign: TextAlign.center),
+                );
+              }
+              return ListView.separated(
+                shrinkWrap: true,
+                itemCount: recentMpesaPayments.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, i) {
+                  final p = recentMpesaPayments[i];
+                  return ListTile(
+                    leading:
+                        const Icon(Icons.phone_android, color: Colors.green),
+                    title: Text(p.payerName.isEmpty ? p.mpesaRef : p.payerName),
+                    subtitle: Text('${p.mpesaRef} • ${p.time}'),
+                    trailing: Text('KES ${p.amount.toStringAsFixed(2)}',
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                    onTap: () =>
+                        (onSelect ?? addMpesaPayment)(p), // <-- the key line
+                  );
+                },
+              );
+            }),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
 
   @override
   void onInit() {
@@ -588,8 +880,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         amountTotalPaid: amountTotalPaid,
       );
 
-      print(sale);
-
       // Validate split payment is fully paid.
       if (sale['paymentTag'] == 'split' &&
           (receiptData.outstandingBalance ?? 0) > 0) {
@@ -648,7 +938,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       getSalesByDate(type: 'today', shop: _shopId!);
       getNetAnalysis(type: 'today', shopId: _shopId!);
 
-      if (response['sale'] != null) {
+      if (response['sale'] != null && status != 'hold') {
         final sale = SaleModel.fromJson(response['sale']);
         _printReceipt(sale);
       }
@@ -760,9 +1050,14 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       salesnote,
       amountPaid,
       selectedCustomerController,
+      mpesaTransId,
+      mpesaPhone,
     ]) {
       c.clear();
     }
+
+    selectedMpesaPayments.clear(); // ← add: empties the running tally
+    resetMpesaFlow(); // ← add: stops polling + resets STK status
 
     extraCharges.clear();
     receipt.refresh();

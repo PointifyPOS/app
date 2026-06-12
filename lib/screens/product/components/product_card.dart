@@ -125,7 +125,8 @@ Widget productCard(
                               size: 11),
                         if (product.productCategoryId != null)
                           const SizedBox(width: 5),
-                        if (product.manufacturer!.isNotEmpty)
+                        if (product.manufacturer != null &&
+                            product.manufacturer!.isNotEmpty)
                           Text(
                             product.manufacturer ?? "",
                             style: const TextStyle(

@@ -22,38 +22,45 @@ class _SalePreviewState extends State<SalePreview> {
   final SalesController salesController = Get.find<SalesController>();
   final CustomerController customersController = Get.find<CustomerController>();
 
+  late final Worker _mpesaSuccessWorker;
+
   @override
   void initState() {
     super.initState();
 
     salesController.paymentType.value = 'Cash';
-
-    // Clear any stale extra charges from a previous sale.
     salesController.extraCharges.clear();
+
+    // Auto-complete the sale the moment an STK payment is confirmed AND fully paid.
+    _mpesaSuccessWorker = ever(salesController.mpesaStatus, (status) {
+      if (status != 'success') return;
+      if (salesController.paymentType.value != 'Mpesa') return;
+
+      final total = salesController.receipt.value?.totalWithDiscount ?? 0;
+      final paid = double.tryParse(salesController.amountPaid.text) ?? 0;
+      if (paid + 0.0001 < total)
+        return; // not fully covered → leave it to the cashier
+
+      salesController.saveSale(
+        screen: widget.page ?? 'admin',
+        status: 'cashed',
+      );
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(
         const Duration(milliseconds: 250),
-        () {
-          _showPaymentMethodsSheet();
-          // final method = salesController.paymentType.value ?? 'Cash';
-
-          // if (method == 'Split Payment') {
-          //   _confirmSplitPayment(
-          //     'cashed',
-          //     paymentType: method,
-          //   );
-          // } else {
-          //   _showSinglePaymentSheet(method);
-          // }
-        },
+        () => _showPaymentMethodsSheet(),
       );
     });
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // BUILD
-  // ─────────────────────────────────────────────────────────────────────────
+  @override
+  void dispose() {
+    _mpesaSuccessWorker.dispose(); // ← clean up the worker
+    salesController.resetMpesaFlow();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -306,15 +313,14 @@ class _SalePreviewState extends State<SalePreview> {
           ],
           _buildInlineExtraCharges(),
           const SizedBox(height: 12),
-          _buildAmountPaidField(
-            method: method,
-            openSheetOnTap: openSheetOnTap,
-            focusNode: amountFocus,
-          ),
-          if (isMpesa) ...[
-            const SizedBox(height: 10),
-            _buildMpesaTransIdField(),
-          ],
+          if (isMpesa)
+            _buildMpesaSection()
+          else
+            _buildAmountPaidField(
+              method: method,
+              openSheetOnTap: openSheetOnTap,
+              focusNode: amountFocus,
+            ),
           const SizedBox(height: 14),
           _buildPaymentSummary(method: method),
         ],
@@ -629,17 +635,351 @@ class _SalePreviewState extends State<SalePreview> {
     }
   }
 
-  // ─── mpesa transaction id (optional) ───────────────────────────────────
+  Widget _buildSplitMpesaStk(StateSetter setState) {
+    return Obx(() {
+      if (!salesController.shopHasMpesa) return const SizedBox.shrink();
+      final status = salesController.mpesaStatus.value;
+      final busy = status == 'sending' || status == 'waiting';
+      final done = status == 'success';
+      return Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              controller: salesController.mpesaPhone,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: 'Customer phone (for STK)',
+                hintText: '07XX XXX XXX',
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (done)
+              Row(children: [
+                const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                      'Mpesa paid · ${salesController.mpesaTransId.text}',
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ])
+            else
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: ElevatedButton.icon(
+                  onPressed: busy
+                      ? null
+                      : () async {
+                          await salesController.sendStkPushSplit();
+                          setState(() {});
+                        },
+                  icon: busy
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.send_rounded, size: 18),
+                  label: Text(
+                      busy ? 'Waiting for PIN…' : 'Send STK for Mpesa amount'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.mainColor,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor:
+                        AppColors.mainColor.withOpacity(.5),
+                    disabledForegroundColor: Colors.white70,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            if (status == 'failed' &&
+                salesController.mpesaError.value.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(salesController.mpesaError.value,
+                    style: const TextStyle(color: Colors.red, fontSize: 12)),
+              ),
+          ],
+        ),
+      );
+    });
+  }
 
-  Widget _buildMpesaTransIdField() {
+  Widget _buildMpesaManualCode() {
     return TextFormField(
       controller: salesController.mpesaTransId,
       decoration: InputDecoration(
-        labelText: 'Mpesa Transaction ID (optional)',
+        labelText: 'Mpesa Transaction Code',
         hintText: 'e.g. QFG3X9KLM2',
         prefixIcon: const Icon(Icons.confirmation_number_outlined),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
       ),
+    );
+  }
+
+  // ── M-PESA (clean, single section with a mode switcher) ──────────────────
+  Widget _buildMpesaSection() {
+    return Obx(() {
+      if (!salesController.shopHasMpesa) {
+        return _buildMpesaManualCode();
+      }
+      final mode = salesController.mpesaEntryMode.value;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // switcher
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: const Color(0xfff1f1f6),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(children: [
+              _modeTab('stk', 'STK Push', Icons.send_rounded, mode),
+              _modeTab(
+                  'paid', 'Already Paid', Icons.receipt_long_outlined, mode),
+              _modeTab('code', 'Enter Code', Icons.dialpad_rounded, mode),
+            ]),
+          ),
+          const SizedBox(height: 14),
+          if (mode == 'stk')
+            _mpesaStkBody()
+          else if (mode == 'paid')
+            _mpesaPaidBody()
+          else
+            _mpesaCodeBody(),
+        ],
+      );
+    });
+  }
+
+  Widget _modeTab(String key, String label, IconData icon, String current) {
+    final selected = current == key;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => salesController.mpesaEntryMode.value = key,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(11),
+            boxShadow: selected
+                ? [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(.06),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2))
+                  ]
+                : null,
+          ),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon,
+                size: 18,
+                color: selected ? AppColors.mainColor : Colors.grey.shade500),
+            const SizedBox(height: 3),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color:
+                        selected ? AppColors.mainColor : Colors.grey.shade600)),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _mpesaInput(String label, String hint, IconData icon) =>
+      InputDecoration(
+        labelText: label,
+        hintText: hint,
+        prefixIcon: Icon(icon, size: 20),
+        isDense: true,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+      );
+
+// ── mode bodies ──────────────────────────────────────────────────────────
+  Widget _mpesaStkBody() {
+    return Obx(() {
+      final status = salesController.mpesaStatus.value;
+      if (status == 'success') return _mpesaSuccessTile();
+      final busy = status == 'sending' || status == 'waiting';
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        TextFormField(
+          controller: salesController.mpesaPhone,
+          enabled: !busy,
+          keyboardType: TextInputType.phone,
+          decoration: _mpesaInput(
+              'Customer phone', '07XX XXX XXX', Icons.phone_android),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 48,
+          child: ElevatedButton.icon(
+            onPressed: busy ? null : salesController.sendStkPush,
+            icon: busy
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white))
+                : const Icon(Icons.send_rounded, size: 18),
+            label: Text(status == 'waiting'
+                ? 'Waiting for PIN…'
+                : status == 'sending'
+                    ? 'Sending…'
+                    : 'Send STK Push'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.mainColor,
+              foregroundColor: Colors.white, // ← icon + text white
+              disabledBackgroundColor: AppColors.mainColor.withOpacity(.5),
+              disabledForegroundColor: Colors.white70, // ← legible while busy
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+        ),
+        if (busy)
+          Center(
+              child: TextButton(
+                  onPressed: salesController.resetMpesaFlow,
+                  child: const Text('Cancel'))),
+        if (salesController.mpesaError.value.isNotEmpty)
+          Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(salesController.mpesaError.value,
+                  style: const TextStyle(color: Colors.red, fontSize: 12))),
+      ]);
+    });
+  }
+
+  Widget _mpesaPaidBody() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      OutlinedButton.icon(
+        onPressed: salesController.openMpesaPaymentPicker,
+        icon: const Icon(Icons.add, size: 18),
+        label: const Text('Add M-Pesa payment'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.mainColor,
+          side: BorderSide(color: AppColors.mainColor),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+      ),
+      Obx(() {
+        final picks = salesController.selectedMpesaPayments;
+        if (picks.isEmpty) {
+          return const Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Text('No payments added yet.',
+                  style: TextStyle(color: Colors.grey, fontSize: 12)));
+        }
+        return Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Column(
+              children: picks
+                  .map((p) => Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xfff5faf6),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.green.shade100),
+                        ),
+                        child: Row(children: [
+                          const Icon(Icons.check_circle,
+                              color: Colors.green, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                Text(
+                                    p.payerName.isEmpty
+                                        ? p.mpesaRef
+                                        : p.payerName,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13)),
+                                Text(p.mpesaRef,
+                                    style: TextStyle(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 11)),
+                              ])),
+                          Text('KES ${p.amount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 13)),
+                          const SizedBox(width: 6),
+                          InkWell(
+                              onTap: () =>
+                                  salesController.removeMpesaPayment(p),
+                              child: Icon(Icons.close,
+                                  size: 16, color: Colors.red.shade300)),
+                        ]),
+                      ))
+                  .toList()),
+        );
+      }),
+    ]);
+  }
+
+  Widget _mpesaCodeBody() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      TextFormField(
+        controller: salesController.amountPaid,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        onChanged: (_) {
+          salesController.getTotalCredit();
+          salesController.receipt.refresh();
+        },
+        decoration:
+            _mpesaInput('Amount', 'Enter amount', Icons.payments_outlined),
+      ),
+      const SizedBox(height: 10),
+      TextFormField(
+        controller: salesController.mpesaTransId,
+        textCapitalization: TextCapitalization.characters,
+        decoration: _mpesaInput('M-Pesa code', 'e.g. UEV8O6C7MO',
+            Icons.confirmation_number_outlined),
+      ),
+    ]);
+  }
+
+  Widget _mpesaSuccessTile() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xfff0faf2),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.green.shade200),
+      ),
+      child: Row(children: [
+        const Icon(Icons.check_circle, color: Colors.green, size: 22),
+        const SizedBox(width: 10),
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('Payment received',
+              style: TextStyle(fontWeight: FontWeight.w700)),
+          Text(salesController.mpesaRef.value ?? '',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+        ])),
+        TextButton(
+            onPressed: salesController.resetMpesaFlow,
+            child: const Text('Redo')),
+      ]),
     );
   }
 
@@ -822,6 +1162,17 @@ class _SalePreviewState extends State<SalePreview> {
         );
 
       case 'Mpesa':
+        if (paid <= 0) {
+          return _PaymentValidation(
+              canComplete: false, buttonLabel: 'Add M-Pesa Payment');
+        }
+        if (paid < total) {
+          return _PaymentValidation(
+              canComplete: false,
+              buttonLabel: 'Add ${htmlPrice(total - paid)} more');
+        }
+        return _PaymentValidation(
+            canComplete: true, buttonLabel: 'Complete Sale');
       case 'Bank':
         if (paid <= 0) {
           return _PaymentValidation(
@@ -1177,6 +1528,24 @@ class _SalePreviewState extends State<SalePreview> {
                 controller: salesController.mpesaCashPaid,
                 label: 'Mpesa Amount',
                 setState: setState,
+              ),
+              _buildSplitMpesaStk(setState),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () async {
+                    await salesController.openMpesaPaymentPicker(
+                      onSelect: salesController.selectMpesaForSplit,
+                    );
+                    salesController
+                        .calculateSplitTotals(); // recompute totals + amountPaid
+                    setState(() {}); // refresh the sheet's fields
+                  },
+                  icon: const Icon(Icons.search, size: 18),
+                  label: const Text('Select M-Pesa payment'),
+                  style: TextButton.styleFrom(
+                      foregroundColor: AppColors.mainColor),
+                ),
               ),
               const SizedBox(height: 12),
               _buildSplitField(

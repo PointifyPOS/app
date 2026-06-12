@@ -144,9 +144,6 @@ class AuthController {
         Get.off(() => HomePage());
       } else {
         final DateTime now = DateTime.now();
-        int days = DateTime.parse(
-          userController.currentUser.value!.emailVerificationDate!,
-        ).difference(DateTime(now.year, now.month, now.day)).inDays;
         if (userController.currentUser.value?.primaryShop != null) {
           if (type == "auth") {
             Get.offAll(() => const Home());

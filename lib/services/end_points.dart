@@ -57,6 +57,10 @@ class EndPoints {
   static const products_v2_list = "${products_v2}list";
   static const producttransferimport = "${products_v2}import/transfer";
   static var productstats = "${products_v2}stats";
+  static const String mpesaLookup = "${apiEndPointv_2}mpesa/lookup";
+  static const String mpesaStkPush = "${apiEndPointv_2}mpesa/stk-push";
+  static const String mpesaExpect = "${apiEndPointv_2}mpesa/expect";
+  static const String mpesaStatus = "${apiEndPointv_2}mpesa/status";
 
   //measures
   static const measures = "${apiEndPoint}measures/";

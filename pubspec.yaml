@@ -1,7 +1,7 @@
 name: pointify
 description: "Pointify Pos."
 publish_to: 'none'
-version: 2.0.182+202
+version: 2.0.185+205
 
 environment:
   sdk: '>=3.5.0 <4.0.0'

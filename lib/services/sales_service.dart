@@ -1,5 +1,6 @@
 import 'package:pointify/main.dart';
 import 'package:pointify/models/customer.dart';
+import 'package:pointify/models/mpesa_payment.dart';
 import 'package:pointify/models/product.dart';
 import 'package:pointify/models/salemodel.dart';
 
@@ -212,4 +213,38 @@ class SalesService {
         DbBase().getRequestType);
     return response;
   }
+
+  static Future<Iterable<MpesaPayment>> lookupRecentMpesa(
+      {required String shopId}) async {
+    String url = "${EndPoints.mpesaLookup}?shopId=$shopId&recent=1";
+    var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
+
+    // DbBase returns decoded JSON. Upstream may send a bare array, a single
+    // object, or a wrapper ({payments|results|data:[...]}). Normalize all of them.
+    final dynamic raw = response is Map
+        ? (response['payments'] ??
+            response['results'] ??
+            response['data'] ??
+            (response['error'] != null ? const [] : [response]))
+        : response;
+
+    final List list = raw is List ? raw : (raw == null ? const [] : [raw]);
+
+    return list
+        .whereType<Map>()
+        .map((e) => MpesaPayment.fromJson(Map<String, dynamic>.from(e)))
+        .where((p) => !p.allocated && p.mpesaRef.isNotEmpty)
+        .toList();
+  }
+
+  static Future stkPush(Map<String, dynamic> body) =>
+      DbBase().databaseRequest(EndPoints.mpesaStkPush, DbBase().postRequestType,
+          body: body);
+
+  static Future expectMpesa(Map<String, dynamic> body) =>
+      DbBase().databaseRequest(EndPoints.mpesaExpect, DbBase().postRequestType,
+          body: body);
+
+  static Future mpesaStatus(String txnId) => DbBase().databaseRequest(
+      "${EndPoints.mpesaStatus}/$txnId", DbBase().getRequestType);
 }

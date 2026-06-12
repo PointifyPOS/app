@@ -486,7 +486,7 @@ class ProductNewController extends GetxController {
 
       generalAlert(
         title: "Error",
-        message: e.toString(),
+        message: "Error fetching products, try again after few minutes",
       );
     }
   }
