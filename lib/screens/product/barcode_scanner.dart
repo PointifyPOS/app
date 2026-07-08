@@ -33,7 +33,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
 
+    Future.delayed(const Duration(milliseconds: 300), () async {
+      await controller.pauseCamera();
+      await controller.resumeCamera();
+    });
+
     controller.scannedDataStream.listen((scanData) async {
+      print("scanData: $scanData");
       if (scanned) return;
 
       final code = scanData.code;
@@ -47,6 +53,10 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         print("scanned: $code");
         if (widget.popAfterScan) {
           Get.back(result: code);
+        } else {
+          // Multi-scan mode: brief pause then allow next scan
+          await Future.delayed(const Duration(milliseconds: 1500));
+          if (mounted) setState(() => scanned = false);
         }
       }
     });

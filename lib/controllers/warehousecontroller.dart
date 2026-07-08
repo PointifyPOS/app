@@ -7,7 +7,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/models/wahoureinvoice.dart';
+import 'package:pointify/sqlite/helper.dart';
+import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/alert.dart';
+import 'package:pointify/widgets/snackbars.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../main.dart';
@@ -79,7 +82,7 @@ class WareHouseController extends GetxController {
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
@@ -143,7 +146,7 @@ class WareHouseController extends GetxController {
                 },
                 child: Text(
                   "Update".toUpperCase(),
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
@@ -153,8 +156,6 @@ class WareHouseController extends GetxController {
           );
         });
   }
-
-  //crumbs
 
   Future<void> productStockinRequest({required Shop shop}) async {
     List<Map<String, dynamic>> items = [];
@@ -193,6 +194,21 @@ class WareHouseController extends GetxController {
 
     LoadingDialog.showLoadingDialog(
         context: Get.context!, title: "Please wait", key: _keyLoader);
+
+    if (!await isConnected()) {
+      Get.back();
+      await DatabaseHelper().insertWarehouseRequestOffline({
+        "fromShopId": userController.currentUser.value!.primaryShop!.id,
+        "toShopId": shop.id,
+        "products": productdata["inventory"],
+      });
+      productsCountCart.clear();
+      showSnackBar(
+          message: "Request saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
+
     var response = await ProductService.productStockinRequest(productdata);
     print(response);
     Get.back();
@@ -215,6 +231,16 @@ class WareHouseController extends GetxController {
     try {
       isLoadingCount.value = true;
       warehouseInvoices.clear();
+
+      if (!await isConnected()) {
+        isLoadingCount.value = false;
+        showSnackBar(
+            message: "Requests require an internet connection",
+            color: Colors.orange);
+        refresh();
+        return;
+      }
+
       List<dynamic> response = await ProductService().getRequests(
           warehouse: warehouse,
           from: from,
@@ -238,6 +264,14 @@ class WareHouseController extends GetxController {
   Future<void> updateStatus(
       WareHouseInvoice wareHouseInvoice, String status) async {
     Get.back();
+
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Updating requests requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     await ProductService()
         .updateStatusWareHouseInvoice(wareHouseInvoice, status);
     getRequests(
@@ -252,6 +286,13 @@ class WareHouseController extends GetxController {
   }
 
   Future<void> delete(WareHouseInvoice wareHouseInvoice) async {
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Deleting requests requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     warehouseInvoices.remove(wareHouseInvoice);
     refresh();
     Get.back();
@@ -259,6 +300,13 @@ class WareHouseController extends GetxController {
   }
 
   Future<void> updateInvoice(Map<String, dynamic> data, String type) async {
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Updating requests requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     if (type == "receive") {
       var i = currentwarehouseItem.value?.items?.indexWhere(
           (element) => element.product?["_id"] == data["productId"]);
@@ -273,6 +321,13 @@ class WareHouseController extends GetxController {
   }
 
   Future<void> deleteSingleItem({required item}) async {
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "This action requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     await ProductService().deleteSigleItem({
       "item": item,
     }, requestId: currentwarehouseItem.value!.id);
@@ -280,6 +335,13 @@ class WareHouseController extends GetxController {
 
   Future<void> acceptOrder(
       WareHouseInvoice wareHouseInvoice, String from) async {
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Accepting orders requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     LoadingDialog.showLoadingDialog(
         context: Get.context!, title: "Please wait", key: _keyLoader);
 
@@ -317,6 +379,13 @@ class WareHouseController extends GetxController {
   }
 
   Future<void> approve(WareHouseInvoice wareHouseInvoice) async {
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Approving requests requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     LoadingDialog.showLoadingDialog(
         context: Get.context!, title: "Please wait", key: _keyLoader);
 

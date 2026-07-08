@@ -6,7 +6,9 @@ import 'package:pointify/main.dart';
 import 'package:pointify/models/cashflow.dart';
 import 'package:pointify/models/cashflowcategory.dart';
 import 'package:pointify/models/cashflowtransaction.dart';
+import 'package:pointify/sqlite/helper.dart';
 import 'package:pointify/utils/colors.dart';
+import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/alert.dart';
 
 import '../functions/functions.dart';
@@ -23,7 +25,7 @@ class CashFlowController extends GetxController {
   RxList<BankModel> cashAtBanks = RxList([]);
   RxList<BankModel> bankslist = RxList([]);
   RxBool filteringCashflow = RxBool(false);
-  RxString title =RxString("") ;
+  RxString title = RxString("");
   Rxn<Map<String, dynamic>> cashflowmanager = Rxn({
     "totalSales": 0,
     "cashintotal": 0,
@@ -66,41 +68,65 @@ class CashFlowController extends GetxController {
 
   createCashFlow(CashFlowCategory cashFlowCategory, {String? expenseId}) async {
     if (textEditingControllerAmount.text.isEmpty) {
-      showSnackBar(message: "enter amount", color: Colors.red);
+      showSnackBar(message: 'enter amount', color: Colors.red);
       return;
     }
-    if (cashFlowCategory.name?.toLowerCase() == "bank") {
+    if (cashFlowCategory.name?.toLowerCase() == 'bank') {
       if (selectedBank.value == null) {
-        showSnackBar(message: "select bank", color: Colors.red);
+        showSnackBar(message: 'select bank', color: Colors.red);
         return;
       }
       textEditingControllerName.text = selectedBank.value!.name!;
     } else {
       if (textEditingControllerName.text.isEmpty) {
-        showSnackBar(message: "enter name", color: Colors.red);
+        showSnackBar(message: 'enter name', color: Colors.red);
         return;
       }
     }
+
     isCreatingCashFlow.value = true;
-    var data = {
-      "name": Get.find<CashFlowController>().textEditingControllerName.text,
-      "amount": int.parse(textEditingControllerAmount.text),
-      "category": cashFlowCategory.id,
-      "bank": Get.find<CashFlowController>().selectedBank.value?.id!,
-      "attendantId": userController.currentUser.value!.attendantId,
-      "shopId": userController.currentUser.value!.primaryShop?.id
+
+    final data = {
+      'name': Get.find<CashFlowController>().textEditingControllerName.text,
+      'amount': int.parse(textEditingControllerAmount.text),
+      'category': cashFlowCategory.id,
+      'bank': Get.find<CashFlowController>().selectedBank.value?.id,
+      'attendantId': userController.currentUser.value!.attendantId?.sId,
+      'shopId': userController.currentUser.value!.primaryShop?.id,
     };
-    var response ={};
+
+    final connected = await isConnected();
+
+    if (!connected) {
+      // ── offline: queue in SQLite ──
+      await DatabaseHelper().insertCashflowOffline(data);
+      isCreatingCashFlow.value = false;
+      Get.back();
+      Get.find<CashFlowController>().textEditingControllerName.clear();
+      textEditingControllerAmount.clear();
+      Get.find<CashFlowController>().selectedcashFlowCategoty.value = null;
+      Get.find<CashFlowController>().selectedBank.value = null;
+      showSnackBar(
+          message: 'Cash flow saved offline — will sync when connected',
+          color: Colors.orange);
+      await getCashFlow();
+      return;
+    }
+
+    var response = <String, dynamic>{};
     if (expenseId != null && expenseId.isNotEmpty) {
-      data["expenseId"] = expenseId;
+      data['expenseId'] = expenseId;
       response = await CashFlowServices.updateCashFlow(expenseId, data);
     } else {
       response = await CashFlowServices.createCashFlow(data);
     }
-    if (response["error"] != null) {
-      showSnackBar(message: response["error"], color: Colors.red);
+
+    if (response['error'] != null) {
+      showSnackBar(message: response['error'], color: Colors.red);
+      isCreatingCashFlow.value = false;
       return;
     }
+
     Get.back();
     Get.find<CashFlowController>().textEditingControllerName.clear();
     textEditingControllerAmount.clear();
@@ -111,16 +137,41 @@ class CashFlowController extends GetxController {
   }
 
   getCashFlow(
-      {String? shop = "", String? fromDate = "", String? toDate = ""}) async {
+      {String? shop = '', String? fromDate = '', String? toDate = ''}) async {
     if (fromDate!.isEmpty) {
-      fromDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-      toDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      fromDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      toDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     }
-    List response = await getCashFlow(
-        shop: userController.currentUser.value?.primaryShop!.id,
-        fromDate: fromDate,
-        toDate: toDate);
+
+    final connected = await isConnected();
+
+    if (!connected) {
+      // ── offline: load from SQLite ──
+      final rows = await DatabaseHelper().getCashflows(
+          shopId: userController.currentUser.value?.primaryShop?.id);
+      cashflows.value = rows
+          .map((e) => CashFlowModel.fromJson({
+                '_id': e['id'],
+                'name': e['name'],
+                'amount': e['amount'],
+                'category': {'_id': e['categoryId']},
+                'attendantId': e['attendantId'],
+                'shopId': e['shopId'],
+                'createAt': e['createAt'],
+              }))
+          .toList();
+      return cashflows;
+    }
+
+    // ── online ──
+    final List response = await CashFlowServices.getCashFlowCategoryList(
+        userController.currentUser.value?.primaryShop!.id, '');
     cashflows.value = response.map((e) => CashFlowModel.fromJson(e)).toList();
+
+    // Cache for offline display
+    for (final cf in response) {
+      await DatabaseHelper().insertCashflow(cf);
+    }
     return response;
   }
 
@@ -227,7 +278,7 @@ class CashFlowController extends GetxController {
         }),
         DataCell(Text(
           list[i]['in'].toString(),
-          style:  TextStyle(
+          style: TextStyle(
               color: AppColors.mainColor, fontWeight: FontWeight.bold),
         )),
         DataCell(Text(list[i]['out'].toString())),
@@ -238,10 +289,23 @@ class CashFlowController extends GetxController {
   }
 
   createCashFlowCategory(String type) async {
+    final shopId = userController.currentUser.value?.primaryShop?.id;
+
+    if (!await isConnected()) {
+      await DatabaseHelper().insertCashflowCategoryOffline(
+          type, textEditingControllerCategory.text, shopId!);
+      textEditingControllerCategoryName.clear();
+      textEditingControllerCategory.clear();
+      showSnackBar(
+          message: "Category saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
+
     var data = {
       "type": type,
       "name": textEditingControllerCategory.text,
-      "shopId": userController.currentUser.value?.primaryShop?.id
+      "shopId": shopId
     };
     var respose = await CashFlowServices.createCashFlowCategory(data);
     if (respose["error"] != null) {
@@ -258,6 +322,10 @@ class CashFlowController extends GetxController {
     cashFlowCategotyLists.clear();
     List<dynamic> response = await CashFlowServices.getCashFlowCategoryList(
         userController.currentUser.value?.primaryShop?.id, type);
+
+    for (final cat in response) {
+      await DatabaseHelper().insertCashflowCategory(cat);
+    }
     cashFlowCategotyLists
         .addAll(response.map((e) => CashFlowCategory.fromJson(e)).toList());
 
@@ -304,8 +372,20 @@ class CashFlowController extends GetxController {
 
   createBankNames() async {
     try {
+      final shopId = userController.currentUser.value?.primaryShop!.id;
+
+      if (!await isConnected()) {
+        await DatabaseHelper()
+            .insertBankOffline(textEditingControllerBankName.text, shopId!);
+        textEditingControllerBankName.clear();
+        showSnackBar(
+            message: "Bank saved offline — will sync when connected",
+            color: Colors.orange);
+        return;
+      }
+
       var bankdata = {
-        "shop": userController.currentUser.value?.primaryShop!.id,
+        "shop": shopId,
         "name": textEditingControllerBankName.text,
       };
       var response = await CashFlowServices().createBank(bankdata);
@@ -355,7 +435,21 @@ class CashFlowController extends GetxController {
   }
 
   Future<void> deleteBank(String s) async {
-  await CashFlowServices.deleteBank(s);
+    if (!await isConnected()) {
+      if (!hasSyncedServerId(s)) {
+        showSnackBar(
+            message:
+                "This bank hasn't synced yet — connect to the internet before deleting it",
+            color: Colors.orange);
+        return;
+      }
+      await DatabaseHelper().insertBankDeleteOffline(s);
+      showSnackBar(
+          message: "Delete saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
+    await CashFlowServices.deleteBank(s);
     getBanks();
   }
 
@@ -369,8 +463,25 @@ class CashFlowController extends GetxController {
 
   Future<void> updatebank(BankModel bankModel) async {
     if (textEditingControllerBankName.text.isNotEmpty) {
+      if (!await isConnected()) {
+        if (!hasSyncedServerId(bankModel.id)) {
+          showSnackBar(
+              message:
+                  "This bank hasn't synced yet — connect to the internet before editing it",
+              color: Colors.orange);
+          return;
+        }
+        await DatabaseHelper().insertBankUpdateOffline(
+            bankModel.id!, textEditingControllerBankName.text);
+        bankModel.name = textEditingControllerBankName.text;
+        textEditingControllerBankName.clear();
+        showSnackBar(
+            message: "Update saved offline — will sync when connected",
+            color: Colors.orange);
+        return;
+      }
       bankModel.name = textEditingControllerBankName.text;
-     await CashFlowServices.updateBank(
+      await CashFlowServices.updateBank(
           bankModel, {"name": textEditingControllerBankName.text});
       textEditingControllerBankName.clear();
       getBanks();
@@ -378,6 +489,30 @@ class CashFlowController extends GetxController {
   }
 
   Future<void> updateCategory(String id) async {
+    if (!await isConnected()) {
+      if (!hasSyncedServerId(id)) {
+        showSnackBar(
+            message:
+                "This category hasn't synced yet — connect to the internet before editing it",
+            color: Colors.orange);
+        return;
+      }
+      await DatabaseHelper().insertCashflowCategoryUpdateOffline(
+          id, textEditingControllerCategory.text);
+      final index =
+          cashFlowCategotyWithTotals.indexWhere((element) => element.id == id);
+      if (index != -1) {
+        cashFlowCategotyWithTotals[index].name =
+            textEditingControllerCategory.text;
+      }
+      cashFlowCategotyWithTotals.refresh();
+      textEditingControllerCategory.clear();
+      showSnackBar(
+          message: "Update saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
+
     var response = await CashFlowServices.updateCategory(
         id, {"name": textEditingControllerCategory.text});
     cashFlowCategotyWithTotals[cashFlowCategotyWithTotals
@@ -388,6 +523,22 @@ class CashFlowController extends GetxController {
   }
 
   Future<void> deleteCashflowCategory(CashFlowCategory cashFlowCategory) async {
+    if (!await isConnected()) {
+      if (!hasSyncedServerId(cashFlowCategory.id)) {
+        showSnackBar(
+            message:
+                "This category hasn't synced yet — connect to the internet before deleting it",
+            color: Colors.orange);
+        return;
+      }
+      await DatabaseHelper()
+          .insertCashflowCategoryDeleteOffline(cashFlowCategory.id!);
+      showSnackBar(
+          message: "Delete saved offline — will sync when connected",
+          color: Colors.orange);
+      getCashFlowCategoryWithTotals(cashFlowCategory.type!);
+      return;
+    }
     await CashFlowServices.deleteCashflowCategory(cashFlowCategory.id!);
     getCashFlowCategoryWithTotals(cashFlowCategory.type!);
   }

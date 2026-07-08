@@ -121,7 +121,13 @@ class UserController {
   getAttendants() async {
     if (attendantsloading.isTrue) return;
     attendantsloading.value = true;
-    List<dynamic> response = await User.getAttendants();
+    final raw = await User.getAttendants();
+    // Guard: returns null when offline or server unreachable
+    if (raw == null || raw is! List) {
+      attendantsloading.value = false;
+      return;
+    }
+    List<dynamic> response = raw;
     attendants.value = response.map((e) => UserModel.fromJson(e)).toList();
     attendantsloading.value = false;
   }

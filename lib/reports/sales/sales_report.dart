@@ -4,27 +4,23 @@ import 'package:intl/intl.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:printing/printing.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../controllers/salescontroller.dart';
 import '../../../controllers/shopcontroller.dart';
 import '../../controllers/reports_controller.dart';
 import '../../models/salemodel.dart';
-import '../../screens/receipts/pdf/sales/sales_report.dart';
-import '../../screens/receipts/pdf/sales/sales_report_pdf.dart';
 import '../../screens/sales/components/sales_card.dart';
 import '../../utils/colors.dart';
 import '../../widgets/filter_dates.dart';
 import '../../widgets/no_items_found.dart';
-import '../../widgets/textbutton.dart';
 
 class SalesReport extends StatefulWidget {
   final String? title;
   final String? keyFrom;
   SalesReport({super.key, this.title, this.keyFrom}) {
     SalesController salesController = Get.find<SalesController>();
+    ReportsController reportsController = Get.find<ReportsController>();
     if (keyFrom == "dues") {
       salesController.getSalesByDate(
         dueDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
@@ -32,6 +28,7 @@ class SalesReport extends StatefulWidget {
         toDate: DateFormat('yyyy-MM-dd').format(DateTime.now()),
         paymentType: "credit",
         shop: userController.currentUser.value!.primaryShop!.id!,
+        attendantId: reportsController.selectedAttedant.value.id ?? "",
       );
     }
   }
@@ -528,6 +525,7 @@ class _SalesReportState extends State<SalesReport> {
                     dueDate: reportsController.filterStartDate.value,
                     fromDate: reportsController.filterStartDate.value,
                     toDate: reportsController.filterEndDate.value,
+                    attendantId: reportsController.selectedAttedant.value.id!,
                     paymentType: "credit",
                     shop: userController.currentUser.value!.primaryShop!.id!);
               } else {
@@ -535,6 +533,7 @@ class _SalesReportState extends State<SalesReport> {
                   salesController.getSalesByDate(
                       fromDate: reportsController.filterStartDate.value,
                       toDate: reportsController.filterEndDate.value,
+                      attendantId: reportsController.selectedAttedant.value.id!,
                       shop: userController.currentUser.value!.primaryShop!.id!,
                       status: "hold");
                 } else {
@@ -542,6 +541,8 @@ class _SalesReportState extends State<SalesReport> {
                     salesController.getSalesByDate(
                         fromDate: reportsController.filterStartDate.value,
                         toDate: reportsController.filterEndDate.value,
+                        attendantId:
+                            reportsController.selectedAttedant.value.id!,
                         shop:
                             userController.currentUser.value!.primaryShop!.id!,
                         paymentTag:
@@ -551,6 +552,8 @@ class _SalesReportState extends State<SalesReport> {
                     salesController.getSalesByDate(
                         fromDate: reportsController.filterStartDate.value,
                         toDate: reportsController.filterEndDate.value,
+                        attendantId:
+                            reportsController.selectedAttedant.value.id!,
                         paymentType: widget.keyFrom.toString().trim(),
                         paymentTag:
                             reportsController.cashsalesfilterSelected.value,
@@ -568,6 +571,7 @@ class _SalesReportState extends State<SalesReport> {
               reportsController.getSalesReport(
                 startDate: reportsController.filterStartDate.value,
                 toDate: reportsController.filterEndDate.value,
+                attendant: reportsController.selectedAttedant.value.id!,
                 shopid: userController.currentUser.value!.primaryShop!.id!,
               );
             }),

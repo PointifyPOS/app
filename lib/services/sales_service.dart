@@ -3,6 +3,7 @@ import 'package:pointify/models/customer.dart';
 import 'package:pointify/models/mpesa_payment.dart';
 import 'package:pointify/models/product.dart';
 import 'package:pointify/models/salemodel.dart';
+import 'package:pointify/models/usermodel.dart';
 
 import 'client.dart';
 import 'end_points.dart';
@@ -42,13 +43,14 @@ class SalesService {
       String? status = "cashed",
       bool? production = false,
       String? customerId = "",
+      String? attedandId = "",
       int page = 1,
       int limit = 50}) async {
     if (userController.currentUser.value?.usertype == "attendant") {
       attendantId = userController.currentUser.value?.attendantId?.sId;
     }
     String url =
-        "${EndPoints.salesfilter}?order=$order&paymentTag=$paymentTag&receiptNo=$receiptNo&start=$fromDate&saleType=$saleType&duedate=$dueDate&end=$toDate&shopId=$shopId&attendantId=$attendantId&paymentType=$paymentType&customerId=$customerId&status=$status&page=$page&limit=$limit&production=$production";
+        "${EndPoints.salesfilter}?order=$order&paymentTag=$paymentTag&receiptNo=$receiptNo&start=$fromDate&saleType=$saleType&duedate=$dueDate&end=$toDate&shopId=$shopId&attendantId=$attendantId&paymentType=$paymentType&customerId=$customerId&status=$status&page=$page&limit=$limit&production=$production&attedandId=$attedandId";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }
@@ -110,7 +112,7 @@ class SalesService {
       {SaleModel? salesModel,
       Customer? customerModel,
       Product? product,
-      Attendant? attedandId,
+      UserModel? attedandId,
       String? type,
       String? shopid,
       String? fromDate,
@@ -123,7 +125,7 @@ class SalesService {
       url += "&customerId=${customerModel.sId}";
     }
     if (attedandId != null) {
-      url += "&attendantId=${attedandId.sId}";
+      url += "&attendantId=${attedandId.id}";
     }
     if (userController.currentUser.value?.usertype == "attendant") {
       url +=

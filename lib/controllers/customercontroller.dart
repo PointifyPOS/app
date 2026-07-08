@@ -11,11 +11,8 @@ import '../functions/functions.dart';
 import '../models/customer.dart';
 import '../models/payment.dart';
 import '../models/salemodel.dart';
-import '../responsive/responsiveness.dart';
-import '../screens/customers/customers_page.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
-import 'homecontroller.dart';
 
 class CustomerController extends GetxController
     with SingleGetTickerProviderMixin {
@@ -77,6 +74,30 @@ class CustomerController extends GetxController
           context: Get.context!,
           title: "Creating customer...",
           key: _keyLoader);
+
+      final customerData = {
+        "name": nameController.text,
+        "address": addressController.text,
+        "email": emailController.text,
+        "phoneNumber": phoneController.text,
+        "wallet": 0,
+        "attendantId": userController.currentUser.value?.attendantId?.sId,
+        "shopId": userController.currentUser.value!.primaryShop!.id,
+      };
+
+      if (!await isConnected()) {
+        await DatabaseHelper().insertCustomerOffline(customerData);
+        Get.back();
+        clearTexts();
+        Get.back();
+        getCustomersInShop('');
+        creatingCustomerLoad.value = false;
+        showSnackBar(
+            message: "Customer saved offline — will sync when connected",
+            color: Colors.orange);
+        return;
+      }
+
       Customer customerModel = Customer(
           name: nameController.text,
           address: addressController.text,
@@ -180,16 +201,42 @@ class CustomerController extends GetxController
   }
 
   updateCustomer(context, Customer customerModel) async {
+    var customerData = {
+      "name": nameController.text,
+      "shopId": userController.currentUser.value!.primaryShop?.id,
+      "phonenumber": phoneController.text,
+      "creditLimit": creditLimitController.text,
+      "email": emailController.text,
+      "address": addressController.text,
+      "attendantId": userController.currentUser.value!.attendantId
+    };
+
+    if (!await isConnected()) {
+      if (!hasSyncedServerId(customerModel.sId)) {
+        showSnackBar(
+            message:
+                "This customer hasn't synced yet — connect to the internet before editing them",
+            color: Colors.orange);
+        return;
+      }
+      await DatabaseHelper()
+          .insertCustomerUpdateOffline(customerModel.sId!, customerData);
+      currentCustomer.value = Customer.fromJson({
+        ...customerModel.toJson(),
+        'name': customerData['name'],
+        'phonenumber': customerData['phonenumber'],
+        'creditLimit': customerData['creditLimit'],
+        'email': customerData['email'],
+        'address': customerData['address'],
+      });
+      currentCustomer.refresh();
+      showSnackBar(
+          message: "Saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
+
     try {
-      var customerData = {
-        "name": nameController.text,
-        "shopId": userController.currentUser.value!.primaryShop?.id,
-        "phonenumber": phoneController.text,
-        "creditLimit": creditLimitController.text,
-        "email": emailController.text,
-        "address": addressController.text,
-        "attendantId": userController.currentUser.value!.attendantId
-      };
       debugPrintMessage(customerData);
       var response = await CustomerService.updateCustomer(
           customerData, customerModel.sId!);
@@ -202,6 +249,24 @@ class CustomerController extends GetxController
   }
 
   deleteCustomer(Customer customerModel) async {
+    if (!await isConnected()) {
+      if (!hasSyncedServerId(customerModel.sId)) {
+        showSnackBar(
+            message:
+                "This customer hasn't synced yet — connect to the internet before deleting them",
+            color: Colors.orange);
+        return;
+      }
+      await DatabaseHelper().insertCustomerDeleteOffline(customerModel.sId!);
+      getCustomersInShop('');
+      Get.back();
+      Get.back();
+      showSnackBar(
+          message: "Delete saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
+
     try {
       LoadingDialog.showLoadingDialog(
           context: Get.context!,
@@ -219,37 +284,46 @@ class CustomerController extends GetxController
   deposit(Customer customerModel, context, page, size) async {
     if (amountController.text == "") {
       generalAlert(title: "Error", message: "Please enter a valid amount");
-    } else {
-      LoadingDialog.showLoadingDialog(
-        context: Get.context!,
-        title: "Please wait...",
-        key: _keyLoader,
-      );
-      try {
-        var customerData = {
-          "wallet": int.parse(amountController.text),
-          "shopId": userController.currentUser.value!.primaryShop?.id,
-          "attendantId": userController.currentUser.value!.attendantId,
-          "payment_method": Get.find<SalesController>().paynowMethod.value,
-          "mpesaCode": Get.find<SalesController>().mpesaCode.text
-        };
-        var response = await CustomerService.updateCustomer(
-            customerData, customerModel.sId!);
-        Get.back();
-        if (response['error'] != null) {
-          generalAlert(title: "Error", message: response["error"]);
-          return;
-        }
-        currentCustomer.value = Customer.fromJson(response);
-        getTransactions("deposit", customerModel.sId!, clear: false);
-      } catch (e) {
-        debugPrintMessage(e);
-        generalAlert(title: "Error", message: e.toString());
-      } finally {
-        Get.find<SalesController>().paynowMethod.value = "Cash";
-        amountController.text = "";
-        Get.find<SalesController>().mpesaCode.text = "";
+      return;
+    }
+
+    if (!await isConnected()) {
+      generalAlert(
+          title: "No connection",
+          message:
+              "Wallet deposits require an internet connection — this calculates against live account balances that can't be verified offline");
+      return;
+    }
+
+    LoadingDialog.showLoadingDialog(
+      context: Get.context!,
+      title: "Please wait...",
+      key: _keyLoader,
+    );
+    try {
+      var customerData = {
+        "wallet": int.parse(amountController.text),
+        "shopId": userController.currentUser.value!.primaryShop?.id,
+        "attendantId": userController.currentUser.value!.attendantId,
+        "payment_method": Get.find<SalesController>().paynowMethod.value,
+        "mpesaCode": Get.find<SalesController>().mpesaCode.text
+      };
+      var response = await CustomerService.updateCustomer(
+          customerData, customerModel.sId!);
+      Get.back();
+      if (response['error'] != null) {
+        generalAlert(title: "Error", message: response["error"]);
+        return;
       }
+      currentCustomer.value = Customer.fromJson(response);
+      getTransactions("deposit", customerModel.sId!, clear: false);
+    } catch (e) {
+      debugPrintMessage(e);
+      generalAlert(title: "Error", message: e.toString());
+    } finally {
+      Get.find<SalesController>().paynowMethod.value = "Cash";
+      amountController.text = "";
+      Get.find<SalesController>().mpesaCode.text = "";
     }
   }
 

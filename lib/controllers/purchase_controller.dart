@@ -6,6 +6,8 @@ import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/suppliercontroller.dart';
 import 'package:pointify/screens/suppliers/suppliers_page.dart';
+import 'package:pointify/sqlite/helper.dart';
+import 'package:pointify/utils/helper.dart';
 
 import '../functions/functions.dart';
 import '../main.dart';
@@ -93,28 +95,40 @@ class PurchaseController extends GetxController {
                 previousValue + (element.unitPrice! * element.quantity!)))
         .fold<double>(0.0, (value, element) => value + (element ?? 0.0));
   }
+// ─────────────────────────────────────────────────────────────────────────────
+// PATCH — replace createPurchase() and getPurchases() in purchase_controller.dart
+//
+// Find the existing createPurchase() method and replace it with the version
+// below. Find getPurchases() and replace it with the version below.
+// All other methods in the file remain unchanged.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── REPLACE createPurchase() with this ───────────────────────────────────────
 
   createPurchase() async {
     LoadingDialog.showLoadingDialog(
-        context: Get.context!, title: "Please wait...", key: _keyLoader);
-    var items = invoice.value?.items!
+        context: Get.context!, title: 'Please wait...', key: _keyLoader);
+
+    final items = invoice.value?.items!
         .map((e) => {
-              "product": e.product?.sId,
-              "quantity": e.quantity,
-              "unitPrice": e.unitPrice,
-              "sellingPrice": e.product?.sellingPrice,
-              "lineDiscount": e.lineDiscount,
-              "attendantId": userController.currentUser.value?.attendantId?.sId
+              'product': e.product?.sId,
+              'quantity': e.quantity,
+              'unitPrice': e.unitPrice,
+              'sellingPrice': e.product?.sellingPrice,
+              'lineDiscount': e.lineDiscount,
+              'attendantId': userController.currentUser.value?.attendantId?.sId,
             })
         .toList();
 
-    var totalPaid = int.parse(textEditingControllerAmount.text.isEmpty
-        ? "0"
+    final totalPaid = int.parse(textEditingControllerAmount.text.isEmpty
+        ? '0'
         : textEditingControllerAmount.text.trim());
-    var paymentType = selectedpaymentMethod.value.toLowerCase();
-    if (selectedSupplier.value == null && paymentType == "credit") {
+    final paymentType = selectedpaymentMethod.value.toLowerCase();
+
+    if (selectedSupplier.value == null && paymentType == 'credit') {
+      Get.back(); // close loader
       generalAlert(
-          title: "You have to select supplier to purchase on credit ",
+          title: 'You have to select supplier to purchase on credit',
           function: () {
             Get.to(() => Scaffold(
                   appBar: AppBar(
@@ -123,64 +137,56 @@ class PurchaseController extends GetxController {
                     elevation: 0.3,
                     centerTitle: false,
                     leading: IconButton(
-                      onPressed: () {
-                        Get.back();
-                      },
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.black,
-                      ),
+                      onPressed: Get.back,
+                      icon:
+                          const Icon(Icons.arrow_back_ios, color: Colors.black),
                     ),
                     title: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         majorTitle(
-                            title: "Supplier", color: Colors.black, size: 16.0),
+                            title: 'Supplier', color: Colors.black, size: 16.0),
                         minorTitle(
-                            title:
-                                "${userController.currentUser.value!.primaryShop?.name}",
-                            color: Colors.grey)
+                            title: userController
+                                    .currentUser.value!.primaryShop?.name ??
+                                '',
+                            color: Colors.grey),
                       ],
                     ),
                     actions: [
                       if (verifyPermission(
-                          category: "suppliers", permission: "manage"))
+                          category: 'suppliers', permission: 'manage'))
                         InkWell(
-                          onTap: () {
-                            Get.to(() => CreateSuppliers(
-                                  page: "createPurchase",
-                                ));
-                          },
+                          onTap: () => Get.to(
+                              () => CreateSuppliers(page: 'createPurchase')),
                           child: Padding(
                             padding: const EdgeInsets.all(10),
                             child: Container(
                               padding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
                               decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: (BorderRadius.circular(10)),
+                                  borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                       color: AppColors.mainColor, width: 1)),
                               child: Center(
-                                child: majorTitle(
-                                    title: "Add Supplier",
-                                    color: AppColors.mainColor,
-                                    size: 12.0),
-                              ),
+                                  child: majorTitle(
+                                      title: 'Add Supplier',
+                                      color: AppColors.mainColor,
+                                      size: 12.0)),
                             ),
                           ),
                         )
                     ],
                   ),
                   body: Suppliers(
-                    from: "purchases",
+                    from: 'purchases',
                     function: () {
                       generalAlert(
-                          title: "Credit purchase",
+                          title: 'Credit purchase',
                           message:
-                              "Are you sure you want to make credit purchase?",
-                          function: () {
-                            Get.find<PurchaseController>().createPurchase();
-                          });
+                              'Are you sure you want to make credit purchase?',
+                          function: () =>
+                              Get.find<PurchaseController>().createPurchase());
                     },
                   ),
                 ));
@@ -188,52 +194,105 @@ class PurchaseController extends GetxController {
       return;
     }
 
-    var invoiceData = {
-      "purchase": {
-        "shopId": userController.currentUser.value?.primaryShop?.id,
-        "supplierId": selectedSupplier.value?.id,
-        "attendantId": userController.currentUser.value?.attendantId?.sId,
-        "paymentType": paymentType,
+    final invoiceData = {
+      'purchase': {
+        'shopId': userController.currentUser.value?.primaryShop?.id,
+        'supplierId': selectedSupplier.value?.id,
+        'attendantId': userController.currentUser.value?.attendantId?.sId,
+        'paymentType': paymentType,
       },
-      "purchaseItems": items,
-      "amountpaid": totalPaid,
+      'purchaseItems': items,
+      'amountpaid': totalPaid,
       'trackBatches':
           userController.currentUser.value?.primaryShop?.allowbatchtracking ??
               false,
-      "useWarehouse":
-          userController.currentUser.value?.primaryShop?.useWarehouse ?? false
+      'useWarehouse':
+          userController.currentUser.value?.primaryShop?.useWarehouse ?? false,
     };
-    print(invoiceData);
 
-    var response = await PurchaseService.createPurchase(invoiceData);
-    Get.back();
-    if (response["error"] != null) {
-      showSnackBar(message: response["error"], color: Colors.red);
+    final connected = await isConnected();
+
+    if (!connected) {
+      Get.back(); // close loader
+      // ── offline: save purchase + all items to SQLite ──
+      final db = DatabaseHelper();
+      // Extract the purchase sub-map as a typed variable so Dart doesn't
+      // treat it as dynamic and complain about [] indexing
+      final purchaseMeta = invoiceData['purchase'] as Map<String, dynamic>;
+      final purchaseRow = {
+        'shopId': purchaseMeta['shopId'],
+        'supplierId': purchaseMeta['supplierId'],
+        'attendantId': purchaseMeta['attendantId'],
+        'paymentType': paymentType,
+        'totalAmount': invoice.value?.items?.fold<double>(
+              0,
+              (sum, e) => sum + ((e.unitPrice ?? 0) * (e.quantity ?? 0)),
+            ) ??
+            0.0,
+        'amountPaid': totalPaid.toDouble(),
+        'outstandingBalance': 0.0,
+      };
+      final localId = await db.insertPurchaseOffline(purchaseRow);
+      for (final item in (items ?? [])) {
+        await db.insertPurchaseItem(localId, {
+          ...item,
+          'shop': purchaseMeta['shopId'],
+          'attendantId': purchaseMeta['attendantId'],
+        });
+        // Update local product quantity
+        final product = invoice.value?.items
+            ?.firstWhere((e) => e.product?.sId == item['product'],
+                orElse: () => InvoiceItem())
+            .product;
+        if (product != null && product.sId != null) {
+          final newQty = (product.quantity ?? 0) + (item['quantity'] as int);
+          await db.updateProduct({'id': product.sId, 'quantity': newQty});
+        }
+      }
+      // Clear state
+      selectedSupplier.value = null;
+      selectedpaymentMethod.value = 'Cash';
+      invoice.value = null;
+      selectedSupplierController.clear();
+      productController.getProductsAnalysis(type: 'all');
+      productController.getProductsBySort(type: 'all');
+      textEditingControllerAmount.clear();
+      showSnackBar(
+          message: 'Purchase saved offline — will sync when connected',
+          color: Colors.orange);
+      Get.back();
+      return;
+    }
+
+    // ── online: normal flow ──
+    final response = await PurchaseService.createPurchase(invoiceData);
+    Get.back(); // close loader
+    if (response['error'] != null) {
+      showSnackBar(message: response['error'], color: Colors.red);
       Get.back();
       return;
     }
     Get.back();
-    Invoice invoiceDataRes = Invoice.fromJson(response["purchase"]);
+    final invoiceDataRes = Invoice.fromJson(response['purchase']);
     Get.back();
-    Get.to(() => InvoiceScreen(
-          invoice: invoiceDataRes,
-          type: "",
-        ));
+    Get.to(() => InvoiceScreen(invoice: invoiceDataRes, type: ''));
     selectedSupplier.value = null;
-    selectedpaymentMethod.value = "Cash";
+    selectedpaymentMethod.value = 'Cash';
     invoice.value = null;
     selectedSupplierController.clear();
-    productController.getProductsAnalysis(type: "all");
-    productController.getProductsBySort(type: "all");
+    productController.getProductsAnalysis(type: 'all');
+    productController.getProductsBySort(type: 'all');
     textEditingControllerAmount.clear();
   }
 
+// ── REPLACE getPurchases() with this ─────────────────────────────────────────
+
   getPurchases({
-    String? supplier = "",
+    String? supplier = '',
     bool? onCredit,
-    String? fromDate = "",
-    String? shopid = "",
-    String? toDate = "",
+    String? fromDate = '',
+    String? shopid = '',
+    String? toDate = '',
     bool loadMore = false,
   }) async {
     if (!loadMore) {
@@ -245,37 +304,55 @@ class PurchaseController extends GetxController {
       isLoadingMore.value = true;
     }
     if (!hasMore.value) return;
-    var response = await PurchaseService.getPurchases(
+
+    final connected = await isConnected();
+
+    if (!connected) {
+      // ── offline: load from SQLite ──
+      final rows = await DatabaseHelper().getPurchases(shopId: shopid);
+      invoices.addAll(rows
+          .map((e) => Invoice.fromJson({
+                '_id': e['id'],
+                'shopId': e['shopId'],
+                'supplierId': e['supplierId'],
+                'paymentType': e['paymentType'],
+                'totalAmount': e['totalAmount'],
+                'amountPaid': e['amountPaid'],
+                'createdAt': e['createdAt'],
+                'items': [],
+              }))
+          .toList());
+      filteredInvoices.value = invoices;
+      isLoadingPurchases.value = false;
+      isLoadingMore.value = false;
+      return;
+    }
+
+    final response = await PurchaseService.getPurchases(
       fromDate: fromDate,
       toDate: toDate,
       shopId: shopid,
       supplier: supplier,
-      paymentType: onCredit == true ? "credit" : "cash",
+      paymentType: onCredit == true ? 'credit' : 'cash',
       page: page.value,
       limit: limit,
     );
 
-    List<dynamic> purchasesresponse = response['purchases'];
+    final List<dynamic> purchasesresponse = response['purchases'];
+    if (purchasesresponse.length < limit) hasMore.value = false;
 
-    if (purchasesresponse.length < limit) {
-      hasMore.value = false;
-    }
-
-    invoices.addAll(
-      purchasesresponse.map((e) => Invoice.fromJson(e)).toList(),
-    );
+    invoices.addAll(purchasesresponse.map((e) => Invoice.fromJson(e)).toList());
 
     if (onCredit == true) {
       filteredInvoices.value = invoices;
     } else {
       filteredInvoices.value =
-          invoices.where((p0) => p0.paymentType == "cash").toList();
+          invoices.where((p0) => p0.paymentType == 'cash').toList();
       getfilterTotals();
       selectedItem.value = 'cash';
     }
 
     page.value++;
-
     isLoadingPurchases.value = false;
     isLoadingMore.value = false;
   }

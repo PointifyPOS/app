@@ -44,7 +44,7 @@ class CustomerService {
     return response;
   }
 
-  static Future<void> deleteCustomer({required Customer customerModel}) async {
+  static Future deleteCustomer({required Customer customerModel}) async {
     String url = "${EndPoints.customer}/${customerModel.sId}";
     var response =
         await DbBase().databaseRequest(url, DbBase().deleteRequestType);

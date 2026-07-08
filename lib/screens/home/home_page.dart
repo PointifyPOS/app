@@ -54,7 +54,8 @@ class HomePage extends StatelessWidget {
   final ExpenseController expenseController = Get.put(ExpenseController());
   final UserController attendantController = Get.put(UserController());
   final AuthController authController = Get.find<AuthController>();
-  final ProductNewController productController = Get.find<ProductNewController>();
+  final ProductNewController productController =
+      Get.find<ProductNewController>();
   final DateTime now = DateTime.now();
   WareHouseController wareHouseController = Get.put(WareHouseController());
 
@@ -510,9 +511,7 @@ class HomePage extends StatelessWidget {
                             const SizedBox(height: 20),
                           Obx(
                             () {
-                              return (salesController.homecards.isEmpty ||
-                                          userController
-                                              .internetConected.isFalse) ||
+                              return (salesController.homecards.isEmpty) ||
                                       userController.currentUser.value
                                               ?.primaryShop?.warehouse ==
                                           true
@@ -557,9 +556,9 @@ class HomePage extends StatelessWidget {
                               fastMovingCount: productController
                                       .productStats['fastmoving']?.length ??
                                   0,
-                              dormant: productController
-                                      .productStats['dormant'] ??
-                                  0,
+                              dormant:
+                                  productController.productStats['dormant'] ??
+                                      0,
                             ),
                           const SizedBox(height: 20),
                           majorTitle(
@@ -1100,11 +1099,15 @@ class HomePage extends StatelessWidget {
   }
 
   handleClickFunctions({required context, required title}) {
-    if (userController.internetConected.value == false && title != "pos") {
-      if (title == "stock" || title == "stocks") {
-        Get.to(() => ProductPage());
-        return;
-      }
+    // // Only Reports and Invoices genuinely require a live connection —
+    // Reports needs full server-side history aggregation, Invoices needs
+    // both shops in a warehouse transfer to be online at once. Everything
+    // else (POS, Stock, Sales & Orders, Cashflow, Suppliers, Customers)
+    // has its own offline read/write handling built in, so it shouldn't be
+    // blocked here.
+    final offlineBlockedScreens = ["reports", "invoices"];
+    if (userController.internetConected.value == false &&
+        offlineBlockedScreens.contains(title)) {
       showSnackBar(message: 'No Internet Connection', color: Colors.red);
       return;
     }

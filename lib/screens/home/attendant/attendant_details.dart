@@ -51,12 +51,7 @@ class AttendantDetails extends StatelessWidget {
         centerTitle: false,
         leading: IconButton(
           onPressed: () {
-            if (isSmallScreen(context)) {
-              Get.back();
-            } else {
-              Get.find<HomeController>().selectedWidget.value =
-                  AttendantsPage();
-            }
+            Get.back();
           },
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,

@@ -713,14 +713,39 @@ class _SalePreviewState extends State<SalePreview> {
   }
 
   Widget _buildMpesaManualCode() {
-    return TextFormField(
-      controller: salesController.mpesaTransId,
-      decoration: InputDecoration(
-        labelText: 'Mpesa Transaction Code',
-        hintText: 'e.g. QFG3X9KLM2',
-        prefixIcon: const Icon(Icons.confirmation_number_outlined),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextFormField(
+          controller: salesController.amountPaid,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          onChanged: (_) {
+            salesController.getTotalCredit();
+            salesController.receipt.refresh();
+          },
+          decoration: InputDecoration(
+            labelText: 'Mpesa Amount',
+            hintText: 'Enter amount received',
+            prefixIcon: const Icon(Icons.payments_outlined),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextFormField(
+          controller: salesController.mpesaTransId,
+          textCapitalization: TextCapitalization.characters,
+          decoration: InputDecoration(
+            labelText: 'Mpesa Transaction Code',
+            hintText: 'e.g. QFG3X9KLM2',
+            prefixIcon: const Icon(Icons.confirmation_number_outlined),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

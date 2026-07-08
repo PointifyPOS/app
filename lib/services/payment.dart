@@ -24,7 +24,7 @@ class PaymentService {
   }
 
   static getPaymentsByShopAndDate(
-      String shop, String fromDate, String toDate) async {
+      {String? shop, String? fromDate, String? toDate}) async {
     String url =
         "${EndPoints.payments}?shop=$shop&fromDate=$fromDate&toDate=$toDate";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);

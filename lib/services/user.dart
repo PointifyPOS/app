@@ -1,6 +1,7 @@
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/usermodel.dart';
+import 'package:pointify/services/preference_manager.dart';
 import 'package:pointify/sqlite/helper.dart';
 import 'package:pointify/utils/helper.dart';
 
@@ -13,8 +14,8 @@ class User {
     if (!await isConnected()) {
       return await DatabaseHelper().getOfflineSettings();
     }
-    var response = await DbBase()
-        .databaseRequest("${EndPoints.setting}?type=$type", DbBase().getRequestType);
+    var response = await DbBase().databaseRequest(
+        "${EndPoints.setting}?type=$type", DbBase().getRequestType);
     return response;
     // } catch (e) {
     //   return null;
@@ -38,8 +39,11 @@ class User {
   }
 
   static getAttendants() async {
+    var prefs = PreferenceManager();
+    if ((await prefs.getString('id')) == null) return;
+    userController.currentUserId.value = (await prefs.getString('id'))!;
     var response = await DbBase().databaseRequest(
-      "${EndPoints.attendantsfilter}?adminId=${userController.currentUser.value?.id}",
+      "${EndPoints.attendantsfilter}?adminId=${userController.currentUserId.value}",
       DbBase().getRequestType,
     );
     return response;

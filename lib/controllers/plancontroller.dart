@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointify/utils/helper.dart';
+import 'package:pointify/widgets/snackbars.dart';
 
 import '../models/package.dart';
 import '../services/plan_service.dart';
@@ -12,6 +15,15 @@ class PlanController extends GetxController {
     try {
       plans.clear();
       isLoadingPackages.value = true;
+
+      if (!await isConnected()) {
+        isLoadingPackages.value = false;
+        showSnackBar(
+            message: "Plans require an internet connection",
+            color: Colors.orange);
+        return;
+      }
+
       var response = await PlansService().getPlans();
       isLoadingPackages.value = false;
       if (response.isEmpty) {

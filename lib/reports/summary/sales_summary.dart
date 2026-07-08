@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:pointify/controllers/paymentcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/functions/functions.dart';
+import 'package:pointify/models/usermodel.dart';
 import 'package:pointify/reports/sales/sales_report.dart';
 import 'package:pointify/reports/sales/salesreturns_report.dart';
+import 'package:pointify/services/user.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/filter_dates.dart';
@@ -20,11 +22,13 @@ import '../components/summarycard.dart';
 
 class SalesSummary extends StatelessWidget {
   SalesSummary({super.key}) {
+    reportsController.selectedAttedant.value = UserModel();
     reportsController.getSalesReport(
       startDate: reportsController.filterStartDate.value,
       toDate: reportsController.filterEndDate.value,
       shopid: userController.currentUser.value!.primaryShop!.id!,
     );
+    userController.getAttendants();
   }
 
   final ReportsController reportsController = Get.find<ReportsController>();
@@ -53,6 +57,8 @@ class SalesSummary extends StatelessWidget {
                     startDate: reportsController.filterStartDate.value,
                     toDate: reportsController.filterEndDate.value,
                     shopid: userController.currentUser.value!.primaryShop!.id!,
+                    attendant:
+                        reportsController.selectedAttedant.value.id ?? "",
                   );
                 }),
                 const SizedBox(height: 30),
@@ -125,6 +131,11 @@ class SalesSummary extends StatelessWidget {
                                               fromDate: reportsController
                                                   .filterStartDate.value,
                                               status: "cashed",
+                                              attendantId: reportsController
+                                                      .selectedAttedant
+                                                      .value
+                                                      .id ??
+                                                  "",
                                               paymentTag: 'cash',
                                               toDate: reportsController
                                                   .filterEndDate.value);
@@ -143,6 +154,11 @@ class SalesSummary extends StatelessWidget {
                                           salesController.getSalesByDate(
                                               shop: userController.currentUser
                                                   .value!.primaryShop!.id!,
+                                              attendantId: reportsController
+                                                      .selectedAttedant
+                                                      .value
+                                                      .id ??
+                                                  "",
                                               fromDate: reportsController
                                                   .filterStartDate.value,
                                               paymentType: key,
@@ -167,6 +183,11 @@ class SalesSummary extends StatelessWidget {
                                           salesController.getSalesByDate(
                                               shop: userController.currentUser
                                                   .value!.primaryShop!.id!,
+                                              attendantId: reportsController
+                                                      .selectedAttedant
+                                                      .value
+                                                      .id ??
+                                                  "",
                                               fromDate: reportsController
                                                   .filterStartDate.value,
                                               status: key,
@@ -181,6 +202,8 @@ class SalesSummary extends StatelessWidget {
 
                                         if (key == "returns") {
                                           salesController.getReturns(
+                                              attendantId: reportsController
+                                                  .selectedAttedant.value,
                                               fromDate: reportsController
                                                   .filterStartDate.value,
                                               toDate: reportsController
@@ -195,11 +218,14 @@ class SalesSummary extends StatelessWidget {
                                         if (key == "debtpaid") {
                                           paymentController
                                               .getPaymentsByShopAndDate(
-                                                  userController.currentUser
-                                                      .value!.primaryShop!.id!,
-                                                  reportsController
+                                                  shop: userController
+                                                      .currentUser
+                                                      .value!
+                                                      .primaryShop!
+                                                      .id!,
+                                                  fromDate: reportsController
                                                       .filterStartDate.value,
-                                                  reportsController
+                                                  toDate: reportsController
                                                       .filterEndDate.value);
                                           Get.to(() => PaymentHistory());
                                         }
@@ -221,6 +247,15 @@ class SalesSummary extends StatelessWidget {
           style: TextStyle(color: AppColors.mainColor),
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.people_alt_outlined,
+              color: AppColors.mainColor,
+            ),
+            onPressed: () {
+              _showAttendantFilter(context);
+            },
+          ),
           IconButton(
               onPressed: () {
                 Get.to(() => Scaffold(
@@ -249,6 +284,83 @@ class SalesSummary extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showAttendantFilter(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        height: 500,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 15),
+            Container(
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Filter by Attendant",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.people),
+              title: const Text("All Attendants"),
+              onTap: () {
+                Get.back();
+
+                reportsController.selectedAttedant.value = UserModel();
+                reportsController.getSalesReport(
+                    startDate: reportsController.filterStartDate.value,
+                    toDate: reportsController.filterEndDate.value,
+                    shopid: userController.currentUser.value!.primaryShop!.id!);
+              },
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: userController.attendants.length,
+                itemBuilder: (context, index) {
+                  UserModel attendant = userController.attendants[index];
+                  reportsController.selectedAttedant.value = attendant;
+                  return ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.person),
+                    ),
+                    title: Text(attendant.username ?? ""),
+                    subtitle: Text(attendant.phone ?? ""),
+                    onTap: () {
+                      Get.back();
+
+                      reportsController.getSalesReport(
+                        startDate: reportsController.filterStartDate.value,
+                        toDate: reportsController.filterEndDate.value,
+                        shopid:
+                            userController.currentUser.value!.primaryShop!.id!,
+                        attendant: attendant.id,
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }

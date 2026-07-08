@@ -19,6 +19,7 @@ import '../../utils/colors.dart';
 import '../../widgets/major_title.dart';
 import '../customers/customers_page.dart';
 import 'components/sales_container.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class CreateSale extends StatelessWidget {
   final String? page;
@@ -443,20 +444,20 @@ class CreateSale extends StatelessWidget {
                                     ),
                                     IconButton(
                                       onPressed: () async {
-                                        Get.to(
-                                          () => BarcodeScannerPage(
-                                            popAfterScan: false,
-                                            onScanned: (barcode) async {
-                                              await productController
-                                                  .getProductsBySort(
-                                                type: "search",
-                                                barcodeId: barcode,
-                                                page: 1,
-                                                scanningFrom: 'sale',
-                                                limit: 50,
-                                              );
-                                            },
+                                        final barcode = await Get.to(
+                                          () => const BarcodeScannerPage(
+                                            popAfterScan: true,
                                           ),
+                                        );
+                                        if (barcode == null ||
+                                            barcode.toString().isEmpty) return;
+                                        await productController
+                                            .getProductsBySort(
+                                          type: "search",
+                                          barcodeId: barcode.toString(),
+                                          page: 1,
+                                          scanningFrom: 'sale',
+                                          limit: 50,
                                         );
                                       },
                                       icon: const Icon(Icons.qr_code),
