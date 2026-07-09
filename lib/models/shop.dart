@@ -11,6 +11,7 @@ class Shop {
   String? location;
   double? tax;
   double? distance;
+  bool? viewAllCustomers;
   String? sunpayMerchantId;
   bool? warehouse;
   bool? useWarehouse;
@@ -50,6 +51,7 @@ class Shop {
       this.backupInterval,
       this.allowOnlineSelling,
       this.allowBackup,
+      this.viewAllCustomers,
       this.location,
       this.distance,
       this.subscription,

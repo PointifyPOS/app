@@ -13,6 +13,7 @@ class Customer {
   String? email;
   String? sId;
   String? createAt;
+  String? owner;
 
   Customer(
       {this.name,
@@ -25,6 +26,7 @@ class Customer {
       this.address,
       this.customerNo,
       this.phoneNumber,
+      this.owner,
       this.email,
       this.createAt});
 
@@ -37,6 +39,7 @@ class Customer {
             : 0.0;
     wallet = json['wallet'] != null ? toDouble(json['wallet']) : 0.0;
     totalDebt = json['totalDebt'];
+    owner = json['owner'];
     shopId = json['shopId'];
     customerNo = json['customerNo'] ?? 0;
     address = json['address'] ?? '';
@@ -55,6 +58,7 @@ class Customer {
     data['customerNo'] = customerNo;
     data['address'] = address;
     data['email'] = email;
+    data['owner'] = owner;
     data['shopId'] = shopId;
     data['attendantId'] = attendantId;
     data['phonenumber'] = phoneNumber;

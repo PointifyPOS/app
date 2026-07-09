@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/customercontroller.dart';
+import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/models/awards.dart';
+import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/models/customer.dart';
 import 'package:pointify/models/payment.dart';
 import 'package:pointify/models/payment_methods.dart';
@@ -15,7 +17,7 @@ class PaymentController extends GetxController {
   RxList<Payment> payments = RxList([]);
   RxList<PaymentMethods> paymentmethods = RxList([]);
   RxList<Awards> awardpayments = RxList([]);
-
+  final RxString paymentSearch = ''.obs;
   getSalesPaymentByPurchaseId(String id) async {
     isPaymentLoading.value = true;
 
@@ -34,6 +36,24 @@ class PaymentController extends GetxController {
     paymentData.sort((a, b) => b.date!.compareTo(a.date!));
     payments.assignAll(paymentData);
     isPaymentLoading.value = false;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    debounce(
+      paymentSearch,
+      (value) {
+        getPaymentsByShopAndDate(
+          Get.find<UserController>().currentUser.value!.primaryShop!.id!,
+          Get.find<ReportsController>().filterStartDate.value,
+          Get.find<ReportsController>().filterEndDate.value,
+          value,
+        );
+      },
+      time: const Duration(milliseconds: 500),
+    );
   }
 
   getAwardTransactions(String id) async {
@@ -55,10 +75,8 @@ class PaymentController extends GetxController {
   }
 
   getPaymentsByShopAndDate(
-      {String? shop,
-      String? fromDate,
-      String? toDate,
-      String? attendant}) async {
+      String shop, String fromDate, String toDate, String? search,
+      String? attendant) async {
     isPaymentLoading.value = true;
 
     if (!await isConnected()) {
@@ -70,9 +88,11 @@ class PaymentController extends GetxController {
     }
 
     List<dynamic> response = await PaymentService.getPaymentsByShopAndDate(
-      shop: shop,
-      fromDate: fromDate,
-      toDate: toDate,
+      shop,
+      fromDate,
+      toDate,
+      search,
+      String? attendant
     );
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();

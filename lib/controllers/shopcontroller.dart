@@ -43,7 +43,7 @@ class ShopController {
   TextEditingController paybillAcc = TextEditingController();
   TextEditingController paybillTill = TextEditingController();
   TextEditingController address = TextEditingController();
-
+RxBool viewAllCustomers = false.obs;
   TextEditingController nameController = TextEditingController();
   TextEditingController backupemail = TextEditingController();
   TextEditingController businessController = TextEditingController();

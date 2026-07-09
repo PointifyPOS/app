@@ -158,8 +158,9 @@ class PurchasesSummary extends StatelessWidget {
                                                       .id!,
                                                   fromDate: reportsController
                                                       .filterStartDate.value,
-                                                  toDate: reportsController
-                                                      .filterEndDate.value);
+                                                  reportsController
+                                                      .filterEndDate.value,
+                                                  '');
                                           Get.to(() => PaymentHistory());
                                         }
                                       }))),
