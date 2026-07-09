@@ -43,6 +43,14 @@ class ReportsController extends GetxController {
       RxMap({'cash': 0, 'mpesa': 0, 'bank': 0});
   RxString activeFilter = RxString('today');
   RxDouble totalSales = RxDouble(0.0);
+  Map<String, dynamic> debtbreakdown = {
+    "cash": 0.0,
+    "mpesa": 0.0,
+    "bank": 0.0,
+    "wallet": 0.0,
+    "credit": 0.0,
+    "debtpaid": 0.0
+  };
   var filterStartDate = DateFormat("yyy-MM-dd").format(DateTime.now()).obs;
   var filterEndDate = DateFormat("yyy-MM-dd").format(DateTime.now()).obs;
   RxList<Payment> payments = RxList([]);
@@ -71,6 +79,7 @@ class ReportsController extends GetxController {
     String? toDate,
     String? shopid,
   }) async {
+    print("getPurchasesReport");
     var types = [
       {
         "title": "Total Purchases",
@@ -112,6 +121,7 @@ class ReportsController extends GetxController {
     isLoadingReports.value = true;
     var respose = await ReportsService().getPurchasesReport(
         startDate: startDate, toDate: toDate, shopid: shopid);
+    print(respose);
     salesCard.clear();
     totalSales.value = 0;
     for (var element in types) {
@@ -215,6 +225,9 @@ class ReportsController extends GetxController {
         }
       }
     }
+    print("respose: $respose");
+
+    debtbreakdown = respose['debtpaid_breakdown'];
     salesReportData.value = respose;
     isLoadingReports.value = false;
   }

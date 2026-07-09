@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/salescontroller.dart';
+import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/services/customer.dart';
 import 'package:pointify/sqlite/helper.dart';
@@ -82,6 +83,7 @@ class CustomerController extends GetxController
           address: addressController.text,
           email: emailController.text,
           phoneNumber: phoneController.text,
+          owner: userController.currentUser.value?.id,
           wallet: 0,
           attendantId: userController.currentUser.value?.attendantId?.sId,
           shopId: userController.currentUser.value!.primaryShop!.id);
@@ -111,24 +113,23 @@ class CustomerController extends GetxController
       gettingCustomersLoad.value = true;
       customers.clear();
       DatabaseHelper db = DatabaseHelper();
-      if (type == "debtors") {
-        customers
-            .assignAll(customers.where((p0) => p0.totalDebt! > 0).toList());
+      List<dynamic> customerresponse = [];
+      if (!await isConnected()) {
+        customers.clear();
+        customerresponse = await db.getCustomers();
       } else {
-        List<dynamic> customerresponse = [];
-        if (!await isConnected()) {
-          customers.clear();
-          customerresponse = await db.getCustomers();
-        } else {
-          customerresponse = await CustomerService.getCustomersByShopId(
-              type, userController.currentUser.value!.primaryShop!);
-          for (var element in customerresponse) {
-            db.inserCustomer(element);
-          }
+        customerresponse = await CustomerService.getCustomersByShopId(
+            type,
+            userController.currentUser.value!.primaryShop!,
+            Get.find<ShopController>().viewAllCustomers.isFalse
+                ? ""
+                : userController.currentUser.value!.id!);
+        for (var element in customerresponse) {
+          db.inserCustomer(element);
         }
-        customers.value =
-            customerresponse.map((e) => Customer.fromJson(e)).toList();
       }
+      customers.value =
+          customerresponse.map((e) => Customer.fromJson(e)).toList();
       filteredCustomers.value = customers;
       customers.refresh();
       gettingCustomersLoad.value = false;

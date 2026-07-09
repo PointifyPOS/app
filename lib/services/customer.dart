@@ -19,8 +19,9 @@ class CustomerService {
     return response;
   }
 
-  static getCustomersByShopId(type, Shop shop) async {
-    String url = "${EndPoints.customer}?type=$type&shopId=${shop.id ?? ""}";
+  static getCustomersByShopId(type, Shop shop, String id) async {
+    String url =
+        "${EndPoints.customer}?type=$type&shopId=${shop.id ?? ""}&owner=$id";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }

@@ -193,23 +193,23 @@ Widget salesCard({required SaleModel salesModel, String? from = ""}) {
                     color: Colors.black,
                     size: 11),
               // Get.find<SalesController>().getSaleAmount(),
-              // if (showUnpaidBadge(salesModel)) const SizedBox(height: 5),
-              // if (showUnpaidBadge(salesModel))
-              //   Container(
-              //     decoration: BoxDecoration(
-              //         border: Border.all(color: Colors.red),
-              //         borderRadius: BorderRadius.circular(5)),
-              //     padding:
-              //         const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              //     child: Column(
-              //       children: [
-              //         minorTitle(
-              //             title:
-              //                 "${from == "dues" ? "Dues: " : "Unpaid"}: ${htmlPrice(salesModel.outstandingBalance)}",
-              //             color: Colors.red),
-              //       ],
-              //     ),
-              //   ),
+              if (showUnpaidBadge(salesModel)) const SizedBox(height: 5),
+              if (showUnpaidBadge(salesModel))
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red),
+                      borderRadius: BorderRadius.circular(5)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  child: Column(
+                    children: [
+                      minorTitle(
+                          title:
+                              "${from == "dues" ? "Dues: " : "Unpaid"}: ${htmlPrice(salesModel.outstandingBalance)}",
+                          color: Colors.red),
+                    ],
+                  ),
+                ),
             ],
           ),
         ],
