@@ -11,6 +11,7 @@ import 'package:pointify/main.dart';
 import 'package:pointify/screens/product/product_categories.dart';
 import 'package:pointify/screens/product/products_page.dart';
 import 'package:pointify/screens/suppliers/suppliers_page.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/colors.dart';
@@ -1410,6 +1411,32 @@ class CreateProduct extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 5),
+                      const Text("Barcode"),
+                      const SizedBox(height: 5),
+                      TextFormField(
+                        controller: productController.barcodeController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          hintText: "Type or scan barcode",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          suffixIcon: IconButton(
+                            tooltip: 'Scan barcode',
+                            icon: Icon(Icons.qr_code_scanner,
+                                color: AppColors.mainColor),
+                            onPressed: () => _scanBarcode(context),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       buildUploadImagesTile(context),
                       if (productController.isProduct())
                         Obx(
@@ -1480,6 +1507,77 @@ class CreateProduct extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _scanBarcode(BuildContext context) {
+    final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+    QRViewController? qrController;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.5,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Scan Barcode",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold)),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () {
+                      qrController?.dispose();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: QRView(
+                key: qrKey,
+                onQRViewCreated: (controller) {
+                  qrController = controller;
+                  controller.scannedDataStream.listen((scanData) {
+                    final code = scanData.code;
+                    if (code != null && code.isNotEmpty) {
+                      productController.barcodeController.text = code;
+                      controller.dispose();
+                      Navigator.pop(context);
+                    }
+                  });
+                },
+                overlay: QrScannerOverlayShape(
+                  borderColor: AppColors.mainColor,
+                  borderRadius: 10,
+                  borderLength: 30,
+                  borderWidth: 8,
+                  cutOutSize: 220,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                "Point camera at barcode or QR code",
+                style: TextStyle(color: Colors.grey[400], fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).whenComplete(() => qrController?.dispose());
   }
 
   Widget buildUploadImagesTile(BuildContext context) {

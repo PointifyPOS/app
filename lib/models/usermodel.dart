@@ -36,22 +36,14 @@ class UserModel {
 
   UserModel.fromJson(Map<String, dynamic> json) {
     id = json['_id'];
-    emailVerified = json['emailVerified'] == 1 || json['emailVerified'] == true
-        ? true
-        : json['emailVerified'] == 0 || json['emailVerified'] == false
-            ? false
-            : null;
-    phoneVerified = json['phoneVerified'] == 1 || json['phoneVerified'] == true
-        ? json['phoneVerified'] == 0 || json['phoneVerified'] == false
-            ? false
-            : true
-        : null;
+    emailVerified = _toBool(json['emailVerified']);
+    phoneVerified = _toBool(json['phoneVerified']);
     smscredit = json['smscredit'] == null
         ? 0.0
         : isInteger(json['smscredit'] ?? json['smscredit'])
             ? (json['smscredit']).toDouble()
             : json['smscredit'] ?? json['smscredit'] ?? 0.0;
-    saleSmsEnabled = json['saleSmsEnabled'];
+    saleSmsEnabled = _toBool(json['saleSmsEnabled']);
     emailVerificationDate = json['emailVerificationDate'];
     lastAppRatingDate = json['lastAppRatingDate'];
     permisions = json['permissions'] ?? [];
@@ -80,6 +72,13 @@ class UserModel {
     uniqueDigits = json['uniqueDigits'] ?? 0;
     username = json['username'] ?? "";
   }
+  static bool? _toBool(dynamic v) {
+    if (v == null) return null;
+    if (v is bool) return v;
+    if (v is int) return v == 1;
+    return null;
+  }
+
   bool isInteger(num value) => value is int || value == value.roundToDouble();
 
   Map<String, dynamic> toJson() {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -18,6 +19,7 @@ import 'package:pointify/models/mpesa_payment.dart';
 import 'package:pointify/models/order.dart';
 import 'package:pointify/models/payment.dart';
 import 'package:pointify/models/salereturn.dart';
+import 'package:pointify/models/usermodel.dart';
 import 'package:pointify/screens/sales/onholdsales.dart';
 import 'package:pointify/sqlite/helper.dart';
 import 'package:pointify/utils/formatter.dart';
@@ -903,6 +905,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       if (receiptData.sId != null) {
         response = await SalesService.updateSale(sale, receiptData.sId!);
       } else if (!await isConnected()) {
+        Get.back(); // close the loading dialog before stacking the confirm dialog
+        saveSaleLoad.value = false;
         generalAlert(
           title: 'There is no internet connection, proceed with cash sale?',
           function: () => saveOfflinesale(sale, receiptData),
@@ -1003,6 +1007,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       ),
       'customerId': currentCustomer.value?.sId,
       'saleDiscount': _parseOrZero(saleDiscount.text),
+      'totalAmount': receiptData.totalAmount ?? total,
+      'totalWithDiscount': total,
     };
   }
 
@@ -1070,6 +1076,8 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     SaleModel receiptData,
   ) async {
     Get.back();
+    sale['clientRef'] ??=
+        'offline_${DateTime.now().millisecondsSinceEpoch}_${_shopId}';
     DatabaseHelper().insertSale(sale);
 
     receiptData.items?.forEach((item) {
@@ -1472,7 +1480,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       fromDate = DateFormat('MMM-dd').format(DateTime(y, 1, 1));
       toDate = DateFormat('MMM-dd').format(DateTime(y, 12, 31));
     }
-
+    if (!await isConnected()) return;
     final response = await SalesService.getSales(
       shopId: _shopId,
       fromDate: fromDate,
@@ -1524,8 +1532,26 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
-  Future<SaleModel> getSingleSaleById({required String id}) async {
+  Future<SaleModel?> getSingleSaleById({required String id}) async {
+    if (!await isConnected()) {
+      final cached = await DatabaseHelper().getCachedSaleById(id);
+      if (cached == null) {
+        showSnackBar(
+            message: "This sale hasn't been cached for offline viewing",
+            color: Colors.orange);
+        return null;
+      }
+      final saleModel = SaleModel.fromJson(
+          jsonDecode(cached['rawJson'] as String) as Map<String, dynamic>);
+      currentReceipt.value = saleModel;
+      currentReceipt.refresh();
+      return saleModel;
+    }
+
     final response = await SalesService.getSingleSaleById(id: id);
+    if (response != null) {
+      await DatabaseHelper().cacheSalesBatch([response]);
+    }
     final saleModel = SaleModel.fromJson(response);
     currentReceipt.value = saleModel;
     currentReceipt.refresh();
@@ -1689,6 +1715,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     String? saleType = '',
     bool? production = false,
     bool? loadMore = false,
+    String? attendantId = '',
     String? customerid = '',
     String? shop = '',
   }) async {
@@ -1715,6 +1742,94 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       toDate = _todayDate();
     }
 
+    // ── offline fallback: read from SQLite ──────────────────────────────────
+    // ── offline fallback: read from SQLite ──────────────────────────────────
+    if (!await isConnected()) {
+      final cachedRows = await DatabaseHelper().getCachedSales(
+        shopId: shop ?? '',
+        fromDate: fromDate,
+        toDate: toDate,
+        customerId: customerid,
+        status: status,
+      );
+
+      final salesObjects = cachedRows
+          .map((row) => SaleModel.fromJson(
+              jsonDecode(row['rawJson'] as String) as Map<String, dynamic>))
+          .toList();
+
+      // Also include sales made offline that haven't synced yet — these
+      // aren't in salesReadCache since they've never touched the server.
+      if (customerid == null || customerid.isEmpty) {
+        final pendingRows = await DatabaseHelper().getSalesByDateLocal(
+          fromDate: fromDate,
+          toDate: toDate,
+          shopId: shop,
+        );
+
+        for (final row in pendingRows) {
+          final rawItems = jsonDecode(row['products'] as String) as List;
+          final items = <Map<String, dynamic>>[];
+          for (final item in rawItems) {
+            final productId = item['product'] as String?;
+            final productName = productId != null
+                ? await DatabaseHelper().getProductNameById(productId)
+                : null;
+            items.add({
+              'product': productId != null
+                  ? {'_id': productId, 'name': productName ?? 'Item'}
+                  : null,
+              'quantity': item['quantity'],
+              'unitPrice': item['unitPrice'],
+              'tax': item['tax'] ?? 0,
+              'lineDiscount': item['lineDiscount'] ?? 0,
+              'createdAt': item['createdAt'],
+            });
+          }
+
+          salesObjects.add(SaleModel.fromJson({
+            '_id': row['id'].toString(),
+            'shopId': row['shopId'],
+            'attendantId': row['attendantId'] != null
+                ? {
+                    '_id': row['attendantId'],
+                    'username': row['attendantUsername'] ?? 'Unknown',
+                  }
+                : null,
+            'saleType': row['saleType'],
+            'createdAt': row['createdAt'],
+            'status': row['status'],
+            'totaltax': row['totaltax'],
+            'salesnote': row['salesnote'],
+            'paymentType': row['paymentType'],
+            'paymentTag': row['paymentTag'],
+            'amountPaid': row['amountPaid'],
+            'totalDiscount': row['totalDiscount'],
+            'totalWithDiscount': row['totalWithDiscount'],
+            'outstandingBalance': row['outstandingBalance'],
+            'customerId':
+                row['customerId'] != null ? {'_id': row['customerId']} : null,
+            'receiptNo': 'OFFLINE-${row['id']}',
+            'items': items,
+          }));
+        }
+
+        salesObjects
+            .sort((a, b) => (b.createdAt ?? '').compareTo(a.createdAt ?? ''));
+      }
+
+      if (loadMore == true) {
+        allSales.addAll(salesObjects);
+      } else {
+        allSales.value = salesObjects;
+      }
+      allSalesFiltered.value = allSales;
+      loadingSales.value = false;
+      loadingMoreSales.value = false;
+      return;
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     final response = await SalesService.getSales(
       fromDate: fromDate,
       saleType: saleType,
@@ -1728,6 +1843,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       shopId: shop,
       paymentType: paymentType,
       customerId: customerid,
+      attendantId: attendantId,
       page: salesPaginageSettings['page'] ?? 1,
       limit: 50,
     );
@@ -1735,8 +1851,10 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     loadingMoreSales.value = false;
     loadingSales.value = false;
 
-    if (response['error'] != null) {
-      showSnackBar(message: response['error'], color: Colors.red);
+    if (response == null || response['error'] != null) {
+      if (response != null) {
+        showSnackBar(message: response['error'], color: Colors.red);
+      }
       return;
     }
 
@@ -1744,12 +1862,74 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         .map((e) => SaleModel.fromJson(e))
         .toList();
 
+    // Merge in anything still sitting in the local write-queue (created
+    // offline, not yet synced — or stuck retrying) so it doesn't silently
+    // disappear from view the moment connectivity returns, before sync has
+    // actually finished (or if it's failing).
+    if ((customerid == null || customerid.isEmpty) && (loadMore != true)) {
+      final pendingRows = await DatabaseHelper().getSalesByDateLocal(
+        fromDate: fromDate,
+        toDate: toDate,
+        shopId: shop,
+      );
+      for (final row in pendingRows) {
+        final rawItems = jsonDecode(row['products'] as String) as List;
+        final items = <Map<String, dynamic>>[];
+        for (final item in rawItems) {
+          final productId = item['product'] as String?;
+          final productName = productId != null
+              ? await DatabaseHelper().getProductNameById(productId)
+              : null;
+          items.add({
+            'product': productId != null
+                ? {'_id': productId, 'name': productName ?? 'Item'}
+                : null,
+            'quantity': item['quantity'],
+            'unitPrice': item['unitPrice'],
+            'tax': item['tax'] ?? 0,
+            'lineDiscount': item['lineDiscount'] ?? 0,
+            'createdAt': item['createdAt'],
+          });
+        }
+        salesObjects.add(SaleModel.fromJson({
+          '_id': row['id'].toString(),
+          'shopId': row['shopId'],
+          'attendantId': row['attendantId'] != null
+              ? {
+                  '_id': row['attendantId'],
+                  'username': row['attendantUsername'] ?? 'Unknown',
+                }
+              : null,
+          'saleType': row['saleType'],
+          'createdAt': row['createdAt'],
+          'status': row['status'],
+          'totaltax': row['totaltax'],
+          'salesnote': row['salesnote'],
+          'paymentType': row['paymentType'],
+          'paymentTag': row['paymentTag'],
+          'amountPaid': row['amountPaid'],
+          'totalDiscount': row['totalDiscount'],
+          'totalWithDiscount': row['totalWithDiscount'],
+          'outstandingBalance': row['outstandingBalance'],
+          'customerId':
+              row['customerId'] != null ? {'_id': row['customerId']} : null,
+          'receiptNo': 'PENDING SYNC-${row['id']}',
+          'items': items,
+        }));
+      }
+      salesObjects
+          .sort((a, b) => (b.createdAt ?? '').compareTo(a.createdAt ?? ''));
+    }
+
     if (loadMore == true) {
       allSales.addAll(salesObjects);
     } else {
       allSales.value = salesObjects;
     }
     allSalesFiltered.value = allSales;
+
+    await DatabaseHelper().cacheSalesBatch(response['data'] as List<dynamic>);
+
     salesPaginageSettings['total'] = response['total'];
     salesPaginageSettings['page'] = response['currentPage'];
     salesPaginageSettings['totalPages'] = response['totalPages'];
@@ -1780,8 +1960,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     );
     loadingSales.value = false;
 
-    if (response['error'] != null) {
-      showSnackBar(message: response['error'], color: Colors.red);
+    if (response == null || response['error'] != null) {
+      if (response != null)
+        showSnackBar(message: response['error'], color: Colors.red);
       return;
     }
 
@@ -1807,6 +1988,49 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       toDate = _todayDate();
     }
 
+    if (!await isConnected()) {
+      final cached = await DatabaseHelper().getCachedNetAnalysis(shopId);
+      homecards.clear();
+      if (cached == null) return;
+
+      homecards.add(HomeCard(
+        total: (cached['totalSales'] as num).toDouble(),
+        name: 'Today Sales',
+        key: 'sales',
+        color: AppColors.secondary_color,
+        iconData: Icons.auto_graph_rounded,
+      ));
+
+      if (verifyPermission(category: 'sales', permission: 'view_profit')) {
+        homecards.add(HomeCard(
+          total: (cached['netProfit'] as num).toDouble(),
+          name: 'Today Profit',
+          key: 'profit',
+          color: AppColors.button_color,
+          iconData: Icons.auto_graph_rounded,
+        ));
+      }
+
+      homecards.add(HomeCard(
+        total: (cached['creditTotals'] as num).toDouble(),
+        name: 'Today Dues',
+        key: 'dues',
+        color: AppColors.mainColor,
+        iconData: Icons.auto_graph_rounded,
+      ));
+
+      if (verifyPermission(category: 'expenses', permission: 'view')) {
+        homecards.add(HomeCard(
+          total: (cached['totalExpenses'] as num).toDouble(),
+          name: 'Today Expenses',
+          key: 'expenses',
+          color: AppColors.secondary_color,
+          iconData: Icons.auto_graph_rounded,
+        ));
+      }
+      return;
+    }
+
     final response = await SalesService.netAnalysis(
       fromDate: fromDate,
       toDate: toDate,
@@ -1815,8 +2039,14 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       duesales: duesales,
     );
 
+    // Guard: response is null when server is unreachable
+    if (response == null) {
+      homecards.clear();
+      return;
+    }
     if (response['error'] != null) {
       showSnackBar(message: response['error'], color: Colors.red);
+      return;
     }
 
     homecards.clear();
@@ -1834,11 +2064,13 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       iconData: Icons.auto_graph_rounded,
     ));
 
+    double netProfitValue = 0;
     if (verifyPermission(category: 'sales', permission: 'view_profit')) {
       final net = double.parse(response['net'].toStringAsFixed(2));
       final taxes = double.parse(response['totalTaxes'].toStringAsFixed(2));
+      netProfitValue = net + taxes;
       homecards.add(HomeCard(
-        total: net + taxes,
+        total: netProfitValue,
         name: 'Today Profit',
         key: 'profit',
         color: AppColors.button_color,
@@ -1854,14 +2086,30 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       iconData: Icons.auto_graph_rounded,
     ));
 
+    double totalExpensesValue = 0;
     if (verifyPermission(category: 'expenses', permission: 'view')) {
+      totalExpensesValue =
+          double.parse(expensedata['totalExpenses'].toString());
       homecards.add(HomeCard(
-        total: double.parse(expensedata['totalExpenses'].toString()),
+        total: totalExpensesValue,
         name: 'Today Expenses',
         key: 'expenses',
         color: AppColors.secondary_color,
         iconData: Icons.auto_graph_rounded,
       ));
+    }
+
+    // Cache for offline use — only meaningful for "today" (the home screen
+    // view); a historical date-range query overwriting the cache would be
+    // misleading the next time this loads offline.
+    if (type == 'today') {
+      await DatabaseHelper().cacheNetAnalysis(
+        shopId,
+        double.parse(data['totalSales'].toString()),
+        netProfitValue,
+        double.parse(response['creditTotals'].toString()),
+        totalExpensesValue,
+      );
     }
 
     analysis.value = Analysis(
@@ -1892,6 +2140,27 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     String from = 'sales',
   }) async {
     try {
+      if (!await isConnected()) {
+        if (!hasSyncedServerId(saledId)) {
+          showSnackBar(
+              message:
+                  "This sale hasn't synced yet — connect to the internet before returning it",
+              color: Colors.orange);
+          return;
+        }
+        await DatabaseHelper().insertSaleReturnOffline({
+          'saleid': saledId,
+          'items': returnItems,
+          'reason': 'test',
+          'deleteReceipt': deleteReceipt,
+          'shopId': _shopId,
+          'attendantId': _attendantId,
+        });
+        showSnackBar(
+            message: "Return saved offline — will sync when connected",
+            color: Colors.orange);
+        return;
+      }
       LoadingDialog.showLoadingDialog(
         context: Get.context!,
         title: deleteReceipt ? 'Deleting receipt...' : 'Returning receipt...',
@@ -1991,6 +2260,26 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     required SaleModel salesBody,
     required int amount,
   }) async {
+    if (!await isConnected()) {
+      if (!hasSyncedServerId(salesBody.sId)) {
+        showSnackBar(
+            message:
+                "This sale hasn't synced yet — connect to the internet before recording a payment on it",
+            color: Colors.orange);
+        return;
+      }
+      await DatabaseHelper().insertSalePaymentOffline({
+        'saleId': salesBody.sId,
+        'paymentAmount': amount,
+        'paymentType': paynowMethod.value,
+        'mpesaCode': mpesaCode.text,
+        'attendantId': _attendantId,
+      });
+      showSnackBar(
+          message: "Payment saved offline — will sync when connected",
+          color: Colors.orange);
+      return;
+    }
     LoadingDialog.showLoadingDialog(
       context: Get.context!,
       title: 'Please wait...',
@@ -2023,6 +2312,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     SaleModel? salesModel,
     Product? product,
     String? fromDate,
+    UserModel? attendantId,
     required String shopid,
     String? type,
     String? toDate,
@@ -2031,11 +2321,20 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
     currentReceiptReturns.clear();
     allSalesReturns.clear();
+
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Returns history requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     loadingSales.value = true;
 
     final response = await SalesService.getSalesRetuns(
       salesModel: salesModel,
       customerModel: customerModel,
+      attedandId: attendantId,
       product: product,
       type: type,
       fromDate: fromDate,
@@ -2044,6 +2343,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     );
 
     loadingSales.value = false;
+
+    if (response == null) return;
+
     List res = response;
     allSalesReturns.addAll(
       res.map((e) => SaleRetuns.fromJson(e)).toList(),
@@ -2052,6 +2354,12 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   }
 
   Future<void> deleteSaleReturn(String saleReturnId) async {
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Deleting returns requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
     allSalesReturns.removeWhere((e) => e.sId == saleReturnId);
     Get.back();
     await SalesService.deleteSaleReturn(saleReturnId);
@@ -2068,12 +2376,21 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     toDate ??= DateFormat(_dateFmt)
         .format(DateTime.now().add(const Duration(days: 1)));
 
+    if (!await isConnected()) {
+      showSnackBar(
+          message: "Sales history requires an internet connection",
+          color: Colors.orange);
+      return;
+    }
+
     final response = await SalesService.getProductSalesGroupedByMonth(
       startDate: fromDate,
       endDate: toDate,
       product: product?.sId,
       shopId: _shopId,
     );
+
+    if (response == null) return;
 
     productMonthSales.addAll(
       (response as List).map<Map<String, dynamic>>((e) => {
@@ -2166,8 +2483,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       dueDate: dueDate,
     );
 
-    if (response['error'] != null) {
-      showSnackBar(message: response['error'], color: Colors.red);
+    if (response == null || response['error'] != null) {
+      if (response != null)
+        showSnackBar(message: response['error'], color: Colors.red);
       return;
     }
 

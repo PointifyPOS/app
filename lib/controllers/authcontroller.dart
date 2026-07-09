@@ -91,8 +91,6 @@ class AuthController {
 
   initUser({String type = ""}) async {
     bool connected = await isConnected();
-
-    // try {
     if (connected) {
       if ((await prefs.getString('id')) == null) return;
       userController.currentUserId.value = (await prefs.getString('id'))!;
@@ -103,19 +101,38 @@ class AuthController {
         response = await Authentication.getUser(
           userController.currentUserId.value,
         );
-        if (response["error"] != null) {
+        // Guard: response can be null if server unreachable despite isConnected()
+        if (response == null) {
+          // Fall back to SQLite cache
+          final id = await prefs.getString('id');
+          response = await DatabaseHelper().getUserByEmail(id: id);
+          if (response == null) {
+            logOut();
+            return;
+          }
+          response['_id'] = response['id'];
+        } else if (response["error"] != null) {
           logOut();
+          return;
         }
         response["usertype"] = usertype;
-
         DatabaseHelper().insertUser(response);
         userController.currentUser.value = UserModel.fromJson(response);
       } else if (usertype == "attendant") {
         var response = await Authentication.getAttendant(
           userController.currentUserId.value,
         );
-        if (response["error"] != null) {
+        if (response == null) {
+          final id = await prefs.getString('id');
+          response = await DatabaseHelper().getUserByEmail(id: id);
+          if (response == null) {
+            logOut();
+            return;
+          }
+          response['_id'] = response['id'];
+        } else if (response["error"] != null) {
           logOut();
+          return;
         }
         response["usertype"] = usertype;
         userController.currentUser.value = UserModel.fromJson(response);
@@ -141,9 +158,8 @@ class AuthController {
     var user = userController.currentUser.value;
     if (user != null) {
       if (user.usertype == "attendant") {
-        Get.off(() => HomePage());
+        Get.offAll(() => HomePage());
       } else {
-        final DateTime now = DateTime.now();
         if (userController.currentUser.value?.primaryShop != null) {
           if (type == "auth") {
             Get.offAll(() => const Home());
@@ -155,21 +171,30 @@ class AuthController {
         }
       }
     }
-    // } catch (e) {
-    //   print("Error: $e");
-    //   debugPrintMessage(e);
-    // } finally {
     SettingsApi.getSettings().then((data) async {
+      if (data == null) {
+        final cached = await DatabaseHelper().getOfflineSettings();
+        if (cached != null) {
+          AppConfig.offline_mode = (cached['offlineEnabled'] ?? 0) == 1;
+          userController.enableOffline.value = AppConfig.offline_mode;
+        }
+        return;
+      }
+
       var app = data['APP_CONFIG'];
       var themes = data['theme'];
       var general = data['GENERAL_CONFIG'];
       var stripe = data['STRIPE_CONFIG'];
+
       AppConfig.country_code =
           general == null ? "KES" : general['country_code'] ?? "US";
-      AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
-      if (AppConfig.stripePublishKey.isNotEmpty) {
-        Stripe.publishableKey = AppConfig.stripePublishKey;
-        Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
+
+      final stripeKey = stripe?['stripePublishKey'] ?? "";
+      AppConfig.stripePublishKey = stripeKey;
+      if (stripeKey.isNotEmpty && themes != null) {
+        Stripe.publishableKey = stripeKey;
+        Stripe.merchantIdentifier =
+            (themes['app_name'] ?? 'pointify').toLowerCase().trim();
         await Stripe.instance.applySettings();
       }
       if (app != null) {
@@ -178,14 +203,16 @@ class AuthController {
         AppConfig.demo_mode = app['demoEnabled'] ?? false;
         AppConfig.iosLink = app['iosLink'] ?? "";
       }
-      if (AppConfig.offline_mode == false) {
-        userController.enableOffline.value = false;
-      } else {
-        userController.enableOffline.value = true;
-      }
+      userController.enableOffline.value = AppConfig.offline_mode;
+
+      await DatabaseHelper().insertSettings({
+        'offlineEnabled': AppConfig.offline_mode,
+        'appName': themes?['app_name'],
+        'default_currency': general?['country_code'],
+      });
+
       checkForUpdate(app);
     });
-
     if (await isConnected()) {
       if (userController.currentUser.value != null &&
           userController.currentUser.value!.primaryShop != null) {
@@ -228,7 +255,6 @@ class AuthController {
       fromDate: Get.find<ReportsController>().filterStartDate.value,
       toDate: Get.find<ReportsController>().filterEndDate.value,
     );
-    // }
   }
 
   rateApp() async {

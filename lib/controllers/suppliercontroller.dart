@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/saleitem.dart';
+import 'package:pointify/sqlite/helper.dart';
+import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/snackBars.dart';
 
 import '../functions/functions.dart';
@@ -76,6 +78,20 @@ class SupplierController extends GetxController
         "shopId": userController.currentUser.value?.primaryShop?.id,
         "phoneNumber": phoneController.text,
       };
+
+      if (!await isConnected()) {
+        await DatabaseHelper().insertSupplierOffline(supplier);
+        await getSuppliers('');
+        clearTexts();
+        Get.back();
+        Get.back();
+        creatingSupplierLoad.value = false;
+        showSnackBar(
+            message: "Supplier saved offline — will sync when connected",
+            color: Colors.orange);
+        return;
+      }
+
       await SupplierService().createSupplier(supplier);
       await getSuppliers('');
       clearTexts();
@@ -101,10 +117,17 @@ class SupplierController extends GetxController
   getSuppliers(type, {String? name, String? shop}) async {
     loadingsuppliers.value = true;
     suppliers.clear();
-    List<dynamic> suppliersList = await SupplierService().getSuppliers(
-        name: name,
-        shop: userController.currentUser.value?.primaryShop?.id.toString(),
-        type: type);
+
+    List<dynamic> suppliersList;
+    if (!await isConnected()) {
+      suppliersList = await DatabaseHelper().getSuppliersLocal();
+    } else {
+      suppliersList = await SupplierService().getSuppliers(
+          name: name,
+          shop: userController.currentUser.value?.primaryShop?.id.toString(),
+          type: type);
+    }
+
     suppliers.addAll(suppliersList.map((e) => Supplier.fromJson(e)).toList());
     filteredSuppliers.value = suppliers;
     loadingsuppliers.value = false;

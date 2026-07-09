@@ -3,7 +3,7 @@ class BankModel {
   String? name;
   int? amount;
 
-  BankModel({this.name, this.amount});
+  BankModel({this.id, this.name, this.amount});
 
   BankModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];

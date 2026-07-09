@@ -11,8 +11,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/functions/functions.dart';
+import 'package:pointify/models/product.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/stockreport.dart';
+import 'package:pointify/models/usermodel.dart';
 import 'package:pointify/services/end_points.dart';
 import 'package:pointify/services/reports.dart';
 import 'package:pointify/widgets/snackbars.dart';
@@ -42,6 +44,7 @@ class ReportsController extends GetxController {
   RxMap<String, dynamic> filterPaymentTypeTotals =
       RxMap({'cash': 0, 'mpesa': 0, 'bank': 0});
   RxString activeFilter = RxString('today');
+  Rx<UserModel> selectedAttedant = Rx<UserModel>(UserModel());
   RxDouble totalSales = RxDouble(0.0);
   Map<String, dynamic> debtbreakdown = {
     "cash": 0.0,
@@ -156,7 +159,13 @@ class ReportsController extends GetxController {
     String? startDate,
     String? toDate,
     String? shopid,
+    String? attendant = "",
   }) async {
+    if (selectedAttedant.value.id != null) {
+      attendant = selectedAttedant.value.id;
+    } else {
+      attendant = '';
+    }
     var types = [
       {
         "title": "Cash Sales",
@@ -196,8 +205,11 @@ class ReportsController extends GetxController {
       },
     ];
     isLoadingReports.value = true;
-    var respose = await ReportsService()
-        .getSalesReport(startDate: startDate, toDate: toDate, shopid: shopid);
+    var respose = await ReportsService().getSalesReport(
+        startDate: startDate,
+        toDate: toDate,
+        shopid: shopid,
+        attendantId: attendant);
     salesCard.clear();
     totalSales.value = 0.0;
 

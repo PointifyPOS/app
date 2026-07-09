@@ -34,10 +34,6 @@ Widget productCard(
       } else if (type == "salemodule") {
         function!(product);
       } else {
-        if (userController.internetConected.isFalse) {
-          showSnackBar(message: "No internet connection", color: Colors.red);
-          return;
-        }
         if (function != null) {
           function(product);
         } else if (userController.currentUser.value!.primaryShop!.production ==

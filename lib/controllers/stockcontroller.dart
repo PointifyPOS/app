@@ -7,16 +7,19 @@ import 'package:pointify/main.dart';
 import 'package:pointify/models/productcount.dart';
 import 'package:pointify/models/transferhistory.dart';
 import 'package:pointify/services/product_service.dart';
+import 'package:pointify/sqlite/helper.dart';
 import 'package:pointify/widgets/alert.dart';
 import 'package:pointify/widgets/loading_dialog.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/product.dart';
 import '../models/shop.dart';
 import '../screens/stock/transfer_history.dart';
 import '../utils/colors.dart';
+import '../utils/helper.dart';
+import '../widgets/snackBars.dart';
 
 class StockController extends GetxController {
-
   RxList<Product> productsCount = RxList([]);
   RxList<Product> productsCountCart = RxList([]);
   Rxn<Product> selectedProductCount = Rxn();
@@ -31,26 +34,20 @@ class StockController extends GetxController {
   RxBool isLoadingCount = RxBool(false);
   RxList<ProductCount> countHistory = RxList([]);
 
-  RxString activeItem = RxString("Transfer In");
+  RxString activeItem = RxString('Transfer In');
   RxString filterDate =
-      RxString(DateFormat("MMM dd, yyyy").format(DateTime.now()));
-
-  
-
-  
+      RxString(DateFormat('MMM dd, yyyy').format(DateTime.now()));
 
   incrementQuantityWidget(context, Product product) {
     return showDialog(
         context: context,
         builder: (_) {
           return AlertDialog(
-            title: const Text(
-              "Update product count",
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
-            ),
+            title: const Text('Update product count',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -64,35 +61,27 @@ class StockController extends GetxController {
                         vertical: 10, horizontal: 10),
                     hintStyle: const TextStyle(color: Colors.grey),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
+                        borderRadius: BorderRadius.circular(5)),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
+                        borderRadius: BorderRadius.circular(5)),
                   ),
-                  onChanged: (v) => {},
                 ),
               ],
             ),
             actions: [
               TextButton(
-                onPressed: () {
-                  Get.back();
-                },
-                child: Text(
-                  "Cancel".toUpperCase(),
-                  style: TextStyle(
-                    color: AppColors.mainColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                onPressed: () => Get.back(),
+                child: Text('Cancel'.toUpperCase(),
+                    style: TextStyle(
+                        color: AppColors.mainColor,
+                        fontWeight: FontWeight.bold)),
               ),
               TextButton(
                 onPressed: () {
-                  int index = productsCountCart
-                      .indexWhere((element) => element.sId == product.sId);
-                  if (index != -1) {
-                    productsCountCart[index].lastCount =
+                  final idx =
+                      productsCountCart.indexWhere((e) => e.sId == product.sId);
+                  if (idx != -1) {
+                    productsCountCart[idx].lastCount =
                         int.parse(textEditingControllerCount.text);
                   } else {
                     product.lastCount =
@@ -104,24 +93,22 @@ class StockController extends GetxController {
                   Get.back();
                   textEditingControllerCount.clear();
                 },
-                child: Text(
-                  "Update".toUpperCase(),
-                  style: TextStyle(
-                    color: AppColors.mainColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: Text('Update'.toUpperCase(),
+                    style: TextStyle(
+                        color: AppColors.mainColor,
+                        fontWeight: FontWeight.bold)),
               ),
             ],
           );
         });
   }
 
-  gettingTransferHistory(
-      {String? startDate = "",
-      String? toDate = "",
-      String? shopid = "",
-      String? direction = ""}) async {
+  gettingTransferHistory({
+    String? startDate = '',
+    String? toDate = '',
+    String? shopid = '',
+    String? direction = '',
+  }) async {
     try {
       transferHistory.clear();
       gettingTransferHistoryLoad.value = true;
@@ -139,32 +126,53 @@ class StockController extends GetxController {
     }
   }
 
+  // countProduct — saves offline if no internet, syncs back on reconnect
   Future<void> countProduct() async {
     LoadingDialog.showLoadingDialog(
-        context: Get.context!, title: "Please wait", key: _keyLoader);
-    var productdata = {
-      "attendantId": userController.currentUser.value!.attendantId,
-      "useWarehouse":
+        context: Get.context!, title: 'Please wait', key: _keyLoader);
+
+    final productdata = {
+      'attendantId': userController.currentUser.value!.attendantId?.sId,
+      'useWarehouse':
           userController.currentUser.value!.primaryShop!.useWarehouse,
-      "shopId": userController.currentUser.value!.primaryShop!.id,
-      "products": productsCountCart
-          .map((element) =>
-              {"productId": element.sId, "physicalCount": element.lastCount!})
-          .toList()
+      'shopId': userController.currentUser.value!.primaryShop!.id,
+      'products': productsCountCart
+          .map((e) => {'productId': e.sId, 'physicalCount': e.lastCount!})
+          .toList(),
     };
-    var response = await ProductService.countProduct(productdata);
-    Get.back();
-    if (response["error"] != null) {
-      generalAlert(message: response["error"], title: "Error");
+
+    final connected = await isConnected();
+
+    if (!connected) {
+      Get.back(); // close loader
+      await DatabaseHelper().insertStockCountOffline(productdata);
+      // Update local quantities immediately so UI is accurate
+      for (final p in productsCountCart) {
+        await DatabaseHelper()
+            .updateProduct({'id': p.sId, 'quantity': p.lastCount});
+      }
+      productsCountCart.clear();
+      Get.find<ProductController>().getProductsBySort(type: 'all');
+      showSnackBar(
+          message: 'Stock count saved offline — will sync when connected',
+          color: Colors.orange);
+      Get.back();
+      return;
+    }
+
+    final response = await ProductService.countProduct(productdata);
+    Get.back(); // close loader
+    if (response['error'] != null) {
+      generalAlert(message: response['error'], title: 'Error');
       return;
     }
     productsCountCart.clear();
-    Get.find<ProductController>().getProductsBySort(type: "all");
+    Get.find<ProductController>().getProductsBySort(type: 'all');
     Get.back();
   }
 
   getCountHistory(
-      {Product? product, String? fromDate = "", String? toDate = ""}) async {
+      {Product? product, String? fromDate = '', String? toDate = ''}) async {
     countHistory.clear();
     isLoadingCount.value = true;
     List<dynamic> productCountHistory = await ProductService.getCountHistory(

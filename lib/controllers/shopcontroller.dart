@@ -88,6 +88,10 @@ RxBool viewAllCustomers = false.obs;
   ]);
 
   createShop({required page, required context, String? type = "shop"}) async {
+    if (!await isConnected()) {
+      generalAlert(title: "Error", message: "No internet connection");
+      return;
+    }
     if (nameController.text.trim().isEmpty) {
       generalAlert(title: "Error", message: "Please enter  name");
       return;
@@ -426,12 +430,33 @@ RxBool viewAllCustomers = false.obs;
   getCategories() async {
     try {
       loadingcateries.value = true;
+
+      if (!await isConnected()) {
+        loadingcateries.value = false;
+        showSnackBar(
+            message: "Shop categories require an internet connection",
+            color: Colors.orange);
+        return;
+      }
+
       List<dynamic> response = await ShopService().getShopTypes();
       categories.value = response.map((e) => ShopTypes.fromJson(e)).toList();
       loadingcateries.value = false;
     } catch (e) {
       loadingcateries.value = false;
     }
+  }
+
+  Future<Map<String, dynamic>> _pushOrQueueShopUpdate(
+      String shopId, Map<String, dynamic> payload) async {
+    if (!await isConnected()) {
+      await DatabaseHelper().insertShopUpdateOffline(shopId, payload);
+      showSnackBar(
+          message: "Saved offline — will sync when connected",
+          color: Colors.orange);
+      return {};
+    }
+    return await ShopService().updateShop(shopId, payload);
   }
 
   updateShop(
@@ -451,12 +476,11 @@ RxBool viewAllCustomers = false.obs;
           allowOnlineSelling != null ||
           allowBackup != null) {
         if (allowOnlineSelling != null) {
-          await ShopService().updateShop(
+          await _pushOrQueueShopUpdate(
               shop!.id!, {"allowOnlineSelling": allowOnlineSelling});
         }
         if (allowBackup != null) {
-          await ShopService()
-              .updateShop(shop!.id!, {"allowBackup": allowBackup});
+          await _pushOrQueueShopUpdate(shop!.id!, {"allowBackup": allowBackup});
         }
         if (location != "") {
         } else if (backup.isNotEmpty) {
@@ -466,7 +490,7 @@ RxBool viewAllCustomers = false.obs;
           }
           LoadingDialog.showLoadingDialog(
               context: Get.context!, title: "Please wait...", key: _keyLoader);
-          await ShopService().updatebackupiterval(shop!.id!, {
+          await _pushOrQueueShopUpdate(shop!.id!, {
             "backupInterval": selectedbackupsendinterval['name'],
             "backupemail": shop.backupemail,
           });
@@ -474,7 +498,7 @@ RxBool viewAllCustomers = false.obs;
           generalAlert(message: "Update interval updated", title: "Success");
         } else if (backupemail.isNotEmpty) {
         } else {
-          var response = await ShopService().updateShop(shop!.id!, {
+          var response = await _pushOrQueueShopUpdate(shop!.id!, {
             "name": nameController.text,
             "backupInterval": selectedbackupsendinterval['name'],
             "useWarehouse": useWarehouse.value,
@@ -490,7 +514,7 @@ RxBool viewAllCustomers = false.obs;
           }
         }
       } else {
-        var response = await ShopService().updateShop(shop!.id!, {
+        var response = await _pushOrQueueShopUpdate(shop!.id!, {
           "name": nameController.text,
           "backupInterval": selectedbackupsendinterval['name'],
           "production": productionEnabled.value,

@@ -65,7 +65,7 @@ class Shop {
       this.addressReceipt});
 
   Shop.fromJson(Map<String, dynamic> json) {
-    primary = json['primary'] ?? false;
+    primary = _toBool(json['primary']);
     allowBackup = json['allowBackup'] == 1 || json['allowBackup'] == true
         ? true
         : json['allowBackup'] == 0 || json['allowBackup'] == false
@@ -77,11 +77,11 @@ class Shop {
         : json['allowOnlineSelling'] == 0 || json['allowOnlineSelling'] == false
             ? false
             : false;
-    allowbatchtracking = json['trackbatches'] ?? false;
-    useWarehouse = json['useWarehouse'] ?? false;
-    production = json['production'] ?? false;
-    warehouse = json['warehouse'] ?? false;
-    allownegativeselling = json['allownegativeselling'] ?? false;
+    allowbatchtracking = _toBool(json['trackbatches']);
+    useWarehouse = _toBool(json['useWarehouse']);
+    production = _toBool(json['production']);
+    warehouse = _toBool(json['warehouse']);
+    allownegativeselling = _toBool(json['allownegativeselling']);
     warehouseemail = json['warehouseemail'] ?? '';
     receiptemail = json['receiptemail'] ?? '';
     backupInterval = json['backupInterval'] ?? '';
@@ -118,6 +118,15 @@ class Shop {
     paybillTill = json['paybill_till'];
     addressReceipt = json['address_receipt'];
   }
+
+  /// Safely converts SQLite int (0/1), bool, or null to bool.
+  static bool _toBool(dynamic v) {
+    if (v == null) return false;
+    if (v is bool) return v;
+    if (v is int) return v == 1;
+    return false;
+  }
+
   bool isInteger(num value) => value is int || value == value.roundToDouble();
 
   Map<String, dynamic> toJson() {
