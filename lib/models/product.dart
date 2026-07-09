@@ -6,6 +6,262 @@ import 'package:pointify/models/supplier.dart';
 
 import '../screens/product/create_product.dart';
 
+class ProductDisplay {
+  String? name;
+  String? sId;
+  String? image;
+  String? type;
+  String? measureUnit;
+
+  double? buyingPrice;
+  double? sellingPrice;
+  double? minSellingPrice;
+
+  double? quantity;
+
+  String? status;
+
+  int? reorderLevel;
+
+  double? maxDiscount;
+
+  Supplier? supplierId;
+  String? supplierName;
+
+  ProductCategory? productCategoryId;
+  String? productCategoryName;
+
+  String? description;
+  String? expiryDate;
+  String? manufacturer;
+  String? barcode;
+
+  double? wholesalePrice;
+  double? dealerPrice;
+
+  List<CustomImage>? images;
+
+  Attendant? attendantId;
+
+  bool? bundle;
+  bool? virtual;
+  bool? taxable;
+  bool? manageByPrice;
+
+  ProductDisplay({
+    this.name,
+    this.sId,
+    this.image,
+    this.type,
+    this.measureUnit,
+    this.buyingPrice,
+    this.sellingPrice,
+    this.minSellingPrice,
+    this.quantity,
+    this.status,
+    this.reorderLevel,
+    this.maxDiscount,
+    this.supplierId,
+    this.supplierName,
+    this.productCategoryId,
+    this.productCategoryName,
+    this.description,
+    this.expiryDate,
+    this.manufacturer,
+    this.barcode,
+    this.wholesalePrice,
+    this.dealerPrice,
+    this.images,
+    this.attendantId,
+    this.bundle,
+    this.virtual,
+    this.taxable,
+    this.manageByPrice,
+  });
+
+  ProductDisplay.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+    sId = json['_id'];
+
+    image = json['image'];
+
+    type = json['productType'] ?? json['type'] ?? "product";
+
+    measureUnit = json['measure'] ?? json['measureUnit'];
+
+    buyingPrice =
+        json['buyingPrice'] == null ? 0.0 : json['buyingPrice'].toDouble();
+
+    sellingPrice =
+        json['sellingPrice'] == null ? 0.0 : json['sellingPrice'].toDouble();
+
+    minSellingPrice = json['minSellingPrice'] == null
+        ? 0.0
+        : json['minSellingPrice'].toDouble();
+
+    quantity = json['quantity'] == null ? 0.0 : json['quantity'].toDouble();
+
+    status = json['status'];
+
+    reorderLevel = json['reorderLevel'] == null
+        ? 0
+        : int.tryParse(json['reorderLevel'].toString());
+
+    maxDiscount =
+        json['maxDiscount'] == null ? 0.0 : json['maxDiscount'].toDouble();
+
+    supplierId =
+        json['supplierId'] != null && json['supplierId'] is String == false
+            ? Supplier.fromJson(json['supplierId'])
+            : null;
+
+    supplierName = json['supplierName'];
+
+    productCategoryId = json['productCategoryId'] != null &&
+            json['productCategoryId'] is String == false
+        ? ProductCategory.fromJson(json['productCategoryId'])
+        : null;
+
+    productCategoryName = json['productCategoryName'];
+
+    description = json['description'];
+
+    expiryDate = json['expiryDate'];
+
+    manufacturer = json['manufacturer'];
+
+    barcode = json['barcode'];
+
+    wholesalePrice = json['wholesalePrice'] == null
+        ? 0.0
+        : json['wholesalePrice'].toDouble();
+
+    dealerPrice =
+        json['dealerPrice'] == null ? 0.0 : json['dealerPrice'].toDouble();
+
+    images = json["images"] == null ||
+            json["images"].isEmpty ||
+            json["images"] is String
+        ? []
+        : List<CustomImage>.from(
+            json["images"].map(
+              (x) => CustomImage(
+                imgType: ImageType.network,
+                path: x ?? "",
+              ),
+            ),
+          );
+
+    if (json['attendantId'] != null && json['attendantId'] is String == false) {
+      attendantId = Attendant.fromJson(json['attendantId']);
+    }
+
+    bundle = json['bundle'] ?? false;
+    virtual = json['virtual'] ?? false;
+
+    taxable = json['taxable'] == 1 || json['taxable'] == true ? true : false;
+
+    manageByPrice = json['manageByPrice'] ?? false;
+  }
+
+  factory ProductDisplay.fromProduct(Product product) {
+    return ProductDisplay(
+      sId: product.sId,
+      name: product.name,
+      image: product.images != null && product.images!.isNotEmpty
+          ? product.images!.first.path
+          : null,
+      images: product.images,
+      type: product.type,
+      measureUnit: product.measureUnit,
+      buyingPrice: product.buyingPrice,
+      sellingPrice: product.sellingPrice,
+      minSellingPrice: product.minSellingPrice,
+      quantity: product.quantity,
+      status: product.status,
+      reorderLevel: product.reorderLevel,
+      maxDiscount: product.maxDiscount,
+      supplierId: product.supplierId,
+      supplierName: product.supplierId?.name,
+      productCategoryId: product.productCategoryId,
+      productCategoryName: product.productCategoryId?.name,
+      description: product.description,
+      expiryDate: product.expiryDate,
+      manufacturer: product.manufacturer,
+      barcode: product.barcode,
+      wholesalePrice: product.wholesalePrice,
+      dealerPrice: product.dealerPrice,
+      attendantId: product.attendantId,
+      bundle: product.bundle,
+      virtual: product.virtual,
+      taxable: product.taxable,
+      manageByPrice: product.manageByPrice,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      "_id": sId,
+      "name": name,
+      "image": image,
+      "type": type,
+      "measureUnit": measureUnit,
+      "buyingPrice": buyingPrice,
+      "sellingPrice": sellingPrice,
+      "minSellingPrice": minSellingPrice,
+      "quantity": quantity,
+      "status": status,
+      "reorderLevel": reorderLevel,
+      "maxDiscount": maxDiscount,
+      "supplierId": supplierId?.toJson(),
+      "supplierName": supplierName,
+      "productCategoryId": productCategoryId?.toJson(),
+      "productCategoryName": productCategoryName,
+      "description": description,
+      "expiryDate": expiryDate,
+      "manufacturer": manufacturer,
+      "barcode": barcode,
+      "wholesalePrice": wholesalePrice,
+      "dealerPrice": dealerPrice,
+      "bundle": bundle,
+      "virtual": virtual,
+      "taxable": taxable,
+      "manageByPrice": manageByPrice,
+      "attendantId": attendantId?.toJson(),
+      "images": images?.map((e) => e.path).toList(),
+    };
+  }
+
+  Product toProduct() {
+    return Product(
+      sId: sId,
+      images: images ?? [],
+      name: name,
+      manufacturer: manufacturer,
+      expiryDate: expiryDate,
+      manageByPrice: manageByPrice,
+      status: status,
+      taxable: taxable,
+      buyingPrice: buyingPrice,
+      sellingPrice: sellingPrice,
+      minSellingPrice: minSellingPrice,
+      virtual: virtual,
+      quantity: quantity,
+      bundle: bundle,
+      maxDiscount: maxDiscount,
+      reorderLevel: reorderLevel,
+      barcode: barcode,
+      productCategoryId: productCategoryId,
+      measureUnit: measureUnit,
+      supplierId: supplierId,
+      description: description,
+      type: type,
+      dealerPrice: dealerPrice,
+      wholesalePrice: wholesalePrice,
+      attendantId: attendantId,
+    );
+  }
+}
+
 class Product {
   List<CustomImage>? images;
   String? sId;
@@ -186,18 +442,18 @@ class Product {
   }
 
   //get the oldest (by createdAt) batch buying price
-  String? getBuyingPrice() {
-    if (batches!.isNotEmpty) {
-      List<Batch> batches = this.batches!;
-      double totalQty = batches.fold(0, (p, b) => p + b.quantity!);
-      if (totalQty == 0) return buyingPrice?.toStringAsFixed(2);
-      if (totalQty < quantity!) return buyingPrice?.toStringAsFixed(2);
-      batches.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
-      return batches.first.buyingPrice!.toStringAsFixed(2);
-    } else {
-      return buyingPrice?.toStringAsFixed(2);
-    }
-  }
+  // String? getBuyingPrice() {
+  //   if (batches!.isNotEmpty) {
+  //     List<Batch> batches = this.batches!;
+  //     double totalQty = batches.fold(0, (p, b) => p + b.quantity!);
+  //     if (totalQty == 0) return buyingPrice?.toStringAsFixed(2);
+  //     if (totalQty < quantity!) return buyingPrice?.toStringAsFixed(2);
+  //     batches.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+  //     return batches.first.buyingPrice!.toStringAsFixed(2);
+  //   } else {
+  //     return buyingPrice?.toStringAsFixed(2);
+  //   }
+  // }
 }
 
 bool isInteger(num value) => value is int || value == value.roundToDouble();

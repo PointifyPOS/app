@@ -6,7 +6,6 @@ import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/salemodel.dart';
 import 'package:pointify/widgets/minor_title.dart';
 
-import '../../../responsive/responsiveness.dart';
 import '../../../utils/colors.dart';
 import '../../../widgets/delete_dialog.dart';
 import '../../../widgets/major_title.dart';
@@ -17,8 +16,7 @@ showBottomSheet(BuildContext context, OrderItem salesModel) {
   SalesController salesController = Get.find<SalesController>();
   return showModalBottomSheet(
       context: context,
-      backgroundColor:
-          isSmallScreen(context) ? Colors.white : Colors.transparent,
+      backgroundColor: Colors.white,
       builder: (_) {
         return Container(
           color: Colors.white,
@@ -131,11 +129,12 @@ Widget orderCard({required OrderItem salesModel, String? from = ""}) {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 3),
-              minorTitle(
-                  title:
-                      "From: ${salesModel.customer?.name}\n${salesModel.customer?.phoneNumber}",
-                  color: Colors.black,
-                  size: 12),
+              if (salesModel.customer != null)
+                minorTitle(
+                    title:
+                        "From: ${salesModel.customer?.name}\n${salesModel.customer?.phoneNumber}",
+                    color: Colors.black,
+                    size: 12),
               const SizedBox(height: 3),
               Container(
                 decoration: BoxDecoration(
@@ -145,6 +144,7 @@ Widget orderCard({required OrderItem salesModel, String? from = ""}) {
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                 child: minorTitle(
                     title: _chechPayment(salesModel),
+                    size: 11,
                     color: _chechPaymentColor(orderItem: salesModel)),
               ),
             ],

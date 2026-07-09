@@ -18,20 +18,17 @@ class ShopsToRenew extends StatelessWidget {
 
   final ShopController shopController = Get.find();
   final PaymentController paymentController = Get.find();
+  bool get isNewPricing => plan.shopOptions.isNotEmpty;
+
   ShopPriceOption? getSelectedShopOption() {
     final selectedCount = shopController.shopsRenew.length;
 
-    if (plan.shopOptions.isEmpty) return null;
+    if (!isNewPricing) return null;
 
-    // exact match first
     for (final option in plan.shopOptions) {
-      if (option.shops == selectedCount) {
-        return option;
-      }
+      if (option.shops == selectedCount) return option;
     }
 
-    // if selected shops are below package minimum,
-    // charge the package starting price
     final firstOption = plan.shopOptions.first;
 
     if (selectedCount > 0 && selectedCount < firstOption.shops) {
@@ -233,7 +230,9 @@ class ShopsToRenew extends StatelessWidget {
     }
 
     final selectedOption = getSelectedShopOption();
-
+    final priceText = isNewPricing
+        ? (selectedOption?.priceText ?? plan.priceText ?? "")
+        : "KES ${plan.amount ?? 0}";
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
@@ -265,7 +264,7 @@ class ShopsToRenew extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    selectedOption?.priceText ?? plan.priceText ?? "",
+                    priceText,
                     style: TextStyle(
                       fontSize: 18,
                       color: AppColors.mainColor,
@@ -286,8 +285,7 @@ class ShopsToRenew extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              onPressed:
-                  selectedOption == null ? null : () => _paymentSheet(context),
+              onPressed: () => _paymentSheet(context),
               child: const Text(
                 "Continue",
                 style: TextStyle(fontSize: 14, color: Colors.white),
@@ -502,7 +500,7 @@ class ShopsToRenew extends StatelessWidget {
     final String reference = _generateRef();
     final selectedOption = getSelectedShopOption();
 
-    if (selectedOption == null) {
+    if (isNewPricing && selectedOption == null) {
       Get.snackbar(
         "Invalid selection",
         "Please select shops within this plan limit",
@@ -511,7 +509,7 @@ class ShopsToRenew extends StatelessWidget {
       return;
     }
 
-    var amount = selectedOption.amount;
+    var amount = isNewPricing ? selectedOption!.amount : plan.amount!;
     if (userController.currentUser.value?.primaryShop?.currency == "USD") {
       amount = plan.amountusd!;
     }

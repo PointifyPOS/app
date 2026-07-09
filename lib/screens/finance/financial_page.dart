@@ -75,14 +75,11 @@ class FinancialPage extends StatelessWidget {
             toDate: DateFormat('yyy-MM-dd')
                 .format(args.value.endDate ?? args.value.startDate),
             shopId: userController.currentUser.value!.primaryShop!.id!);
-        isSmallScreen(Get.context)
-            ? Get.to(() => NetProfitReport(
-                  headline: "from\n${salesController.range.value}",
-                  firstday: args.value.startDate,
-                  lastday: args.value.endDate ?? args.value.startDate,
-                ))
-            : Get.find<HomeController>().selectedWidget.value = NetProfitReport(
-                headline: "from\n${salesController.range.value}");
+        Get.to(() => NetProfitReport(
+              headline: "from\n${salesController.range.value}",
+              firstday: args.value.startDate,
+              lastday: args.value.endDate ?? args.value.startDate,
+            ));
       }
     }
   }
@@ -98,245 +95,108 @@ class FinancialPage extends StatelessWidget {
             SfDateRangePicker(
                 onSelectionChanged: _onSelectionChanged,
                 selectionMode: DateRangePickerSelectionMode.range,
-                monthCellStyle:  DateRangePickerMonthCellStyle(
+                monthCellStyle: DateRangePickerMonthCellStyle(
                   textStyle: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppColors.mainColor,
                   ),
                 ),
                 monthViewSettings: const DateRangePickerMonthViewSettings(),
-                headerStyle:  DateRangePickerHeaderStyle(
+                headerStyle: DateRangePickerHeaderStyle(
                     textAlign: TextAlign.center,
                     textStyle: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.mainColor,
                         fontSize: 18)),
                 onSubmit: (v) {}),
-            isSmallScreen(context)
-                ? ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: operations.length,
-                    itemBuilder: (context, index) {
-                      return financeCards(
-                          title: operations[index]["title"],
-                          subtitle: operations[index]["subtitle"],
-                          icon: operations[index]["icon"],
-                          onPresssed: () {
-                            switch (operations[index]["title"]) {
-                              case "Today profit":
-                                {
-                                  salesController.filterStartDate.value =
-                                      DateFormat("yyy-MM-dd")
-                                          .format(DateTime.now());
-                                  salesController.filterEndDate.value =
-                                      DateFormat("yyy-MM-dd").format(
-                                          DateTime.now()
-                                              .add(const Duration(days: 1)));
+            ListView.builder(
+                shrinkWrap: true,
+                itemCount: operations.length,
+                itemBuilder: (context, index) {
+                  return financeCards(
+                      title: operations[index]["title"],
+                      subtitle: operations[index]["subtitle"],
+                      icon: operations[index]["icon"],
+                      onPresssed: () {
+                        switch (operations[index]["title"]) {
+                          case "Today profit":
+                            {
+                              salesController.filterStartDate.value =
+                                  DateFormat("yyy-MM-dd")
+                                      .format(DateTime.now());
+                              salesController.filterEndDate.value =
+                                  DateFormat("yyy-MM-dd").format(DateTime.now()
+                                      .add(const Duration(days: 1)));
 
-                                  salesController.getNetAnalysis(
-                                      fromDate:
-                                          salesController.filterStartDate.value,
-                                      toDate:
-                                          salesController.filterEndDate.value,
-                                      shopId: userController
-                                          .currentUser.value!.primaryShop!.id!);
-                                  isSmallScreen(context)
-                                      ? Get.to(() => NetProfitReport(
-                                            headline: "Today",
-                                            firstday: DateTime.now(),
-                                            lastday: DateTime.now()
-                                                .add(const Duration(days: 1)),
-                                          ))
-                                      : Get.find<HomeController>()
-                                              .selectedWidget
-                                              .value =
-                                          NetProfitReport(headline: "Today");
-                                }
-                                break;
-
-                              case "Current Month profit":
-                                {
-                                  DateTime now = DateTime.now();
-                                  var lastday =
-                                      DateTime(now.year, now.month + 1, 0);
-
-                                  final noww = DateTime.now();
-
-                                  var firstday =
-                                      DateTime(noww.year, noww.month, 1);
-
-                                  salesController.filterStartDate.value =
-                                      DateFormat("yyy-MM-dd").format(firstday);
-                                  salesController.filterEndDate.value =
-                                      DateFormat("yyy-MM-dd").format(lastday);
-
-                                  salesController.getNetAnalysis(
-                                      fromDate:
-                                          salesController.filterStartDate.value,
-                                      toDate:
-                                          salesController.filterEndDate.value,
-                                      shopId: userController
-                                          .currentUser.value!.primaryShop!.id!);
-                                  isSmallScreen(context)
-                                      ? Get.to(() => NetProfitReport(
-                                            firstday: firstday,
-                                            lastday: lastday,
-                                            headline:
-                                                '\n${DateFormat("yyy-MM-dd").format(firstday)}-${DateFormat("yyy-MM-dd").format(lastday)}',
-                                          ))
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = NetProfitReport(
-                                          headline:
-                                              '\n${DateFormat("yyy-MM-dd").format(firstday)}-${DateFormat("yyy-MM-dd").format(lastday)}',
-                                        );
-                                }
-                                break;
-                              case "Monthly Profit & Expenses":
-                                {
-                                  isSmallScreen(context)
-                                      ? Get.to(() => MonthFilter())
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = MonthFilter();
-                                }
-                                break;
-
-                              case "Graphical Analysis":
-                                {
-                                  isSmallScreen(context)
-                                      ? Get.to(() => const GraphAnalysis())
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = const GraphAnalysis();
-                                }
-                                break;
-                              case "Products Movement":
-                                {
-                                  salesController.selectedMonth.value =
-                                      DateTime.now().month;
-                                  salesController.currentYear.value =
-                                      DateTime.now().year;
-                                  isSmallScreen(context)
-                                      ? Get.to(() => const ProductAnalysis())
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = const ProductAnalysis();
-                                }
-                                break;
+                              salesController.getNetAnalysis(
+                                  fromDate:
+                                      salesController.filterStartDate.value,
+                                  toDate: salesController.filterEndDate.value,
+                                  shopId: userController
+                                      .currentUser.value!.primaryShop!.id!);
+                              Get.to(() => NetProfitReport(
+                                    headline: "Today",
+                                    firstday: DateTime.now(),
+                                    lastday: DateTime.now()
+                                        .add(const Duration(days: 1)),
+                                  ));
                             }
-                          },
-                          color: operations[index]["color"],
-                          amount: operations[index]["amount"]);
-                    })
-                : GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio:
-                            MediaQuery.of(context).size.width > 1100
-                                ? 1.6
-                                : MediaQuery.of(context).size.width > 900
-                                    ? 1.3
-                                    : 1.1,
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10),
-                    shrinkWrap: true,
-                    itemCount: operations.length,
-                    itemBuilder: (context, index) {
-                      return financeCards(
-                          title: operations[index]["title"],
-                          subtitle: operations[index]["subtitle"],
-                          icon: operations[index]["icon"],
-                          showsummary: false,
-                          onPresssed: () {
-                            switch (operations[index]["title"]) {
-                              case "Today profit":
-                                {
-                                  salesController.getNetAnalysis(
-                                      fromDate: DateFormat("yyy-MM-dd")
-                                          .format(DateTime.now()),
-                                      toDate: DateFormat("yyy-MM-dd").format(
-                                          DateTime.now()
-                                              .add(const Duration(days: 1))),
-                                      shopId: userController
-                                          .currentUser.value!.primaryShop!.id!);
-                                  isSmallScreen(context)
-                                      ? Get.to(() =>
-                                          NetProfitReport(headline: "Today"))
-                                      : Get.find<HomeController>()
-                                              .selectedWidget
-                                              .value =
-                                          NetProfitReport(headline: "Today");
-                                }
-                                break;
+                            break;
 
-                              case "Current Month profit":
-                                {
-                                  DateTime now = DateTime.now();
-                                  var lastday =
-                                      DateTime(now.year, now.month + 1, 0);
+                          case "Current Month profit":
+                            {
+                              DateTime now = DateTime.now();
+                              var lastday =
+                                  DateTime(now.year, now.month + 1, 0);
 
-                                  final noww = DateTime.now();
+                              final noww = DateTime.now();
 
-                                  var firstday =
-                                      DateTime(noww.year, noww.month, 1);
-                                  salesController.getNetAnalysis(
-                                      fromDate: DateFormat("yyy-MM-dd")
-                                          .format(firstday),
-                                      toDate: DateFormat("yyy-MM-dd")
-                                          .format(lastday),
-                                      shopId: userController
-                                          .currentUser.value!.primaryShop!.id!);
-                                  isSmallScreen(context)
-                                      ? Get.to(() => NetProfitReport(
-                                            headline:
-                                                '\n${DateFormat("yyy-MM-dd").format(firstday)}-${DateFormat("yyy-MM-dd").format(lastday)}',
-                                          ))
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = NetProfitReport(
-                                          headline:
-                                              '\n${DateFormat("yyy-MM-dd").format(firstday)}-${DateFormat("yyy-MM-dd").format(lastday)}',
-                                        );
-                                }
-                                break;
-                              case "Monthly Profit & Expenses":
-                                {
-                                  isSmallScreen(context)
-                                      ? Get.to(() => MonthFilter())
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = MonthFilter();
-                                }
-                                break;
+                              var firstday = DateTime(noww.year, noww.month, 1);
 
-                              case "Graphical Analysis":
-                                {
-                                  isSmallScreen(context)
-                                      ? Get.to(() => const GraphAnalysis())
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = const GraphAnalysis();
-                                }
-                                break;
-                              case "Products Movement":
-                                {
-                                  salesController.selectedMonth.value =
-                                      DateTime.now().month;
-                                  salesController.currentYear.value =
-                                      DateTime.now().year;
-                                  isSmallScreen(context)
-                                      ? Get.to(() => const ProductAnalysis())
-                                      : Get.find<HomeController>()
-                                          .selectedWidget
-                                          .value = const ProductAnalysis();
-                                }
-                                break;
+                              salesController.filterStartDate.value =
+                                  DateFormat("yyy-MM-dd").format(firstday);
+                              salesController.filterEndDate.value =
+                                  DateFormat("yyy-MM-dd").format(lastday);
+
+                              salesController.getNetAnalysis(
+                                  fromDate:
+                                      salesController.filterStartDate.value,
+                                  toDate: salesController.filterEndDate.value,
+                                  shopId: userController
+                                      .currentUser.value!.primaryShop!.id!);
+                              Get.to(() => NetProfitReport(
+                                    firstday: firstday,
+                                    lastday: lastday,
+                                    headline:
+                                        '\n${DateFormat("yyy-MM-dd").format(firstday)}-${DateFormat("yyy-MM-dd").format(lastday)}',
+                                  ));
                             }
-                          },
-                          color: operations[index]["color"],
-                          amount: operations[index]["amount"]);
-                    }),
+                            break;
+                          case "Monthly Profit & Expenses":
+                            {
+                              Get.to(() => MonthFilter());
+                            }
+                            break;
+
+                          case "Graphical Analysis":
+                            {
+                              Get.to(() => const GraphAnalysis());
+                            }
+                            break;
+                          case "Products Movement":
+                            {
+                              salesController.selectedMonth.value =
+                                  DateTime.now().month;
+                              salesController.currentYear.value =
+                                  DateTime.now().year;
+                              Get.to(() => const ProductAnalysis());
+                            }
+                            break;
+                        }
+                      },
+                      color: operations[index]["color"],
+                      amount: operations[index]["amount"]);
+                }),
           ],
         ),
       ),
@@ -366,26 +226,6 @@ class FinancialPage extends StatelessWidget {
       ),
       title: majorTitle(
           title: "Profit & expenses", color: Colors.black, size: 16.0),
-      actions: [
-        if (!isSmallScreen(context))
-          InkWell(
-            onTap: () {
-              // Get.find<HomeController>().selectedWidget.value = ExpensePage();
-            },
-            child: Container(
-                height: kToolbarHeight * 0.4,
-                margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.mainColor),
-                child: const Center(
-                    child: Text(
-                  "Add Expense",
-                  style: TextStyle(color: Colors.white),
-                ))),
-          )
-      ],
     );
   }
 
@@ -402,81 +242,38 @@ class FinancialPage extends StatelessWidget {
         onPresssed();
       },
       child: Container(
-        margin: EdgeInsets.only(
-            top: 10, right: isSmallScreen(Get.context) ? 0 : 10),
+        margin: EdgeInsets.only(top: 10, right: 0),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
             color: Colors.deepPurple.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10)),
         child: Column(
-          crossAxisAlignment: isSmallScreen(Get.context)
-              ? CrossAxisAlignment.start
-              : CrossAxisAlignment.center,
-          mainAxisAlignment: isSmallScreen(Get.context)
-              ? MainAxisAlignment.start
-              : MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            isSmallScreen(Get.context)
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(child: Icon(icon)),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          majorTitle(
-                              title: title,
-                              color: Colors.black,
-                              size: isSmallScreen(Get.context) ? 16.0 : 12.0),
-                          const SizedBox(height: 5),
-                          minorTitle(title: subtitle, color: Colors.grey)
-                        ],
-                      )
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: Center(child: Icon(icon)),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: majorTitle(
-                                title: title,
-                                color: Colors.black,
-                                size: isSmallScreen(Get.context) ? 16.0 : 12.0),
-                          ),
-                          const SizedBox(height: 5),
-                          Center(
-                              child: minorTitle(
-                                  title: subtitle, color: Colors.grey))
-                        ],
-                      )
-                    ],
-                  ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      color: color, borderRadius: BorderRadius.circular(20)),
+                  child: Center(child: Icon(icon)),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    majorTitle(title: title, color: Colors.black, size: 0),
+                    const SizedBox(height: 5),
+                    minorTitle(title: subtitle, color: Colors.grey)
+                  ],
+                )
+              ],
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -494,7 +291,7 @@ class FinancialPage extends StatelessWidget {
 }
 
 class MonthFilter extends StatelessWidget {
-  MonthFilter({Key? key}) : super(key: key);
+  MonthFilter({super.key});
   final List<Map<String, dynamic>> months = [
     {"month": "January"},
     {"month": "February"},

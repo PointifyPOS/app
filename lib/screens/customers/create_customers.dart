@@ -16,8 +16,8 @@ import '../../widgets/major_title.dart';
 import '../../widgets/minor_title.dart';
 
 class CreateCustomer extends StatelessWidget {
-  final String  page;
- final  Function? function;
+  final String page;
+  final Function? function;
 
   CreateCustomer({Key? key, required this.page, this.function})
       : super(key: key) {
@@ -33,9 +33,8 @@ class CreateCustomer extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: true,
-      onPopInvoked: (val)  {
+      onPopInvoked: (val) {
         customersController.getCustomersInShop("");
-
       },
       child: Scaffold(
           backgroundColor: Colors.white.withOpacity(0.96),
@@ -47,28 +46,7 @@ class CreateCustomer extends StatelessWidget {
               automaticallyImplyLeading: false,
               leading: IconButton(
                 onPressed: () {
-                  if (!isSmallScreen(context)) {
-                    if (page == "customersPage") {
-                      Get.find<HomeController>().selectedWidget.value =
-                          CustomersPage();
-                    }
-                    if (page == "createSale") {
-                      function!();
-                    }
-                    if (page == "createProduct") {
-                      Get.find<HomeController>().selectedWidget.value =
-                          CreateProduct(
-                        page: "create",
-                        productModel: null,
-                      );
-                    }
-                    if (page == "createPurchase") {
-                      // Get.find<HomeController>().selectedWidget.value =
-                      //     CreatePurchase();
-                    }
-                  } else {
-                    Get.back();
-                  }
+                  Get.back();
                 },
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
               ),
@@ -384,60 +362,20 @@ class CreateCustomer extends StatelessWidget {
   }
 
   chooseCustomer({required context}) {
-    if (isSmallScreen(context)) {
-      Get.to(() => Scaffold(
-            appBar: AppBar(
-              actions: [
-                IconButton(
-                    onPressed: () {
-                      Get.to(() => CreateCustomer(
-                            page: "customersPage",
-                          ));
-                    },
-                    icon: const Icon(Icons.add))
-              ],
-              title: const Text("Select customer"),
-            ),
-            body: Customers(type: "sale"),
-          ));
-    } else {
-      Get.back();
-      Get.find<HomeController>().selectedWidget.value = Scaffold(
-        appBar: AppBar(
-          elevation: 0.2,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-              onPressed: () {
-                Get.find<HomeController>().selectedWidget.value = CreateSale();
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.black,
-              )),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  Get.find<HomeController>().selectedWidget.value =
-                      CreateCustomer(
-                    page: "customersPage",
-                  );
-                },
-                icon: const Icon(
-                  Icons.add,
-                  color: Colors.black,
-                ))
-          ],
-          title: const Text(
-            "Select customer",
-            style: TextStyle(color: Colors.black),
+    Get.to(() => Scaffold(
+          appBar: AppBar(
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    Get.to(() => CreateCustomer(
+                          page: "customersPage",
+                        ));
+                  },
+                  icon: const Icon(Icons.add))
+            ],
+            title: const Text("Select customer"),
           ),
-        ),
-        body: Customers(
-          type: "sale",
-          function: () {
-          },
-        ),
-      );
-    }
+          body: Customers(type: "sale"),
+        ));
   }
 }

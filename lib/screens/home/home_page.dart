@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
@@ -53,7 +54,7 @@ class HomePage extends StatelessWidget {
   final ExpenseController expenseController = Get.put(ExpenseController());
   final UserController attendantController = Get.put(UserController());
   final AuthController authController = Get.find<AuthController>();
-  final ProductController productController = Get.find<ProductController>();
+  final ProductNewController productController = Get.find<ProductNewController>();
   final DateTime now = DateTime.now();
   WareHouseController wareHouseController = Get.put(WareHouseController());
 
@@ -548,16 +549,16 @@ class HomePage extends StatelessWidget {
                               'admin')
                             InventoryInsightsMinimal(
                               runningLow: productController
-                                      .countHistoryData['runningLow'] ??
+                                      .productStats['runninglow'] ??
                                   0,
                               outOfStock: productController
-                                      .countHistoryData['outofstock'] ??
+                                      .productStats['outofstock'] ??
                                   0,
                               fastMovingCount: productController
-                                      .countHistoryData['fastmoving']?.length ??
+                                      .productStats['fastmoving']?.length ??
                                   0,
                               dormant: productController
-                                      .countHistoryData['dormant'] ??
+                                      .productStats['dormant'] ??
                                   0,
                             ),
                           const SizedBox(height: 20),
@@ -1130,14 +1131,6 @@ class HomePage extends StatelessWidget {
         break;
       case "stock":
         {
-          print("user type ${userController.currentUser.value?.usertype}");
-          // if (userController.currentUser.value?.usertype == "attendant" &&
-          //     !verifyPermission(
-          //         category: "stocks", permission: "stock_summary")) {
-          //   Get.to(() => ProductPage());
-          //   return;
-          // }
-
           Get.to(() => StockPage());
         }
         break;

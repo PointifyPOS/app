@@ -46,24 +46,26 @@ class StockTransfer extends StatelessWidget {
             ),
           ),
           actions: [
-            Center(
-              child: InkWell(
-                onTap: () {
-                  Get.to(() => TransferHistoryPage());
-                },
-                child: Container(
-                  margin: const EdgeInsets.all(5),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.mainColor, width: 2)),
-                  child: majorTitle(
-                      title: "Transfer History",
-                      color: AppColors.mainColor,
-                      size: 12.0),
+            if (type == "transfer")
+              Center(
+                child: InkWell(
+                  onTap: () {
+                    Get.to(() => TransferHistoryPage());
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border:
+                            Border.all(color: AppColors.mainColor, width: 2)),
+                    child: majorTitle(
+                        title: "Transfer History",
+                        color: AppColors.mainColor,
+                        size: 12.0),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
         body: SingleChildScrollView(
@@ -75,7 +77,8 @@ class StockTransfer extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: majorTitle(
-                      title: "Select Shop to transfer to",
+                      title:
+                          "Select Shop to ${type == "transfer" ? "Transfer to" : "Import from"}",
                       color: Colors.black,
                       size: 16.0),
                 ),
@@ -97,7 +100,8 @@ class StockTransfer extends StatelessWidget {
                                 onPressed: () {},
                                 icon: const Icon(Icons.search),
                               ),
-                              hintText: "Search shop to transfer to",
+                              hintText:
+                                  "Search shop to ${type == "transfer" ? "Transfer to" : "Import from"}",
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10))),
                         ),

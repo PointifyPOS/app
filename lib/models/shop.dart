@@ -11,6 +11,8 @@ class Shop {
   String? location;
   double? tax;
   double? distance;
+  bool? viewAllCustomers;
+  String? sunpayMerchantId;
   bool? warehouse;
   bool? useWarehouse;
   bool? allownegativeselling;
@@ -38,6 +40,7 @@ class Shop {
       this.id,
       this.production,
       this.warehouseemail,
+      this.sunpayMerchantId,
       this.tax,
       this.name,
       this.useWarehouse,
@@ -48,6 +51,7 @@ class Shop {
       this.backupInterval,
       this.allowOnlineSelling,
       this.allowBackup,
+      this.viewAllCustomers,
       this.location,
       this.distance,
       this.subscription,
@@ -81,6 +85,7 @@ class Shop {
     warehouseemail = json['warehouseemail'] ?? '';
     receiptemail = json['receiptemail'] ?? '';
     backupInterval = json['backupInterval'] ?? '';
+    sunpayMerchantId = json['sunpay_merchant_id'] ?? '';
     tax = toDouble(json['tax'] ?? 0.0);
     backupemail = json['backupemail'] ?? '';
     id = json['_id'];

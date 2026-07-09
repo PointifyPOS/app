@@ -47,45 +47,16 @@ class AttendantLogin extends StatelessWidget {
               SizedBox(
                 height: 40,
               ),
-              isSmallScreen(context)
-                  ? Column(
-                      children: [
-                        Text(
-                          'Login as a cashier',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 30.0),
-                        loginAttendant(context),
-                      ],
-                    )
-                  : Container(
-                      padding: const EdgeInsets.only(top: 20, bottom: 40),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            offset: Offset(0.0, 0.0), //(x,y)
-                            blurRadius: 1.0,
-                          ),
-                        ],
-                      ),
-                      margin: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.25,
-                        right: MediaQuery.of(context).size.width * 0.25,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Login as a cashier',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 30.0),
-                          loginAttendant(context),
-                        ],
-                      )),
+              Column(
+                children: [
+                  Text(
+                    'Login as a cashier',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 30.0),
+                  loginAttendant(context),
+                ],
+              ),
             ],
           ),
         ));
@@ -109,8 +80,8 @@ class AttendantLogin extends StatelessWidget {
                     return null;
                   },
                   keyboardType: TextInputType.number,
-                  decoration: ThemeHelper().textInputDecoration(
-                          'UserId', 'Enter your UserID'),
+                  decoration: ThemeHelper()
+                      .textInputDecoration('UserId', 'Enter your UserID'),
                 ),
               ),
               SizedBox(height: 20.0),
@@ -125,8 +96,8 @@ class AttendantLogin extends StatelessWidget {
                     }
                     return null;
                   },
-                  decoration: ThemeHelper().textInputDecoration(
-                          'Password', 'Enter your password'),
+                  decoration: ThemeHelper()
+                      .textInputDecoration('Password', 'Enter your password'),
                 ),
               ),
               SizedBox(height: 25.0),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/widgets/minor_title.dart';
 import 'package:pointify/widgets/product_image.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -83,86 +85,12 @@ Widget productCard(
                   children: <Widget>[
                     Row(
                       children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "${product.name!.capitalizeFirst!} ${product.measureUnit ?? ""}",
-                                  style: const TextStyle(fontSize: 16.0),
-                                  softWrap: false,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (product.bundleItems!.isNotEmpty)
-                                InkWell(
-                                  onTap: () {
-                                    showDialog(
-                                        context: Get.context!,
-                                        builder: (_) {
-                                          return AlertDialog(
-                                            title: const Center(
-                                              child: Text(
-                                                "Items Included",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16),
-                                              ),
-                                            ),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: List.generate(
-                                                  product.bundleItems!.length,
-                                                  (index) => Text(
-                                                      "${product.bundleItems![index].product!.name!.capitalizeFirst!} - ${product.bundleItems![index].quantity} ${product.bundleItems![index].product!.measureUnit}")),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Get.back();
-                                                },
-                                                child: Text(
-                                                  "Cancel".toUpperCase(),
-                                                  style:  TextStyle(
-                                                    color: AppColors.mainColor,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Get.back();
-                                                },
-                                                child: Text(
-                                                  "Okay".toUpperCase(),
-                                                  style:  TextStyle(
-                                                    color: AppColors.mainColor,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: AppColors.mainColor,
-                                    ),
-                                    child: Text(
-                                      "${userController.currentUser.value!.primaryShop!.production == true ? "Raw Materials" : "Bundle"} (${product.bundleItems?.length}) items",
-                                      style: const TextStyle(
-                                          fontSize: 11.0, color: Colors.white),
-                                      softWrap: false,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ),
-                            ],
+                        Flexible(
+                          child: Text(
+                            "${product.name!.capitalizeFirst!} ${product.measureUnit ?? ""}",
+                            style: const TextStyle(fontSize: 16.0),
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         if (counted == true)
@@ -197,7 +125,8 @@ Widget productCard(
                               size: 11),
                         if (product.productCategoryId != null)
                           const SizedBox(width: 5),
-                        if (product.manufacturer!.isNotEmpty)
+                        if (product.manufacturer != null &&
+                            product.manufacturer!.isNotEmpty)
                           Text(
                             product.manufacturer ?? "",
                             style: const TextStyle(
@@ -290,7 +219,7 @@ Widget productCard(
                                   category: "stocks",
                                   permission: "view_buying_price"))
                                 Text(
-                                  "BP/= ${htmlPrice(product.getBuyingPrice())}",
+                                  "BP/= ${htmlPrice(product.buyingPrice)}",
                                   style: const TextStyle(color: Colors.black),
                                 ),
                               const SizedBox(height: 5),
@@ -315,6 +244,7 @@ Widget productCard(
 
 showProdctionProductModal(context, Product product) {
   ProductController productController = Get.find<ProductController>();
+  ProductNewController productNewController = Get.find<ProductNewController>();
   SalesController salesController = Get.find<SalesController>();
 
   return showModalBottomSheet<void>(
@@ -401,7 +331,7 @@ showProdctionProductModal(context, Product product) {
                                     children: [
                                       TextButton(
                                           onPressed: () {
-                                            productController.adjustStock(
+                                            productNewController.adjustStock(
                                               product: product,
                                               quantity: int.parse(
                                                   productController
@@ -418,7 +348,7 @@ showProdctionProductModal(context, Product product) {
                                           )),
                                       TextButton(
                                           onPressed: () {
-                                            productController.adjustStock(
+                                            productNewController.adjustStock(
                                               product: product,
                                               quantity: int.parse(
                                                   productController
@@ -456,7 +386,7 @@ showProdctionProductModal(context, Product product) {
                       deleteDialog(
                           context: context,
                           onPressed: () {
-                            productController.deleteProduct(
+                            productNewController.deleteProduct(
                               product: product,
                             );
                           });
@@ -476,6 +406,7 @@ showProdctionProductModal(context, Product product) {
 
 showProductModal(context, Product product) {
   ProductController productController = Get.find<ProductController>();
+  ProductNewController productNewController = Get.find<ProductNewController>();
   SalesController salesController = Get.find<SalesController>();
 
   return showModalBottomSheet<void>(
@@ -607,7 +538,7 @@ showProductModal(context, Product product) {
                                   children: [
                                     TextButton(
                                         onPressed: () {
-                                          productController.adjustStock(
+                                          productNewController.adjustStock(
                                             product: product,
                                             quantity: int.parse(
                                                 productController
@@ -623,7 +554,7 @@ showProductModal(context, Product product) {
                                         )),
                                     TextButton(
                                         onPressed: () {
-                                          productController.adjustStock(
+                                          productNewController.adjustStock(
                                             product: product,
                                             quantity: int.parse(
                                                 productController
@@ -643,6 +574,147 @@ showProductModal(context, Product product) {
                         });
                   },
                   title: const Text('Adjust Stock')),
+            if (verifyPermission(category: "products", permission: "edit"))
+              ListTile(
+                leading: const Icon(Icons.qr_code_scanner),
+                onTap: () async {
+                  Get.back();
+
+                  final barcode = await Get.to(
+                    () => const BarcodeScannerPage(),
+                  );
+
+                  if (barcode == null) {
+                    return;
+                  }
+
+                  showDialog(
+                    context: Get.context!,
+                    builder: (_) {
+                      return AlertDialog(
+                        title: const Text(
+                          "Update Barcode",
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.name ?? "",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            const Text("Scanned Barcode"),
+                            const SizedBox(height: 5),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                barcode.toString(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: const Text(
+                              "Cancel",
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              showDialog(
+                                context: Get.context!,
+                                barrierDismissible: false,
+                                builder: (_) {
+                                  return const AlertDialog(
+                                    content: Row(
+                                      children: [
+                                        CircularProgressIndicator(),
+                                        SizedBox(width: 15),
+                                        Expanded(
+                                          child: Text(
+                                            "Updating barcode...",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+
+                              final result =
+                                  await productNewController.updateBarcode(
+                                productId: product.sId!,
+                                barcode: barcode,
+                              );
+
+                              Get.back(); // close loader
+
+                              if (result["success"] == true) {
+                                Get.back(); // close update dialog
+
+                                showDialog(
+                                  context: Get.context!,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      title: const Text("Success"),
+                                      content: Text(result["message"]),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                showDialog(
+                                  context: Get.context!,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      title: const Text("Error"),
+                                      content: Text(result["message"]),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Get.back();
+                                          },
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            child: const Text(
+                              "Update",
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                title: const Text('Update Barcode'),
+              ),
             if (userController.currentUser.value?.usertype == "admin")
               ListTile(
                   leading: const Icon(Icons.code),
@@ -660,7 +732,7 @@ showProductModal(context, Product product) {
                     deleteDialog(
                         context: context,
                         onPressed: () {
-                          productController.deleteProduct(
+                          productNewController.deleteProduct(
                             product: product,
                           );
                         });

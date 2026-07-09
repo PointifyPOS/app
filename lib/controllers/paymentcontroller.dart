@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:pointify/controllers/customercontroller.dart';
+import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
+import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/models/customer.dart';
 import 'package:pointify/services/payment.dart';
 
@@ -13,7 +15,7 @@ class PaymentController extends GetxController {
   RxList<Payment> payments = RxList([]);
   RxList<PaymentMethods> paymentmethods = RxList([]);
   RxList<Awards> awardpayments = RxList([]);
-
+  final RxString paymentSearch = ''.obs;
   getSalesPaymentByPurchaseId(String id) async {
     isPaymentLoading.value = true;
     List<dynamic> response =
@@ -25,6 +27,24 @@ class PaymentController extends GetxController {
     isPaymentLoading.value = false;
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+
+    debounce(
+      paymentSearch,
+      (value) {
+        getPaymentsByShopAndDate(
+          Get.find<UserController>().currentUser.value!.primaryShop!.id!,
+          Get.find<ReportsController>().filterStartDate.value,
+          Get.find<ReportsController>().filterEndDate.value,
+          value,
+        );
+      },
+      time: const Duration(milliseconds: 500),
+    );
+  }
+
   getAwardTransactions(String id) async {
     isPaymentLoading.value = true;
     List<dynamic> response = await PaymentService.getAwardTransactions(id);
@@ -34,12 +54,14 @@ class PaymentController extends GetxController {
     isPaymentLoading.value = false;
   }
 
-  getPaymentsByShopAndDate(String shop, String fromDate, String toDate) async {
+  getPaymentsByShopAndDate(
+      String shop, String fromDate, String toDate, String? search) async {
     isPaymentLoading.value = true;
     List<dynamic> response = await PaymentService.getPaymentsByShopAndDate(
       shop,
       fromDate,
       toDate,
+      search,
     );
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();

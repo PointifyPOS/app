@@ -48,32 +48,18 @@ class _AdminLoginState extends State<AdminLogin> {
             children: [
               Column(
                 children: [
-                  if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250,),
+                  if (AppConfig.app_logo.isNotEmpty)
+                    CachedNetworkImage(
+                      imageUrl: AppConfig.app_logo,
+                      width: 250,
+                    ),
                   Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
                   const SizedBox(
                     height: 40,
                   ),
                 ],
               ),
-              isSmallScreen(context)
-                  ? loginForm(context)
-                  : Container(
-                      padding: const EdgeInsets.only(top: 40, bottom: 20),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            offset: Offset(0.0, 0.0), //(x,y)
-                            blurRadius: 1.0,
-                          ),
-                        ],
-                      ),
-                      margin: EdgeInsets.only(
-                        left: MediaQuery.of(context).size.width * 0.25,
-                        right: MediaQuery.of(context).size.width * 0.25,
-                      ),
-                      child: loginForm(context)),
+              loginForm(context),
             ],
           ),
         ));
@@ -114,8 +100,8 @@ class _AdminLoginState extends State<AdminLogin> {
                     return null;
                   },
                   keyboardType: TextInputType.emailAddress,
-                  decoration:ThemeHelper().textInputDecoration(
-                          'Email', 'Enter your email'),
+                  decoration: ThemeHelper()
+                      .textInputDecoration('Email', 'Enter your email'),
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -138,7 +124,7 @@ class _AdminLoginState extends State<AdminLogin> {
                             ? Icons.visibility_off
                             : Icons.visibility, () {
                       authController.showPassword.value =
-                      !authController.showPassword.value;
+                          !authController.showPassword.value;
                     }),
                   ),
                 ),
@@ -151,7 +137,7 @@ class _AdminLoginState extends State<AdminLogin> {
                     authController.resetPassword.value = false;
                     Get.to(() => ForgotPassword());
                   },
-                  child:  Text(
+                  child: Text(
                     "Forgot Password?",
                     style: TextStyle(
                         fontSize: 15,
@@ -192,7 +178,7 @@ class _AdminLoginState extends State<AdminLogin> {
                     text: 'Create',
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        Get.to(()=>SignUp());
+                        Get.to(() => SignUp());
                       },
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),

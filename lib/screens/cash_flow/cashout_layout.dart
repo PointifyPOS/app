@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -29,7 +28,7 @@ class CashOutLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvoked: (val)  {
+      onPopInvoked: (val) {
         cashFlowController.clearInputs();
       },
       child: Scaffold(
@@ -54,28 +53,6 @@ class CashOutLayout extends StatelessWidget {
                 cashFlowController.clearInputs();
               },
               icon: const Icon(Icons.arrow_back_ios)),
-          actions: [
-            if (!isSmallScreen(context))
-              InkWell(
-                onTap: () {
-                  saveFunction(context: context);
-                },
-                child: Container(
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 10).copyWith(right: 10),
-                  height: kTextTabBarHeight * 0.5,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  decoration: BoxDecoration(
-                      color: AppColors.mainColor,
-                      border: Border.all(color: AppColors.mainColor),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: const Text(
-                    "Save",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              )
-          ],
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -196,14 +173,14 @@ class CashOutLayout extends StatelessWidget {
                                           .textEditingControllerName,
                                       decoration: InputDecoration(
                                         border: OutlineInputBorder(
-                                          borderSide:
-                                              const BorderSide(color: Colors.grey),
+                                          borderSide: const BorderSide(
+                                              color: Colors.grey),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
                                         focusedBorder: OutlineInputBorder(
-                                          borderSide:
-                                              const BorderSide(color: Colors.grey),
+                                          borderSide: const BorderSide(
+                                              color: Colors.grey),
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
@@ -213,7 +190,8 @@ class CashOutLayout extends StatelessWidget {
                                   ]);
                       }),
                       const SizedBox(height: 20),
-                      const Text("Amount", style: TextStyle(color: Colors.grey)),
+                      const Text("Amount",
+                          style: TextStyle(color: Colors.grey)),
                       const SizedBox(height: 10),
                       TextField(
                         controller:
@@ -223,8 +201,8 @@ class CashOutLayout extends StatelessWidget {
                           FilteringTextInputFormatter.digitsOnly
                         ],
                         decoration: InputDecoration(
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 4, horizontal: 10),
                           border: OutlineInputBorder(
                             borderSide: const BorderSide(color: Colors.grey),
                             borderRadius: BorderRadius.circular(10),
@@ -357,18 +335,21 @@ class CashOutLayout extends StatelessWidget {
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                            const Text("Name", style: TextStyle(color: Colors.grey)),
+                            const Text("Name",
+                                style: TextStyle(color: Colors.grey)),
                             const SizedBox(height: 2),
                             TextField(
                               controller:
                                   cashFlowController.textEditingControllerName,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.grey),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(color: Colors.grey),
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
@@ -502,9 +483,7 @@ class CashOutLayout extends StatelessWidget {
                     .toLowerCase() !=
                 "bank" &&
             cashFlowController.textEditingControllerName.text.isEmpty)) {
-      isSmallScreen(context)
-          ? showSnackBar(message: "please fill all fields", color: Colors.black)
-          : generalAlert(title: "Error", message: "please fill all fields");
+      showSnackBar(message: "please fill all fields", color: Colors.black);
     } else {
       await cashFlowController
           .createCashFlow(cashFlowController.selectedcashFlowCategoty.value!);

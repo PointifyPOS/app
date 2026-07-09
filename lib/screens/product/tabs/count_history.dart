@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/productcontroller.dart';
 
-import '../../../controllers/productcontroller.dart';
 import '../../../controllers/salescontroller.dart';
 import '../../../models/counthistory.dart';
 import '../../../models/product.dart';
 import '../../../responsive/responsiveness.dart';
 
 class ProductCountHistory extends StatelessWidget {
-  final  Product? product;
+  final Product? product;
 
-    ProductCountHistory({Key? key, this.product}) : super(key: key);
-final  ProductController productController = Get.find<ProductController>();
-final  SalesController salesController = Get.find<SalesController>();
+  ProductCountHistory({super.key, this.product});
+  final ProductController productController = Get.find<ProductController>();
+  final SalesController salesController = Get.find<SalesController>();
 
   @override
   Widget build(BuildContext context) {

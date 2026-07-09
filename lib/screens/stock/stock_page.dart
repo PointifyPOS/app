@@ -190,7 +190,9 @@ class StockPage extends StatelessWidget {
                                 if (shopController.checkSubscription() ==
                                     true) {
                                   shopController.getShops();
-                                  Get.to(() => StockTransfer());
+                                  Get.to(() => StockTransfer(
+                                        type: "transfer",
+                                      ));
                                 }
                               }
                           }
@@ -352,12 +354,12 @@ class StockPage extends StatelessWidget {
               InkWell(
                 splashColor: Colors.transparent,
                 onTap: () {
-                  Get.to(() => ProductPage());
+                  Get.to(() => ProductPage(refetch: true));
                 },
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.all(10),
-                    width: isSmallScreen(Get.context) ? double.infinity : 200,
+                    width: double.infinity,
                     decoration: BoxDecoration(
                         border:
                             Border.all(width: 3, color: AppColors.mainColor),

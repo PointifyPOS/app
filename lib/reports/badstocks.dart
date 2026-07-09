@@ -173,164 +173,95 @@ class BadStockPage extends StatelessWidget {
                           )
                         : productController.badstocks.isEmpty
                             ? noItemsFound(context, true)
-                            : isSmallScreen(context)
-                                ? ListView.builder(
-                                    itemCount:
-                                        productController.badstocks.length,
-                                    itemBuilder: (context, index) {
-                                      BadStock badstock = productController
-                                          .badstocks
-                                          .elementAt(index);
-                                      return Container(
-                                        padding: const EdgeInsets.all(10),
-                                        margin: const EdgeInsets.symmetric(
-                                                horizontal: 10)
-                                            .copyWith(bottom: 5),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                            color: Colors.white,
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                  offset: Offset(1, 1),
-                                                  blurRadius: 1,
-                                                  color: Colors.grey)
-                                            ]),
-                                        child: Row(
-                                          children: [
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                            : ListView.builder(
+                                itemCount: productController.badstocks.length,
+                                itemBuilder: (context, index) {
+                                  BadStock badstock = productController
+                                      .badstocks
+                                      .elementAt(index);
+                                  return Container(
+                                    padding: const EdgeInsets.all(10),
+                                    margin: const EdgeInsets.symmetric(
+                                            horizontal: 10)
+                                        .copyWith(bottom: 5),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: Colors.white,
+                                        boxShadow: const [
+                                          BoxShadow(
+                                              offset: Offset(1, 1),
+                                              blurRadius: 1,
+                                              color: Colors.grey)
+                                        ]),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
                                                 children: [
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          badstock
-                                                              .product!
-                                                              .name!
-                                                              .capitalize!,
-                                                          style: const TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
-                                                        ),
-                                                      ),
-                                                      Text(DateFormat(
-                                                              "yyyy-MM-dd H:mm a")
-                                                          .format(DateTime
-                                                              .parse(badstock
-                                                                  .createdAt!)))
-                                                    ],
+                                                  Expanded(
+                                                    child: Text(
+                                                      badstock.product!.name!
+                                                          .capitalize!,
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
                                                   ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    "${badstock.reason}",
-                                                    style: const TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 15),
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        "Quantity: ${badstock.quantity!.toString()} @${htmlPrice(badstock.unitPrice)} = ${htmlPrice(badstock.unitPrice! * badstock.quantity!)}",
-                                                        style: const TextStyle(
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                      Align(
-                                                        alignment: Alignment
-                                                            .bottomRight,
-                                                        child: Text(
-                                                          "By: ${badstock.attendant!.username}",
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 15),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
+                                                  Text(DateFormat(
+                                                          "yyyy-MM-dd H:mm a")
+                                                      .format(DateTime.parse(
+                                                          badstock.createdAt!)))
                                                 ],
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "${badstock.reason}",
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 15),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    "Quantity: ${badstock.quantity!.toString()} @${htmlPrice(badstock.unitPrice)} = ${htmlPrice(badstock.unitPrice! * badstock.quantity!)}",
+                                                    style: const TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Text(
+                                                      "By: ${badstock.attendant!.username}",
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 15),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
                                         ),
-                                      );
-                                    })
-                                : Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    child: Theme(
-                                      data: Theme.of(context)
-                                          .copyWith(dividerColor: Colors.grey),
-                                      child: DataTable(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                          width: 1,
-                                          color: Colors.black,
-                                        )),
-                                        columnSpacing: 30.0,
-                                        columns: const [
-                                          DataColumn(
-                                              label: Text('Name',
-                                                  textAlign: TextAlign.center)),
-                                          DataColumn(
-                                              label: Text('Reason',
-                                                  textAlign: TextAlign.center)),
-                                          DataColumn(
-                                              label: Text('Quantity',
-                                                  textAlign: TextAlign.center)),
-                                          DataColumn(
-                                              label: Text('Attendant',
-                                                  textAlign: TextAlign.center)),
-                                          DataColumn(
-                                              label: Text('Date',
-                                                  textAlign: TextAlign.center)),
-                                        ],
-                                        rows: List.generate(
-                                            productController.badstocks.length,
-                                            (index) {
-                                          BadStock badstock = productController
-                                              .badstocks
-                                              .elementAt(index);
-                                          final y = badstock.product?.name;
-                                          final r = badstock.reason;
-                                          final h = badstock.quantity;
-                                          final x =
-                                              badstock.attendant?.username;
-                                          final z = badstock.createdAt;
-
-                                          return DataRow(cells: [
-                                            DataCell(Text(y!)),
-                                            DataCell(Text(r!)),
-                                            DataCell(Text(h.toString())),
-                                            DataCell(Text(x!)),
-                                            DataCell(Text(
-                                                DateFormat("yyyy-dd-MMM ")
-                                                    .format(DateTime.parse(z!)
-                                                        .toUtc()))),
-                                          ]);
-                                        }),
-                                      ),
+                                      ],
                                     ),
                                   );
+                                });
                   }),
                 )
               ],

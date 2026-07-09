@@ -1,5 +1,6 @@
-const apiEndPoint = "https://sandbox.pointifypos.com/";
+const apiEndPoint = "https://api.pointifypos.com/";
 const storeurl = "https://store.pointifypos.com/";
+const apiEndPointv_2 = '${apiEndPoint}api/v2/';
 
 class EndPoints {
   //AUTH
@@ -34,6 +35,7 @@ class EndPoints {
   static const report = "${apiEndPoint}product/report";
   static const productcategories = "${apiEndPoint}product/category";
   static const products = "${apiEndPoint}product/";
+  static const barcode = "${products}bardcode";
   static const productCount = "${apiEndPoint}counts";
   static const warehouserequest = "${apiEndPoint}warehouse";
   static const warehouserequests = "${apiEndPoint}warehouse/request";
@@ -42,7 +44,6 @@ class EndPoints {
   static const approvewarehouseitems =
       "${apiEndPoint}warehouse/request/approve";
   static const productimport = "${products}import/products";
-  static const producttransferimport = "${products}transfer/products";
   static const shopproductCount = "${apiEndPoint}counts/shop";
   static const badstock = "${apiEndPoint}badstock";
   static const summarybadstock = "${apiEndPoint}badstock/summary";
@@ -50,6 +51,16 @@ class EndPoints {
   static const badstockfilter = "${apiEndPoint}badstock/product/filter";
   static const stockreport = "${products}stockreport/";
   static const updateproductimages = "${products}images/";
+
+  //NEW PRODUCTS
+  static const products_v2 = "${apiEndPointv_2}products/";
+  static const products_v2_list = "${products_v2}list";
+  static const producttransferimport = "${products_v2}import/transfer";
+  static var productstats = "${products_v2}stats";
+  static const String mpesaLookup = "${apiEndPointv_2}mpesa/lookup";
+  static const String mpesaStkPush = "${apiEndPointv_2}mpesa/stk-push";
+  static const String mpesaExpect = "${apiEndPointv_2}mpesa/expect";
+  static const String mpesaStatus = "${apiEndPointv_2}mpesa/status";
 
   //measures
   static const measures = "${apiEndPoint}measures/";
@@ -66,6 +77,8 @@ class EndPoints {
   static const debtorexcel = "${apiEndPoint}customers/customers/debtors/excel";
   static const purchasesreport = "${apiEndPoint}analysis/report/purchases";
   static const backupnow = "${apiEndPoint}analysis/backup/download";
+  static const reports = "${apiEndPoint}reports/";
+  static const salesreportexcel = "${reports}/sales/excel/";
 
   // SUPPLIERS
   static const supplier = "${apiEndPoint}suppliers/";
@@ -158,8 +171,6 @@ class EndPoints {
   static const awardstransactions = "${apiEndPoint}payments/awards/";
 
   static const checkpaymentstatus = "${apiEndPoint}payments/checkpaymentstatus";
-
-  static var productstats = "${apiEndPoint}product/stats/summary";
 
   static var topUp = "${apiEndPoint}sms/topup";
 }

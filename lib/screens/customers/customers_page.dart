@@ -20,7 +20,9 @@ import '../../widgets/minor_title.dart';
 enum MenuAction { archive, delete, block, report }
 
 class CustomersPage extends StatelessWidget {
-  CustomersPage({Key? key}) : super(key: key);
+  CustomersPage({super.key}) {
+    customersController.getCustomersInShop("all");
+  }
 
   final ShopController createShopController = Get.find<ShopController>();
   final CustomerController customerController = Get.find<CustomerController>();
@@ -303,7 +305,7 @@ class Customers extends StatelessWidget {
                                       page: "customersPage",
                                     ));
                               },
-                              child:  Column(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

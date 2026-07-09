@@ -43,7 +43,7 @@ class ShopController {
   TextEditingController paybillAcc = TextEditingController();
   TextEditingController paybillTill = TextEditingController();
   TextEditingController address = TextEditingController();
-
+RxBool viewAllCustomers = false.obs;
   TextEditingController nameController = TextEditingController();
   TextEditingController backupemail = TextEditingController();
   TextEditingController businessController = TextEditingController();
@@ -516,16 +516,40 @@ class ShopController {
     }
   }
 
-  deleteShopData({required Shop shop}) async {
+  Future<void> deleteShopData({
+    required Shop shop,
+  }) async {
     try {
-      LoadingDialog.showLoadingDialog(
-          context: Get.context!, title: "Please wait...", key: _keyLoader);
-      await ShopService().deleteDataShop(shop.id!);
+      // close confirmation dialog first
       Get.back();
+
+      await Future.delayed(
+        const Duration(milliseconds: 150),
+      );
+
+      LoadingDialog.showLoadingDialog(
+        context: Get.context!,
+        title: "Deleting shop data...",
+        key: _keyLoader,
+      );
+
+      await ShopService().deleteDataShop(
+        shop.id!,
+      );
+
+      // close loader
+      Get.back();
+
       await authController.initUser();
+
       await getShops();
+
       if (userController.currentUser.value?.primaryShop == null) {
-        Get.off(() => CreateShop(page: "home"));
+        Get.off(
+          () => CreateShop(
+            page: "home",
+          ),
+        );
       } else {
         Get.back();
       }
@@ -539,6 +563,11 @@ class ShopController {
       );
     } catch (e) {
       Get.back();
+
+      generalAlert(
+        title: "Error",
+        message: e.toString(),
+      );
     }
   }
 

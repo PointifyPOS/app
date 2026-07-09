@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/controllers/stockcontroller.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/screens/stock/product_cout_preview.dart';
 import 'package:pointify/utils/constants.dart';
 import 'package:pointify/widgets/no_items_found.dart';
@@ -133,73 +134,106 @@ class StockCount extends StatelessWidget {
                       onTap: () {
                         productController.getProductsBySort(type: 'all');
                       },
-                      child:  Icon(Icons.refresh,
-                          color: AppColors.mainColor))),
+                      child: Icon(Icons.refresh, color: AppColors.mainColor))),
             ],
           ),
         ),
         floatingActionButton: CartButton(),
         body: ListView(children: [
           const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: TextFormField(
-              controller: productController.searchProductCountController,
-              onChanged: (query) {
-                if (query.isEmpty) {
-                  stockController.productsCount.value =
-                      productController.products;
-                  productController.getProductsBySort(
-                      type: "search",
-                      text: productController.searchProductCountController.text,
-                      page: 1,
-                      limit: 50);
-                } else {
-                  stockController.productsCount.value = productController
-                      .products
-                      .where((product) => product.name!
-                          .toLowerCase()
-                          .contains(query.toLowerCase()))
-                      .toList();
-                }
-              },
-              decoration: InputDecoration(
-                suffixIconConstraints: BoxConstraints(maxWidth: 100),
-                contentPadding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
-                suffixIcon: Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: AppColors.mainColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: InkWell(
-                      onTap: () {
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  child: TextFormField(
+                    controller: productController.searchProductCountController,
+                    onChanged: (query) {
+                      if (query.isEmpty) {
+                        stockController.productsCount.value =
+                            productController.products;
                         productController.getProductsBySort(
                             type: "search",
                             text: productController
                                 .searchProductCountController.text,
                             page: 1,
                             limit: 50);
-                      },
-                      child: const Text(
-                        "Search",
-                        style: TextStyle(color: Colors.white),
+                      } else {
+                        stockController.productsCount.value = productController
+                            .products
+                            .where((product) => product.name!
+                                .toLowerCase()
+                                .contains(query.toLowerCase()))
+                            .toList();
+                      }
+                    },
+                    decoration: InputDecoration(
+                      suffixIconConstraints: BoxConstraints(maxWidth: 100),
+                      contentPadding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+                      suffixIcon: Align(
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: AppColors.mainColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              productController.getProductsBySort(
+                                  type: "search",
+                                  text: productController
+                                      .searchProductCountController.text,
+                                  page: 1,
+                                  limit: 50);
+                            },
+                            child: const Text(
+                              "Search",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
+                      hintText: "Quick Search Item",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              const BorderSide(color: Colors.grey, width: 1)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide:
+                              const BorderSide(color: Colors.grey, width: 1)),
                     ),
                   ),
                 ),
-                hintText: "Quick Search Item",
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey, width: 1)),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: Colors.grey, width: 1)),
               ),
-            ),
+              IconButton(
+                onPressed: () async {
+                  Get.to(
+                    () => BarcodeScannerPage(
+                      popAfterScan: false,
+                      onScanned: (barcode) async {
+                        await productController.getProductsBySort(
+                            type: "search",
+                            barcodeId: barcode,
+                            scanningFrom: "count",
+                            page: 1,
+                            limit: 1);
+                        if (stockController.selectedProductCount.value !=
+                            null) {
+                          Get.back();
+                          return stockController.incrementQuantityWidget(
+                              context,
+                              stockController.selectedProductCount.value!);
+                        }
+                      },
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.qr_code),
+              )
+            ],
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -327,9 +361,9 @@ class StockCount extends StatelessWidget {
         children: [
           Obx(() {
             return Text(productController.selectedSortOrderCount.value,
-                style:  TextStyle(color: AppColors.mainColor));
+                style: TextStyle(color: AppColors.mainColor));
           }),
-           Icon(
+          Icon(
             Icons.keyboard_arrow_down,
             color: AppColors.mainColor,
           )

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
@@ -18,7 +19,7 @@ class ProductBadStcokHistory extends StatelessWidget {
   final Product? product;
   final ProductController productController = Get.find<ProductController>();
 
-  ProductBadStcokHistory({Key? key, this.product}) : super(key: key);
+  ProductBadStcokHistory({super.key, this.product});
 
   @override
   Widget build(BuildContext context) {

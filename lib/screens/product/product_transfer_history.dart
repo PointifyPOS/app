@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/controllers/productcontroller.dart';
+import 'package:pointify/main.dart';
 
 import '../../controllers/reports_controller.dart';
 import '../../models/product.dart';
 import '../../widgets/filter_dates.dart';
 import '../../widgets/no_items_found.dart';
 
+// ignore: must_be_immutable
 class ProductTransferHistory extends StatelessWidget {
   Product? product;
   ProductTransferHistory({super.key, this.product}) {
@@ -77,19 +79,23 @@ class ProductTransferHistory extends StatelessWidget {
                                   DataCell(Text(DateFormat("yyy-MM-dd").format(
                                       DateTime.parse(element.createdAt!)))),
                                   DataCell(Text(
-                                    element.toShopId?.id == product?.shop?.id
+                                    element.toShopId?.id ==
+                                            userController.currentUser.value
+                                                ?.primaryShop?.id
                                         ? "+${element.quantity}"
                                         : "-${element.quantity}",
                                     style: TextStyle(
                                         color: element.toShopId?.id ==
-                                                product?.shop?.id
+                                                userController.currentUser.value
+                                                    ?.primaryShop?.id
                                             ? Colors.green
                                             : Colors.red),
                                   )),
-                                  DataCell(Text(
-                                      element.toShopId?.id == product?.shop?.id
-                                          ? element.fromShopId!.name!
-                                          : element.toShopId!.name!)),
+                                  DataCell(Text(element.toShopId?.id ==
+                                          userController.currentUser.value
+                                              ?.primaryShop?.id
+                                      ? element.fromShopId!.name!
+                                      : element.toShopId!.name!)),
                                 ]),
                               )
                             ])))

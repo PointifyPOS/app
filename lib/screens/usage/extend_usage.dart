@@ -7,7 +7,6 @@ import 'package:pointify/widgets/shop_list_bottomsheet.dart';
 
 import '../../controllers/plancontroller.dart';
 import '../../controllers/shopcontroller.dart';
-import '../../functions/functions.dart';
 import '../../models/package.dart';
 import '../../models/shop.dart';
 import '../../widgets/major_title.dart';
@@ -15,6 +14,7 @@ import 'ShopsRenew.dart';
 
 class ExtendUsage extends StatelessWidget {
   final Shop? shop;
+
   ExtendUsage({
     super.key,
     this.shop,
@@ -28,110 +28,148 @@ class ExtendUsage extends StatelessWidget {
 
   final ShopController shopController = Get.find<ShopController>();
   final PlanController planController = Get.find<PlanController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffF8F8FA),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: Icon(
-              Icons.clear,
-              color: AppColors.mainColor,
-            )),
+          onPressed: () => Get.back(),
+          icon: Icon(
+            Icons.clear,
+            color: AppColors.mainColor,
+          ),
+        ),
         title: Text(
           "Extend usage",
-          style: TextStyle(color: AppColors.mainColor),
+          style: TextStyle(
+            color: AppColors.mainColor,
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
         ),
       ),
       body: Column(
         children: [
-          shop != null
-              ? Column(
-                  children: [
-                    Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 20, horizontal: 10),
-                        child: Text(
-                            "Extend Usage for ${shop!.name} for you to be able to switch to this shop.",
-                            style: const TextStyle(
-                              fontSize: 20,
-                            ))),
-                    const Divider(
-                      thickness: 2,
-                    ),
-                  ],
-                )
-              : Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      majorTitle(
-                          title: "Current Shop",
-                          color: Colors.black,
-                          size: 20.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Obx(() {
-                            return minorTitle(
-                                title: userController
-                                            .currentUser.value!.primaryShop ==
-                                        null
-                                    ? ""
-                                    : userController
-                                        .currentUser.value!.primaryShop!.name,
-                                color: AppColors.mainColor);
-                          }),
-                          Obx(
-                            () => InkWell(
-                              onTap: shopController.gettingShopsLoad.isTrue
-                                  ? null
-                                  : () async {
-                                      await shopController.getShops();
-                                      showShopModalBottomSheet(Get.context);
-                                    },
-                              child: Container(
-                                padding: const EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(50),
-                                  border: Border.all(
-                                      color: AppColors.mainColor, width: 2),
-                                ),
-                                child: minorTitle(
-                                    title: "Switch Shop",
-                                    color: AppColors.mainColor),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+          _topSection(),
           Expanded(
             child: Obx(
               () => planController.isLoadingPackages.isTrue
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
+                  ? const Center(child: CircularProgressIndicator())
                   : ListView.separated(
                       padding: const EdgeInsets.fromLTRB(12, 6, 12, 18),
                       separatorBuilder: (_, __) => const SizedBox(height: 4),
                       itemCount: planController.plans.length,
                       itemBuilder: (BuildContext c, int i) {
-                        Package plan = planController.plans[i];
+                        final Package plan = planController.plans[i];
                         return _usageCard(plan);
-                      }),
+                      },
+                    ),
             ),
-          )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _topSection() {
+    if (shop != null) {
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.fromLTRB(14, 12, 14, 8),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.black.withOpacity(.05)),
+        ),
+        child: Text(
+          "Extend usage for ${shop!.name} to continue using this shop.",
+          style: const TextStyle(
+            fontSize: 14,
+            height: 1.4,
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(14, 12, 14, 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.black.withOpacity(.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          majorTitle(
+            title: "Current Shop",
+            color: Colors.black,
+            size: 15.0,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Obx(() {
+                  return Text(
+                    userController.currentUser.value?.primaryShop?.name ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AppColors.mainColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(width: 10),
+              Obx(
+                () => InkWell(
+                  borderRadius: BorderRadius.circular(50),
+                  onTap: shopController.gettingShopsLoad.isTrue
+                      ? null
+                      : () async {
+                          await shopController.getShops();
+                          showShopModalBottomSheet(Get.context);
+                        },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.mainColor.withOpacity(.08),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                        color: AppColors.mainColor.withOpacity(.18),
+                      ),
+                    ),
+                    child: Text(
+                      shopController.gettingShopsLoad.isTrue
+                          ? "Loading..."
+                          : "Switch",
+                      style: TextStyle(
+                        color: AppColors.mainColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -144,9 +182,14 @@ class ExtendUsage extends StatelessWidget {
 
       final int daysRemaining = shopController.checkDaysRemaining(shop: shop);
 
-      final String price = (plan.priceText ?? "").trim();
-      final String displayPrice =
-          price.toLowerCase().startsWith("from") ? price : "From $price";
+      final bool isNewPricing =
+          plan.priceText != null && plan.priceText!.trim().isNotEmpty;
+
+      final String shopText =
+          isNewPricing ? (plan.shopText ?? "") : _oldPlanShopText(plan);
+
+      final String priceText =
+          isNewPricing ? (plan.priceText ?? "") : _oldPlanPriceText(plan);
 
       return InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -177,6 +220,8 @@ class ExtendUsage extends StatelessWidget {
                   Expanded(
                     child: Text(
                       plan.title ?? "",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -184,32 +229,34 @@ class ExtendUsage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 9,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? Colors.green.withOpacity(.12)
-                          : AppColors.mainColor.withOpacity(.10),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      isActive ? "Active" : "Subscribe",
-                      style: TextStyle(
+                  if (plan.type != "free")
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? Colors.green.withOpacity(.12)
+                            : AppColors.mainColor.withOpacity(.10),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Text(
+                        isActive ? "Active" : "Subscribe",
+                        style: TextStyle(
                           color: isActive
                               ? Colors.green.shade700
                               : AppColors.mainColor,
                           fontWeight: FontWeight.w800,
-                          fontSize: 10.5),
+                          fontSize: 10.5,
+                        ),
+                      ),
                     ),
-                  ),
                 ],
               ),
               const SizedBox(height: 6),
               Text(
-                plan.shopText ?? "",
+                shopText,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.black.withOpacity(.52),
@@ -220,16 +267,17 @@ class ExtendUsage extends StatelessWidget {
               RichText(
                 text: TextSpan(
                   children: [
-                    TextSpan(
-                      text: "From ",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                    if (isNewPricing)
+                      const TextSpan(
+                        text: "From ",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
                     TextSpan(
-                      text: plan.priceText ?? "",
+                      text: priceText,
                       style: TextStyle(
                         fontSize: 16,
                         color: AppColors.mainColor,
@@ -255,5 +303,26 @@ class ExtendUsage extends StatelessWidget {
         ),
       );
     });
+  }
+
+  String _oldPlanShopText(Package plan) {
+    if (plan.type == "free") return "Unlimited shops";
+
+    final int max = plan.maxShops ?? 0;
+
+    if (max > 10) return "11+ shops";
+    if (max <= 1) return "$max shop only";
+
+    return "$max shops only";
+  }
+
+  String _oldPlanPriceText(Package plan) {
+    final currency = userController.currentUser.value?.primaryShop?.currency;
+
+    if (currency != "KES") {
+      return "USD ${plan.amountusd ?? 0}";
+    }
+
+    return "KES ${plan.amount ?? 0}";
   }
 }

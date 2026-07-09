@@ -448,6 +448,26 @@ class EditShopDetails extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(height: 8),
+        Obx(
+          () => _buildSwitchTile(
+            title: "Shared Customers",
+            subtitle: "View customers from all shops owned by the same account",
+            value: shopController.viewAllCustomers.value,
+            onChanged: (value) async {
+              shopController.viewAllCustomers.value = value;
+
+              await ShopService().updateShop(shopModel.id!, {
+                "viewAllCustomers": value,
+              });
+
+              var response = await ShopService.getShop(shopModel.id!);
+              userController.currentUser.value?.primaryShop =
+                  Shop.fromJson(response);
+              userController.currentUser.refresh();
+            },
+          ),
+        ),
       ],
     );
   }

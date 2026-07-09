@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/screens/stock/transfering_products.dart';
 import 'package:pointify/widgets/minor_title.dart';
 
 import '../models/shop.dart';
 import '../screens/shop/shop_details.dart';
 import '../screens/stock/products_selection.dart';
-import '../screens/stock/products_shop_import.dart';
 import '../utils/colors.dart';
 import 'major_title.dart';
 
@@ -26,9 +26,9 @@ Widget shopCard(
             if (page == "shop") {
               Get.to(() => ShopDetails(shopModel: shopModel));
             } else if (page == "import") {
-              Get.to(() => ProductShopImport(toShop: shopModel));
-            } else {
               Get.to(() => ProductSelections(toShop: shopModel));
+            } else if (page == "transfer") {
+              Get.to(() => TransferProductsPage(toShop: shopModel));
             }
           },
     child: Container(

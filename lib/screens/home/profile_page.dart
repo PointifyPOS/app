@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
+import 'package:pointify/ios_ble_printer_page.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/screens/profile/sms_settings_page.dart';
@@ -259,6 +260,11 @@ class ProfilePage extends StatelessWidget {
             subtitle: "Pair a Bluetooth receipt printer",
             icon: Icons.print_outlined,
             onTap: () async {
+              if (Platform.isIOS) {
+                Get.to(() => const IosBlePrinterPage());
+                return;
+              }
+
               final bool allowed = await askPermissions();
               if (allowed) {
                 Get.to(() => const BluetoothReceiptPrinter());

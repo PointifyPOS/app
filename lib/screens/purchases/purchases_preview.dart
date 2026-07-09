@@ -2,400 +2,816 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/purchase_controller.dart';
 import 'package:pointify/controllers/suppliercontroller.dart';
-import 'package:pointify/widgets/minor_title.dart';
 
 import '../../functions/functions.dart';
 import '../../main.dart';
 import '../../utils/colors.dart';
 import '../../widgets/alert.dart';
-import '../../widgets/major_title.dart';
 import '../suppliers/suppliers_page.dart';
 
-class PurchaesPreview extends StatelessWidget {
+class PurchaesPreview extends StatefulWidget {
   final String? page;
-  PurchaesPreview({
+
+  const PurchaesPreview({
     super.key,
     this.page,
   });
 
+  @override
+  State<PurchaesPreview> createState() => _PurchaesPreviewState();
+}
+
+class _PurchaesPreviewState extends State<PurchaesPreview> {
   final PurchaseController purchaseController = Get.find<PurchaseController>();
 
   final SupplierController supplierController = Get.find<SupplierController>();
 
   @override
+  void initState() {
+    super.initState();
+
+    if (purchaseController.selectedpaymentMethod.value.isEmpty) {
+      purchaseController.selectedpaymentMethod.value = 'Cash';
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        titleSpacing: 0,
-        backgroundColor: Colors.white,
-        elevation: 0.3,
-        centerTitle: false,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
+      backgroundColor: const Color(0xfff7f7fb),
+      bottomNavigationBar: _buildBottomBar(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildCloseButton(),
+                const SizedBox(height: 12),
+                _buildTotalCard(),
+                const SizedBox(height: 12),
+                _buildPaymentMethodsLabel(),
+                const SizedBox(height: 12),
+                _buildPaymentSection(),
+              ],
+            ),
           ),
         ),
-        title:
-            majorTitle(title: "Sale Preview", color: Colors.black, size: 16.0),
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // CLOSE BUTTON
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildCloseButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: InkWell(
+        onTap: Get.back,
+        borderRadius: BorderRadius.circular(30),
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: const Icon(Icons.close, size: 18),
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // TOTAL CARD
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildTotalCard() {
+    return Obx(() {
+      final total = purchaseController.balance;
+
+      final itemCount = purchaseController.invoice.value?.items?.length ?? 0;
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.mainColor,
+              AppColors.mainColor.withOpacity(.85),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(26),
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-                child: majorTitle(
-                    fontWeight: FontWeight.normal,
-                    title: "Purchase Total",
-                    color: Colors.black,
-                    size: 19.0)),
-            Center(
-                child: majorTitle(
-                    title: htmlPrice(
-                        purchaseController.balance.toStringAsFixed(2) ?? 0),
-                    color: Colors.black,
-                    size: 19.0)),
-            const SizedBox(
-              height: 20,
-            ),
-            Center(
-              child: majorTitle(
-                  title: "Select Payment Method",
-                  color: Colors.black,
-                  size: 19.0),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: Obx(
-                () => ListView.builder(
-                    itemCount: purchaseController.paymentMethods.length,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        onTap: () {
-                          if (purchaseController.invoice.value == null ||
-                              purchaseController
-                                  .invoice.value!.items!.isEmpty) {
-                            generalAlert(title: "No items to pay");
-                            return;
-                          }
-                          purchaseController.selectedpaymentMethod.value =
-                              purchaseController.paymentMethods[index];
-                          _sell(
-                              selectedpaymentMethod:
-                                  purchaseController.paymentMethods[index]);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.only(bottom: 20, top: 20),
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(
-                                      width: 1, color: Colors.grey))),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Obx(
-                                        () => majorTitle(
-                                            title: purchaseController
-                                                .paymentMethods[index],
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal,
-                                            size: 19.0),
-                                      ),
-                                      if (purchaseController
-                                                  .selectedSupplier.value !=
-                                              null &&
-                                          (purchaseController
-                                                  .selectedpaymentMethod
-                                                  .value ==
-                                              purchaseController
-                                                  .paymentMethods[index]))
-                                        minorTitle(
-                                            title:
-                                                "Supplier: ${purchaseController.selectedSupplier.value?.name?.capitalizeFirst}",
-                                            color: Colors.black,
-                                            size: 14.0),
-                                    ],
-                                  ),
-                                  const Icon(Icons.arrow_forward_ios_rounded)
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+            const Text(
+              'PURCHASE TOTAL',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
               ),
-            )
+            ),
+            const SizedBox(height: 10),
+            Text(
+              htmlPrice(total.toStringAsFixed(2)),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$itemCount item(s)',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // LABEL
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildPaymentMethodsLabel() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        'Payment Method',
+        style: TextStyle(
+          color: Colors.grey.shade700,
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // PAYMENT SECTION
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildPaymentSection() {
+    return Obx(() {
+      final method = purchaseController.selectedpaymentMethod.value.isEmpty
+          ? 'Cash'
+          : purchaseController.selectedpaymentMethod.value;
+
+      return Column(
+        children: [
+          _SelectedPaymentMethodCard(
+            method: method,
+            iconResolver: _paymentIcon,
+            onTap: _showPaymentMethodsSheet,
+          ),
+          _buildInlinePaymentCard(method),
+          _buildChangeMethodLink(),
+        ],
+      );
+    });
+  }
+
+  Widget _buildChangeMethodLink() {
+    return InkWell(
+      onTap: _showPaymentMethodsSheet,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 2, bottom: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Change payment method',
+              style: TextStyle(
+                color: AppColors.mainColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down,
+              size: 18,
+              color: AppColors.mainColor,
+            ),
           ],
         ),
       ),
     );
   }
 
-  _needSupplier() {
-    return purchaseController.selectedpaymentMethod.value == "Credit";
+  // ─────────────────────────────────────────────────────────────
+  // INLINE CARD
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildInlinePaymentCard(String method) {
+    final needsSupplier = method == 'Credit';
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (needsSupplier) ...[
+            _buildSupplierSelector(),
+            const SizedBox(height: 12),
+          ],
+          _buildAmountField(method),
+          if (method == "Mpesa") ...[
+            const SizedBox(height: 12),
+            _buildMpesaField(),
+          ],
+          if (method == "Bank") ...[
+            const SizedBox(height: 12),
+            _buildBankField(),
+          ],
+          const SizedBox(height: 16),
+          _buildSummary(method),
+        ],
+      ),
+    );
   }
 
-  confirmPayment(context, status, {String selectedpaymentMethod = ""}) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      isScrollControlled: true,
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Container(
-              margin: const EdgeInsets.only(left: 0),
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              child: Obx(
-                () => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    majorTitle(
-                        title: "Payment Method $selectedpaymentMethod",
-                        color: Colors.black,
-                        size: 20.0,
-                        fontWeight: FontWeight.bold),
-                    const SizedBox(height: 15),
-                    majorTitle(
-                        title:
-                            "Total Amount ${htmlPrice(purchaseController.invoice.value?.totalAmount?.toStringAsFixed(2) ?? 0)}",
-                        color: Colors.black,
-                        size: 14.0),
-                    if (selectedpaymentMethod == "Cash") _cashFieldsWidgets(),
-                    if (selectedpaymentMethod == "Mpesa") mpesaFieldsWidgets(),
-                    if (selectedpaymentMethod == "Bank") bankFieldsWidgets(),
-                    const SizedBox(height: 10),
-                    // if (salesController.change.value > 0)
-                    Center(
-                      child: Obx(
-                        () => majorTitle(
-                            title:
-                                "${purchaseController.balanceText.value} ${htmlPrice(purchaseController.balance.value.toStringAsFixed(2))}",
-                            color: Colors.black,
-                            size: 19.0),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                            onPressed: () {
-                              Get.back();
-                            },
-                            child: majorTitle(
-                                title: "Cancel",
-                                color: AppColors.mainColor,
-                                size: 16.0)),
-                        TextButton(
-                            onPressed: checkEnoughAmountEntered() == false
-                                ? null
-                                : () {
-                                    purchaseController.createPurchase();
-                                  },
-                            child: majorTitle(
-                                title: "Confirm payment",
-                                color: checkEnoughAmountEntered() == false
-                                    ? Colors.grey
-                                    : AppColors.mainColor,
-                                size: 16.0)),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
+  // ─────────────────────────────────────────────────────────────
+  // SUPPLIER SELECTOR
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildSupplierSelector() {
+    return InkWell(
+      onTap: () {
+        Get.to(
+          () => Suppliers(
+            from: "purchases",
           ),
         );
       },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: AppColors.mainColor.withOpacity(.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.storefront_outlined,
+                color: AppColors.mainColor,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Obx(() {
+                final supplier = purchaseController.selectedSupplier.value;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      supplier?.name ?? "Select Supplier",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: supplier == null ? Colors.grey : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      supplier == null
+                          ? "Required for credit purchases"
+                          : "Tap to change",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: Colors.grey.shade500,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Column bankFieldsWidgets() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        majorTitle(
-            title: "Enter Amount received", color: Colors.black, size: 14.0),
-        const SizedBox(height: 10),
-        TextFormField(
-            controller: purchaseController.textEditingControllerAmount,
-            onChanged: (value) {
-              purchaseController.calculateAmount();
-              purchaseController.invoice.refresh();
+  // ─────────────────────────────────────────────────────────────
+  // AMOUNT FIELD
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildAmountField(String method) {
+    return TextFormField(
+      controller: purchaseController.textEditingControllerAmount,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      onChanged: (value) {
+        purchaseController.calculateAmount();
+        purchaseController.invoice.refresh();
+      },
+      decoration: InputDecoration(
+        labelText: _amountLabel(method),
+        hintText: 'Enter amount',
+        prefixIcon: const Icon(Icons.payments_outlined),
+        prefixText:
+            "${userController.currentUser.value!.primaryShop!.currency!} ",
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+    );
+  }
+
+  String _amountLabel(String method) {
+    switch (method) {
+      case 'Cash':
+        return 'Cash Paid';
+      case 'Mpesa':
+        return 'Mpesa Amount';
+      case 'Bank':
+        return 'Bank Amount';
+      case 'Credit':
+        return 'Amount Paid';
+      default:
+        return 'Amount';
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // MPESA FIELD
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildMpesaField() {
+    return TextFormField(
+      controller: purchaseController.mpesaTransId,
+      decoration: InputDecoration(
+        labelText: 'Mpesa Transaction ID',
+        hintText: 'e.g. QWE123RTY',
+        prefixIcon: const Icon(
+          Icons.confirmation_number_outlined,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // BANK FIELD
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildBankField() {
+    return TextFormField(
+      controller: purchaseController.bankTransId,
+      decoration: InputDecoration(
+        labelText: 'Bank Transaction ID',
+        hintText: 'e.g. TXN-293939',
+        prefixIcon: const Icon(
+          Icons.account_balance_outlined,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // SUMMARY
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildSummary(String method) {
+    return Obx(() {
+      final total = purchaseController.balance;
+
+      final paid = double.tryParse(
+            purchaseController.textEditingControllerAmount.text,
+          ) ??
+          0;
+
+      final balance = total - paid;
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            _PaymentRow(
+              label: 'Total',
+              value: htmlPrice(total),
+            ),
+            const SizedBox(height: 10),
+            _PaymentRow(
+              label: 'Paid',
+              value: htmlPrice(paid),
+            ),
+            Divider(
+              height: 24,
+              color: Colors.grey.shade300,
+            ),
+            _PaymentRow(
+              label: balance <= 0 ? 'Change' : 'Balance',
+              value: htmlPrice(balance.abs()),
+              bold: true,
+              valueColor: balance > 0 ? Colors.red : Colors.green,
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // BOTTOM BAR
+  // ─────────────────────────────────────────────────────────────
+
+  Widget _buildBottomBar() {
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(
+          16,
+          10,
+          16,
+          16,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.04),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SizedBox(
+          height: 52,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.mainColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            onPressed: () {
+              _sell(
+                selectedpaymentMethod:
+                    purchaseController.selectedpaymentMethod.value,
+              );
             },
-            keyboardType: TextInputType.number,
-            autofocus: true,
-            decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                border: OutlineInputBorder(
+            child: const Text(
+              'Complete Purchase',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // PAYMENT METHODS SHEET
+  // ─────────────────────────────────────────────────────────────
+
+  void _showPaymentMethodsSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(28),
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 35,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Text(
-                      userController.currentUser.value!.primaryShop!.currency!),
-                ))),
-        const SizedBox(height: 10),
-        majorTitle(
-            title: "Bank Transaction ID", color: Colors.black, size: 14.0),
-        const SizedBox(height: 10),
-        TextFormField(
-            controller: purchaseController.bankTransId,
-            keyboardType: TextInputType.text,
-            textCapitalization: TextCapitalization.characters,
-            autofocus: true,
-            decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                )))
-      ],
-    );
-  }
-
-  Column mpesaFieldsWidgets() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 10),
-        majorTitle(
-            title: "Enter Amount received", color: Colors.black, size: 14.0),
-        const SizedBox(height: 10),
-        TextFormField(
-            controller: purchaseController.textEditingControllerAmount,
-            onChanged: (value) {
-              purchaseController.calculateAmount();
-              purchaseController.invoice.refresh();
-            },
-            keyboardType: TextInputType.number,
-            autofocus: true,
-            decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Select Payment Method',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
                 ),
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Text(
-                      userController.currentUser.value!.primaryShop!.currency!),
-                ))),
-        const SizedBox(height: 10),
-        majorTitle(
-            title: "Mpesa Transaction ID", color: Colors.black, size: 14.0),
-        const SizedBox(height: 10),
-        TextFormField(
-            controller: purchaseController.mpesaTransId,
-            keyboardType: TextInputType.text,
-            textCapitalization: TextCapitalization.characters,
-            autofocus: true,
-            decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                )))
-      ],
-    );
-  }
+              ),
+              const SizedBox(height: 12),
+              ...purchaseController.paymentMethods.map(
+                (method) => _PaymentMethodOption(
+                  method: method,
+                  icon: _paymentIcon(method),
+                  onTap: () {
+                    purchaseController.selectedpaymentMethod.value = method;
 
-  Column _cashFieldsWidgets() {
-    return Column(
-      children: [
-        const SizedBox(height: 10),
-        majorTitle(
-            title: "Enter Amount received", color: Colors.black, size: 14.0),
-        const SizedBox(height: 10),
-        TextFormField(
-            controller: purchaseController.textEditingControllerAmount,
-            onChanged: (value) {
-              purchaseController.calculateAmount();
-              purchaseController.invoice.refresh();
-            },
-            keyboardType: TextInputType.number,
-            autofocus: true,
-            decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                    purchaseController.textEditingControllerAmount.clear();
+
+                    Get.back();
+                  },
                 ),
-                prefix: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Text(
-                      userController.currentUser.value!.primaryShop!.currency!),
-                )))
-      ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  bool checkEnoughAmountEntered() {
-    return toDouble(purchaseController.textEditingControllerAmount.text.isEmpty
-            ? 0
-            : purchaseController.textEditingControllerAmount.text) >=
-        toDouble(purchaseController.invoice.value?.totalAmount ?? 0);
+  // ─────────────────────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────────────────────
+
+  IconData _paymentIcon(String method) {
+    switch (method) {
+      case 'Cash':
+        return Icons.payments_outlined;
+
+      case 'Mpesa':
+        return Icons.phone_android;
+
+      case 'Bank':
+        return Icons.account_balance;
+
+      case 'Credit':
+        return Icons.credit_score;
+
+      default:
+        return Icons.wallet;
+    }
   }
 
-  void _sell({String status = "cashed", String selectedpaymentMethod = ""}) {
+  bool _needSupplier() {
+    return purchaseController.selectedpaymentMethod.value == "Credit";
+  }
+
+  void _sell({
+    String status = "cashed",
+    String selectedpaymentMethod = "",
+  }) {
+    if (purchaseController.invoice.value == null ||
+        purchaseController.invoice.value!.items!.isEmpty) {
+      generalAlert(title: "No items to pay");
+      return;
+    }
+
     if (purchaseController.selectedSupplier.value == null && _needSupplier()) {
       generalAlert(
-          title: "Error!",
-          message: "please select supplier to buy from",
-          function: () {
-            Get.to(() => Suppliers(
-                  from: "purchases",
-                  function: (v) {
-                    print(purchaseController.selectedSupplier.value);
-                    if (purchaseController.selectedSupplier.value != null) {
-                      generalAlert(
-                          title: "Confirm",
-                          message:
-                              "Are you sure you want to purchase on $selectedpaymentMethod from ${purchaseController.selectedSupplier.value?.name}?",
-                          function: () {
-                            purchaseController.createPurchase();
-                          });
-                    }
-                  },
-                ));
-          });
+        title: "Error!",
+        message: "Please select supplier to buy from",
+        function: () {
+          Get.to(
+            () => Suppliers(
+              from: "purchases",
+            ),
+          );
+        },
+      );
       return;
     }
 
     if (selectedpaymentMethod == "Credit") {
       generalAlert(
-          title: "Confirm",
-          message:
-              "Are you sure you want to purchase on $selectedpaymentMethod from ${purchaseController.selectedSupplier.value?.name}?",
-          function: () {
-            purchaseController.createPurchase();
-          });
+        title: "Confirm",
+        message:
+            "Are you sure you want to purchase on $selectedpaymentMethod from ${purchaseController.selectedSupplier.value?.name}?",
+        function: () {
+          purchaseController.createPurchase();
+        },
+      );
     } else {
-      if (selectedpaymentMethod == "Cash" ||
-          selectedpaymentMethod == "Mpesa" ||
-          selectedpaymentMethod == "Bank") {
-        confirmPayment(Get.context!, status,
-            selectedpaymentMethod: selectedpaymentMethod);
-      } else {
-        purchaseController.createPurchase();
-      }
+      purchaseController.createPurchase();
     }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PAYMENT METHOD CARD
+// ─────────────────────────────────────────────────────────────
+
+class _SelectedPaymentMethodCard extends StatelessWidget {
+  final String method;
+  final IconData Function(String) iconResolver;
+  final VoidCallback onTap;
+
+  const _SelectedPaymentMethodCard({
+    required this.method,
+    required this.iconResolver,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: AppColors.mainColor,
+            width: 1.4,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: AppColors.mainColor.withOpacity(.08),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                iconResolver(method),
+                color: AppColors.mainColor,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                method,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.grey.shade500,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PAYMENT OPTION
+// ─────────────────────────────────────────────────────────────
+
+class _PaymentMethodOption extends StatelessWidget {
+  final String method;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _PaymentMethodOption({
+    required this.method,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: Colors.grey.shade200,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 35,
+              height: 35,
+              decoration: BoxDecoration(
+                color: AppColors.mainColor.withOpacity(.08),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                icon,
+                color: AppColors.mainColor,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                method,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 15,
+              color: Colors.grey.shade500,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PAYMENT ROW
+// ─────────────────────────────────────────────────────────────
+
+class _PaymentRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool bold;
+  final Color? valueColor;
+
+  const _PaymentRow({
+    required this.label,
+    required this.value,
+    this.bold = false,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade700,
+            fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+            color: valueColor ?? Colors.black,
+          ),
+        ),
+      ],
+    );
   }
 }

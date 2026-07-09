@@ -10,15 +10,15 @@ import '../../../models/product.dart';
 import '../../../screens/product/product_history.dart';
 
 class MonthlyPreviewPage extends StatelessWidget {
- final  List<dynamic> ?sales;
+  final List<dynamic>? sales;
   final String? type;
- final String? title;
+  final String? title;
   final double? total;
   final Product? product;
 
   const MonthlyPreviewPage(
       {Key? key,
-       this.sales,
+      this.sales,
       this.type,
       required this.product,
       this.title,
@@ -31,21 +31,18 @@ class MonthlyPreviewPage extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
             onPressed: () {
-              isSmallScreen(context)
-                  ? Get.back()
-                  : Get.find<HomeController>().selectedWidget.value =
-                      ProductHistory(product: product!);
+              Get.back();
             },
             icon: Icon(
               Icons.arrow_back_ios,
-              color: isSmallScreen(context) ? Colors.white : Colors.black,
+              color: Colors.white,
             )),
         backgroundColor:
-            isSmallScreen(context) ? AppColors.mainColor : Colors.white,
+            AppColors.mainColor,
         title: Text(
           type ?? "",
           style: TextStyle(
-              color: isSmallScreen(context) ? Colors.white : Colors.black),
+              color: Colors.white),
         ),
       ),
       body: PdfPreview(

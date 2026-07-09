@@ -16,17 +16,16 @@ import '../screens/stock/transfer_history.dart';
 import '../utils/colors.dart';
 
 class StockController extends GetxController {
-  RxList<Map<String, dynamic>> selectedProducts = RxList([]);
 
   RxList<Product> productsCount = RxList([]);
   RxList<Product> productsCountCart = RxList([]);
+  Rxn<Product> selectedProductCount = Rxn();
   RxList<TransferHistory> transferHistory = RxList([]);
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
 
   TextEditingController textEditingControllerQty = TextEditingController();
   TextEditingController textEditingControllerCount = TextEditingController();
 
-  RxBool transferall = RxBool(false);
   RxBool gettingTransferHistoryLoad = RxBool(false);
   RxBool isSavingingCount = RxBool(false);
   RxBool isLoadingCount = RxBool(false);
@@ -36,59 +35,9 @@ class StockController extends GetxController {
   RxString filterDate =
       RxString(DateFormat("MMM dd, yyyy").format(DateTime.now()));
 
-  void addToList(Product productModel, {type = ""}) {
-    var index = selectedProducts
-        .indexWhere((element) => element["product"] == productModel.sId);
-    if (index == -1) {
-      selectedProducts.add({
-        "product": productModel.sId,
-        "quantity": type == "import" ? productModel.quantity : 1,
-        "name": productModel.name,
-        "item": productModel
-      });
-    } else {
-      int i = selectedProducts
-          .indexWhere((element) => element["product"] == productModel.sId);
-      selectedProducts.removeAt(i);
-    }
-    Get.find<ProductController>().products.refresh();
-    selectedProducts.refresh();
-  }
+  
 
-  void submitTranster({required Shop toShop, required context}) async {
-    var transferData = {
-      "attendantId": userController.currentUser.value?.attendantId?.sId,
-      "fromShopId": userController.currentUser.value?.primaryShop?.id,
-      "toShopId": toShop.id,
-      "useWarehouse": (userController
-                  .currentUser.value?.primaryShop!.useWarehouse ??
-              false) ||
-          (userController.currentUser.value?.primaryShop!.warehouse ?? false),
-      "products": selectedProducts
-          .map((element) =>
-              {"product": element["product"], "quantity": element["quantity"]})
-          .toList(),
-    };
-    print(transferData);
-    try {
-      isSavingingCount.value = true;
-      var respose = await ProductService().transferProduct(transferData);
-      isSavingingCount.value = false;
-      if (respose["error"] != null) {
-        generalAlert(
-            title: "Error",
-            message:
-                "${(respose["failedChecks"] as List)[0]['name']} - ${(respose["failedChecks"] as List)[0]['error']}");
-      }
-    } catch (e) {
-      isSavingingCount.value = false;
-    }
-    Get.back();
-    Get.back();
-    Get.to(() => TransferHistoryPage());
-    Get.find<ProductController>().getProductsBySort(type: "");
-    selectedProducts.clear();
-  }
+  
 
   incrementQuantityWidget(context, Product product) {
     return showDialog(
@@ -132,7 +81,7 @@ class StockController extends GetxController {
                 },
                 child: Text(
                   "Cancel".toUpperCase(),
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),
@@ -157,7 +106,7 @@ class StockController extends GetxController {
                 },
                 child: Text(
                   "Update".toUpperCase(),
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: AppColors.mainColor,
                     fontWeight: FontWeight.bold,
                   ),

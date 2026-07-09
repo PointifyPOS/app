@@ -30,8 +30,13 @@ class DbBase {
     _dio.options.headers['Connection'] = 'keep-alive';
   }
 
-  Future databaseRequest(String link, String type,
-      {Map<String, dynamic>? body, Map<String, String>? headers}) async {
+  Future databaseRequest(
+    String link,
+    String type, {
+    Map<String, dynamic>? body,
+    Map<String, String>? headers,
+    ResponseType responseType = ResponseType.json,
+  }) async {
     try {
       final prefs = PreferenceManager();
       headers ??= {
@@ -50,23 +55,43 @@ class DbBase {
           switch (type) {
             case "GET":
               response = await _dio.get(link,
-                  queryParameters: body, options: Options(headers: headers));
+                  queryParameters: body,
+                  options: Options(
+                    headers: headers,
+                    responseType: responseType,
+                  ));
               break;
             case "POST":
               response = await _dio.post(link,
-                  data: body, options: Options(headers: headers));
+                  data: body,
+                  options: Options(
+                    headers: headers,
+                    responseType: responseType,
+                  ));
               break;
             case "PUT":
               response = await _dio.put(link,
-                  data: body, options: Options(headers: headers));
+                  data: body,
+                  options: Options(
+                    headers: headers,
+                    responseType: responseType,
+                  ));
               break;
             case "PATCH":
               response = await _dio.patch(link,
-                  data: body, options: Options(headers: headers));
+                  data: body,
+                  options: Options(
+                    headers: headers,
+                    responseType: responseType,
+                  ));
               break;
             case "DELETE":
               response = await _dio.delete(link,
-                  data: body, options: Options(headers: headers));
+                  data: body,
+                  options: Options(
+                    headers: headers,
+                    responseType: responseType,
+                  ));
               break;
             default:
               throw DioException(

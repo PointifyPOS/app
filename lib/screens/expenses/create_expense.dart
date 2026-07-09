@@ -13,10 +13,8 @@ import '../../models/expensecategory.dart';
 import '../../utils/colors.dart';
 import '../../widgets/major_title.dart';
 
-
-
 class CreateExpense extends StatelessWidget {
-final String? from;
+  final String? from;
   final ExpenseModel? expense;
 
   CreateExpense({Key? key, this.from, this.expense}) : super(key: key) {
@@ -51,26 +49,7 @@ final String? from;
           elevation: 0.3,
           leading: IconButton(
             onPressed: () {
-              if (!isSmallScreen(context)) {
-                if (from == "CashFlowManager") {
-                  // Get.find<HomeController>().selectedWidget.value =
-                  //     CashFlowManager();
-                }
-                if (from == "ExpensePage") {
-                  Get.find<HomeController>().selectedWidget.value = ExpensePage(
-                    firstday: DateTime.now(),
-                    lastday: DateTime.now(),
-                  );
-                }
-                if (from == "ExpensePage") {
-                  Get.find<HomeController>().selectedWidget.value = ExpensePage(
-                    firstday: DateTime.now(),
-                    lastday: DateTime.now(),
-                  );
-                }
-              } else {
-                Get.back();
-              }
+              Get.back();
             },
             icon: const Icon(
               Icons.arrow_back_ios,
@@ -84,9 +63,7 @@ final String? from;
               size: 16.0),
         ),
         body: Container(
-          padding:
-              EdgeInsets.symmetric(horizontal: isSmallScreen(context) ? 0 : 10)
-                  .copyWith(right: isSmallScreen(context) ? 0 : 50),
+          padding: EdgeInsets.symmetric(horizontal: 0).copyWith(right: 0),
           child: ListView(children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -177,7 +154,7 @@ final String? from;
                           borderRadius: BorderRadius.circular(10),
                           border:
                               Border.all(color: AppColors.mainColor, width: 2)),
-                      child:  Text(
+                      child: Text(
                         "+ Add",
                         style: TextStyle(color: AppColors.mainColor),
                       )),

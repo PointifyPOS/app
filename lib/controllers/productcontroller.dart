@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:pointify/controllers/purchase_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/stockcontroller.dart';
 import 'package:pointify/controllers/warehousecontroller.dart';
@@ -41,34 +42,30 @@ class ProductController extends GetxController {
   RxList<Product> products = RxList([]);
   RxList<Product> productDownloadss = RxList([]);
   RxList<Batch> filteredBatches = RxList([]);
-  RxList<ProductCategory> productCategories = RxList([]);
+  Rxn<ProductCategory> selectedCategory = Rxn(null);
   RxString activeAdjustmentFilter = RxString('today');
   RxList<TransferItem> productHistoryList = RxList([]);
-  RxList<SaleItem> productInvoices = RxList([]);
-  RxList<CountHistory> countHistory = RxList([]);
   RxList<ProductTrasferHistory> historytrasfer = RxList([]);
   RxList<Adjustment> adjustment = RxList([]);
   RxList<BundleItem> bundledProducts = RxList([]);
-  RxList<InvoiceItem> productPurchases = RxList([]);
-  RxList<Map<String, dynamic>> productMonthPurchases = RxList([]);
-  RxList<Map<String, dynamic>> monthlyBadStocks = RxList([]);
   Rxn<Supplier> pickedSupplier = Rxn(null);
   RxBool loadingMoreProducts = RxBool(false);
   RxBool loadingproducts = RxBool(false);
+  RxInt currentYear = RxInt(DateTime.now().year);
   RxBool showBadStockWidget = RxBool(false);
-  RxBool transferAll = RxBool(false);
-  RxBool loadingproductCategories = RxBool(false);
-  RxBool saveBadstockLoad = RxBool(false);
+  RxList<BadStock> badstocks = RxList([]);
   Rxn<Product> selectedBadStock = Rxn(null);
   Rxn<ProductCategory> selecteProductCategoty = Rxn(null);
-  RxList<BadStock> badstocks = RxList([]);
+  TextEditingController descriptionController = TextEditingController();
   RxString productType = RxString("product");
-  RxString fromDate = RxString("");
-  RxString toDate = RxString("");
-
   RxString badstockFromDate = RxString("");
+  RxBool saveBadstockLoad = RxBool(false);
   RxString badstockToDate = RxString("");
+  RxList<Map<String, dynamic>> monthlyBadStocks = RxList([]);
+  RxList<Map<String, dynamic>> productMonthPurchases = RxList([]);
+  RxList<CountHistory> countHistory = RxList([]);
 
+  RxList<SaleItem> productInvoices = RxList([]);
   RxList<List<Object?>> sampledata = RxList([
     [
       'Name',
@@ -116,7 +113,6 @@ class ProductController extends GetxController {
 
   RxList<CustomImage> selectedImages = RxList([]);
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
-  RxInt currentYear = RxInt(DateTime.now().year);
   RxBool creatingProductLoad = RxBool(false);
   RxBool getProductLoad = RxBool(false);
   RxBool getProductCountLoad = RxBool(false);
@@ -128,8 +124,11 @@ class ProductController extends GetxController {
   RxString selectedSortOrderCount = RxString("All");
   RxString selectedSortOrderSearch = RxString("all");
   RxString selectedSortOrderCountSearch = RxString("all");
-  RxMap<String, dynamic> countHistoryData = RxMap({});
+  RxString fromDate = RxString("");
+  RxString toDate = RxString("");
+  TextEditingController stockadjust = TextEditingController();
   RxString supplierName = RxString("None");
+  RxList<InvoiceItem> productPurchases = RxList([]);
   Rxn<Supplier> supplierId = Rxn(null);
   Rxn<Map<String, dynamic>> productAnalysis =
       Rxn({'profitEstimate': 0, 'totalStockValue': 0});
@@ -143,7 +142,6 @@ class ProductController extends GetxController {
       .obs;
 
   TextEditingController bundleQty = TextEditingController();
-  TextEditingController stockadjust = TextEditingController();
   TextEditingController itemNameController = TextEditingController();
   TextEditingController spoiltreasonController = TextEditingController();
   TextEditingController buyingPriceController = TextEditingController();
@@ -157,8 +155,6 @@ class ProductController extends GetxController {
   TextEditingController measureController = TextEditingController();
   TextEditingController expiryController = TextEditingController();
   TextEditingController manufacturerController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController categoryName = TextEditingController();
   TextEditingController category = TextEditingController();
   TextEditingController searchProductController = TextEditingController();
   TextEditingController searchBatchController = TextEditingController();
@@ -216,6 +212,12 @@ class ProductController extends GetxController {
     super.onInit();
   }
 
+  Future<void> deleteProductCount(String sId) async {
+    countHistory.removeWhere((element) => element.sId == sId);
+    countHistory.refresh();
+    await ProductService.deleteProductCount(sId);
+  }
+
   void _scrollListener() {
     if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent &&
@@ -223,6 +225,71 @@ class ProductController extends GetxController {
       print("Load more data");
       _loadMoreData();
     }
+  }
+
+  Future<void> getProductPurchaseHistory(Product? product,
+      {required String fromDate, required String toDate}) async {
+    var response = await ProductService.getProductPurchasesHistory(
+        startDate: fromDate, toDate: toDate, product: product!.sId!);
+    if (response["error"] != null) {
+      showSnackBar(message: response["error"], color: Colors.red);
+    } else {
+      List purchses = response["purchases"];
+      productPurchases.value =
+          purchses.map((e) => InvoiceItem.fromJson(e)).toList();
+    }
+  }
+
+  getProductsCountsHistory({required String product}) async {
+    countHistory.clear();
+    List allproducts = await ProductService.getProductsCountsHistory(product);
+    List<CountHistory> products =
+        allproducts.map((e) => CountHistory.fromJson(e)).toList();
+    countHistory.addAll(products);
+    countHistory.refresh();
+  }
+
+  updateQuantity(Map<String, dynamic> data,
+      {required String productId, required int index}) async {
+    countHistory.removeAt(index);
+    countHistory.refresh();
+    await ProductService.updateProduct(data, productId);
+  }
+
+  Future<void> getBadStockGroupedByMonth(
+      {required String year, required String product}) async {
+    monthlyBadStocks.clear();
+    var productsHistory = await ProductService.getBadStockGroupedByMonth(
+      product: product,
+      year: year,
+    );
+    List result = productsHistory["result"];
+    monthlyBadStocks.addAll(result
+        .map((e) => {
+              "month": e["month"],
+              "totalLost": e["totalLost"],
+              "count": e["count"],
+            })
+        .toList());
+    monthlyBadStocks.refresh();
+  }
+
+  getProductPurchasesGroupedByMonth(String product,
+      {String? fromDate, String? toDate}) async {
+    productMonthPurchases.clear();
+    var productsHistory =
+        await ProductService.getProductPurchasesGroupedByMonth(
+            product: product, startDate: fromDate, toDate: toDate);
+    List result = productsHistory;
+    productMonthPurchases.addAll(result
+        .map((e) => {
+              "month": e["month"],
+              "totalBuyingPrice": e["totalPurchases"],
+              "count": e["count"],
+              "totalQuantity": e["totalQuantity"]
+            })
+        .toList());
+    productMonthPurchases.refresh();
   }
 
   Future<void> _loadMoreData() async {
@@ -245,14 +312,22 @@ class ProductController extends GetxController {
   void filterProductsLocally(String query) {
     if (query.isEmpty) {
       filteredProducts.value = products;
-      getProductsBySort(
-          type: "all", text: query, page: 1, limit: 50, showLoader: false);
-    } else {
-      filteredProducts.value = products
-          .where((product) =>
-              product.name!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      return;
     }
+
+    final q = query.toLowerCase();
+
+    filteredProducts.value = products.where((product) {
+      final name = product.name?.toLowerCase() ?? '';
+
+      final barcode = product.barcode?.toLowerCase() ?? '';
+
+      final manufacturer = product.manufacturer?.toLowerCase() ?? '';
+
+      return name.contains(q) ||
+          barcode.contains(q) ||
+          manufacturer.contains(q);
+    }).toList();
   }
 
   Future<void> importProducts(List<List<dynamic>> excelData) async {
@@ -711,6 +786,9 @@ class ProductController extends GetxController {
     selectedImages.value = [];
   }
 
+// new version
+
+  // to be remove in the future
   getProductsBySort(
       {required String type,
       String text = "",
@@ -721,11 +799,13 @@ class ProductController extends GetxController {
       String shop = "",
       bool warehouse = false,
       bool useWarehouse = false,
+      ProductCategory? category,
       int page = 1,
       int limit = 50,
       String reason = "",
       String productid = "",
       bool loadMore = false,
+      bool clearafterloading = false,
       bool showLoader = true,
       String barcodeId = ""}) async {
     if (reason != "download") {
@@ -756,6 +836,7 @@ class ProductController extends GetxController {
       response = await ProductService.getProductsBySort(
           type: type,
           text: text,
+          category: category,
           productType: productType,
           adminId: userController.currentUser.value?.id,
           useWarehouse:
@@ -803,6 +884,9 @@ class ProductController extends GetxController {
         }).toList();
       } else {
         if (loadMore == true) {
+          if (clearafterloading == true) {
+            products.clear();
+          }
           products.addAll(allproducts.map((e) {
             return Product.fromJson(e);
           }).toList());
@@ -825,6 +909,12 @@ class ProductController extends GetxController {
       if (scanningFrom == "sale" && products.isNotEmpty) {
         Get.find<SalesController>().addToCart(products.first);
       }
+      if (scanningFrom == "purchase" && products.isNotEmpty) {
+        Get.find<PurchaseController>().addNewPurchase(products.first);
+      }
+      if (scanningFrom == "count" && products.isNotEmpty) {
+        Get.find<StockController>().selectedProductCount.value = products.first;
+      }
     }
     loadingproducts.value = false;
     loadingMoreProducts.value = false;
@@ -836,45 +926,6 @@ class ProductController extends GetxController {
         shopId: userController.currentUser.value!.primaryShop?.id);
     productAnalysis.value = productAnalysisResponse;
     loadingproducts.value = false;
-  }
-
-  getProductsCountsHistory({required String product}) async {
-    countHistory.clear();
-    List allproducts = await ProductService.getProductsCountsHistory(product);
-    List<CountHistory> products =
-        allproducts.map((e) => CountHistory.fromJson(e)).toList();
-    countHistory.addAll(products);
-    countHistory.refresh();
-  }
-
-  // Future<void> scanQR({required type, required context}) async {
-  //   String barcodeScanRes;
-  //   try {
-  //     var result = await FlutterBarcodeScanner.scanBarcode(
-  //         '#ff6666', 'Cancel', true, ScanMode.BARCODE);
-  //     barcodeScanRes = result == "-1" ? '' : result;
-  //     if (type == "count") {
-  //       searchProductCountController.text = barcodeScanRes;
-  //     }
-  //
-  //     getProductsBySort(
-  //         type: "search", barcodeId: barcodeScanRes, scanningFrom: type);
-  //   } on PlatformException {
-  //     showSnackBar(
-  //         message: 'Failed to get platform version.', color: Colors.red);
-  //   }
-  // }
-
-  deleteProduct({required Product product}) async {
-    var i = products.indexWhere((element) => element.sId == product.sId);
-    products.removeAt(i);
-    await ProductService.deleteProduct(product.sId!);
-    if (product.images != null && product.images!.isNotEmpty) {
-      for (int i = 0; i < product.images!.length; i++) {
-        FirestoreFilesAccess().deleteFileFromPath("${product.sId!}_$i");
-      }
-    }
-    // getProductsBySort(type: "all");
   }
 
   assignTextFields(Product productModel) async {
@@ -932,11 +983,22 @@ class ProductController extends GetxController {
         (storage.getString("print_barcode") ?? false) as bool;
   }
 
-  updateQuantity(Map<String, dynamic> data,
-      {required String productId, required int index}) async {
-    countHistory.removeAt(index);
-    countHistory.refresh();
-    await ProductService.updateProduct(data, productId);
+  getBadStock(
+      {shopId,
+      String? attendant,
+      String? product = "",
+      String? fromDate,
+      String? toDate}) async {
+    try {
+      saveBadstockLoad.value = true;
+      badstocks.clear();
+      List<dynamic> response = await ProductService.getBadStock(
+          product: product, fromDate: fromDate, toDate: toDate);
+      badstocks.addAll(response.map((e) => BadStock.fromJson(e)).toList());
+      saveBadstockLoad.value = false;
+    } catch (e) {
+      saveBadstockLoad.value = false;
+    }
   }
 
   saveBadStock({required page, required context}) async {
@@ -969,148 +1031,6 @@ class ProductController extends GetxController {
       clearControllers();
     } catch (e) {
       saveBadstockLoad.value = false;
-    }
-  }
-
-  getBadStock(
-      {shopId,
-      String? attendant,
-      String? product = "",
-      String? fromDate,
-      String? toDate}) async {
-    try {
-      saveBadstockLoad.value = true;
-      badstocks.clear();
-      List<dynamic> response = await ProductService.getBadStock(
-          product: product, fromDate: fromDate, toDate: toDate);
-      badstocks.addAll(response.map((e) => BadStock.fromJson(e)).toList());
-      saveBadstockLoad.value = false;
-    } catch (e) {
-      saveBadstockLoad.value = false;
-    }
-  }
-
-  getProductPurchasesGroupedByMonth(String product,
-      {String? fromDate, String? toDate}) async {
-    productMonthPurchases.clear();
-    var productsHistory =
-        await ProductService.getProductPurchasesGroupedByMonth(
-            product: product, startDate: fromDate, toDate: toDate);
-    List result = productsHistory;
-    productMonthPurchases.addAll(result
-        .map((e) => {
-              "month": e["month"],
-              "totalBuyingPrice": e["totalPurchases"],
-              "count": e["count"],
-              "totalQuantity": e["totalQuantity"]
-            })
-        .toList());
-    productMonthPurchases.refresh();
-  }
-
-  Future<void> getProductCategiories() async {
-    loadingproductCategories.value = true;
-    productCategories.clear();
-    List<dynamic> productCategoriesResponse = await ProductService()
-        .getProductCategories(userController.currentUser.value!.id!);
-    productCategories.addAll(productCategoriesResponse
-        .map((e) => ProductCategory.fromJson(e))
-        .toList());
-    loadingproductCategories.value = false;
-  }
-
-  Future<void> getProductStats(String shop) async {
-    var productsHistory = await ProductService.getProductStats(shop);
-    countHistoryData.value = productsHistory;
-  }
-
-  Future<void> getProductPurchaseHistory(Product? product,
-      {required String fromDate, required String toDate}) async {
-    var response = await ProductService.getProductPurchasesHistory(
-        startDate: fromDate, toDate: toDate, product: product!.sId!);
-    if (response["error"] != null) {
-      showSnackBar(message: response["error"], color: Colors.red);
-    } else {
-      List purchses = response["purchases"];
-      productPurchases.value =
-          purchses.map((e) => InvoiceItem.fromJson(e)).toList();
-    }
-  }
-
-  Future<void> getBadStockGroupedByMonth(
-      {required String year, required String product}) async {
-    monthlyBadStocks.clear();
-    var productsHistory = await ProductService.getBadStockGroupedByMonth(
-      product: product,
-      year: year,
-    );
-    List result = productsHistory["result"];
-    monthlyBadStocks.addAll(result
-        .map((e) => {
-              "month": e["month"],
-              "totalLost": e["totalLost"],
-              "count": e["count"],
-            })
-        .toList());
-    monthlyBadStocks.refresh();
-  }
-
-  Future<void> deleteProductCount(String sId) async {
-    countHistory.removeWhere((element) => element.sId == sId);
-    countHistory.refresh();
-    await ProductService.deleteProductCount(sId);
-  }
-
-  Future<void> transferProducts(List<Map<String, dynamic>> value, toShop,
-      {all = false}) async {
-    // print(Get.find<StockController>().transferall.value);
-    // return;
-    LoadingDialog.showLoadingDialog(
-      context: Get.context!,
-      title: "Please wait...",
-      key: _keyLoader,
-    );
-    var response = await ProductService.transferProducts(value, toShop, all);
-    Get.back();
-    generalAlert(
-        title: "Success",
-        message: response["message"],
-        negativeCallback: () {
-          Get.back();
-        },
-        function: () {
-          Get.back();
-        });
-  }
-
-  void createCategory() async {
-    LoadingDialog.showLoadingDialog(
-      context: Get.context!,
-      title: "Adding please wait...",
-      key: _keyLoader,
-    );
-    if (categoryName.text.isEmpty) {
-      showSnackBar(message: "enter category name", color: Colors.red);
-      return;
-    }
-    var response = await ProductService.createCategory({
-      "name": categoryName.text,
-      "admin": userController.currentUser.value!.id!
-    });
-    Get.back();
-    if (response["message"] != null) {
-      generalAlert(
-          title: "Success",
-          message: response["message"],
-          negativeCallback: () {
-            Get.back();
-          },
-          function: () {
-            Get.back();
-          });
-      getProductCategiories();
-    } else {
-      showSnackBar(message: response["error"], color: Colors.red);
     }
   }
 
@@ -1166,26 +1086,6 @@ class ProductController extends GetxController {
         },
       );
     }
-  }
-
-  void adjustStock(
-      {required Product product, required int quantity, required String type}) {
-    LoadingDialog.showLoadingDialog(
-      context: Get.context!,
-      title: "Please wait...",
-      key: _keyLoader,
-    );
-    ProductService.adjustStock(
-        product: product, quantity: quantity, type: type);
-    Get.back();
-    showSnackBar(message: "Stock adjusted successfully", color: Colors.green);
-    getProductsBySort(
-        type: "all",
-        text: "",
-        page: 1,
-        limit: 50,
-        shop: userController.currentUser.value!.primaryShop!.id!,
-        showLoader: false);
   }
 
   void getProductTrasferHistory(

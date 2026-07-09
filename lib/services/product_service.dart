@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:pointify/models/product.dart';
+import 'package:pointify/models/productcategory.dart';
+import 'package:pointify/models/shop.dart';
 import 'package:pointify/models/wahoureinvoice.dart';
 
 import '../main.dart';
@@ -63,6 +65,13 @@ class ProductService {
     return response;
   }
 
+  static updateBarcode(Map<String, dynamic> product, String productid) async {
+    var response = await DbBase().databaseRequest(
+        "${EndPoints.barcode}/$productid", DbBase().putRequestType,
+        body: product);
+    return response;
+  }
+
   static deleteProduct(String productid) async {
     var response = await DbBase().databaseRequest(
         "${EndPoints.products}/$productid?shop=${userController.currentUser.value?.primaryShop?.id}&useWarehouse=${userController.currentUser.value?.primaryShop?.useWarehouse}",
@@ -80,13 +89,14 @@ class ProductService {
       String? adminId = "",
       String? date = "",
       String? productType = "",
+      ProductCategory? category,
       String? productid = "",
       String? shopId = "",
       String? sort = "",
       String? reason = "",
       String barcodeid = ""}) async {
     var response = await DbBase().databaseRequest(
-        "${EndPoints.products}${reason == "download" ? "?" : "?page=$page&"}reason=$reason&date=$date&limit=$limit&name=$text&shopid=$shopId&type=$type&sort=$sort&productid=$productid&barcodeid=$barcodeid&productType=$productType&useWarehouse=$useWarehouse&warehouse=$warehouse&adminid=$adminId",
+        "${EndPoints.products}${reason == "download" ? "?" : "?page=$page&"}reason=$reason&date=$date&limit=$limit&name=$text&shopid=$shopId&type=$type&sort=$sort&productid=$productid&barcodeid=$barcodeid&productType=$productType&useWarehouse=$useWarehouse&warehouse=$warehouse&adminid=$adminId&${category?.id != null ? "categoryId=${category?.id}" : ""}",
         DbBase().getRequestType);
     return response;
   }
@@ -207,14 +217,17 @@ class ProductService {
     return response;
   }
 
-  static transferProducts(
-      List<Map<String, dynamic>> products, toShop, bool all) async {
+  static transferProducts(List<Map<String, dynamic>> products, toShop,
+      Shop fromShop, bool all, bool resetQuantity) async {
     String url = EndPoints.producttransferimport;
     var response =
         await DbBase().databaseRequest(url, DbBase().postRequestType, body: {
-      'products': products,
-      "all": all,
+      'products': all ? [] : products,
+      "importall": all,
+      'resetQuantity': resetQuantity,
       "shopId": userController.currentUser.value?.primaryShop?.id,
+      "attendantId": userController.currentUser.value?.attendantId?.sId,
+      "fromShop": fromShop.id,
       "toShop": toShop
     });
     return response;
@@ -356,5 +369,37 @@ class ProductService {
         "${EndPoints.products}/remove/bundle/item?itemId=$s&productId=${product.sId}",
         DbBase().putRequestType);
     return response;
+  }
+
+  static Future<dynamic> getProducts({
+    required String shop,
+    String? type,
+    String stockMode = "instock",
+    required String name,
+    required String sort,
+    ProductCategory? category,
+    required int page,
+    required int limit,
+    required String reason,
+    required String productid,
+    required String barcodeId,
+  }) async {
+    String url = "${EndPoints.products_v2_list}"
+        "?shop=$shop"
+        "&name=$name"
+        "&type=$type"
+        "&stockMode=$stockMode"
+        "&sort=$sort"
+        "&limit=$limit"
+        "&page=$page"
+        "&reason=$reason"
+        "&productid=$productid"
+        "&categoryId=${category?.id}"
+        "&barcodeid=$barcodeId";
+
+    return await DbBase().databaseRequest(
+      url,
+      DbBase().getRequestType,
+    );
   }
 }

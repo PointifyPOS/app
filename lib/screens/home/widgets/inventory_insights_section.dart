@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/controllers/productcontroller.dart';
+import 'package:pointify/main.dart';
 import 'package:pointify/screens/product/product_insightful.dart';
 import 'package:pointify/screens/product/products_page.dart';
 import 'package:pointify/utils/colors.dart';
 
+// ignore: must_be_immutable
 class InventoryInsightsMinimal extends StatelessWidget {
   final int runningLow;
   final int outOfStock;
@@ -12,7 +15,7 @@ class InventoryInsightsMinimal extends StatelessWidget {
   final int fastMovingCount;
   final VoidCallback? onTapFastMoving;
 
-  const InventoryInsightsMinimal({
+  InventoryInsightsMinimal({
     super.key,
     required this.runningLow,
     required this.outOfStock,
@@ -20,6 +23,7 @@ class InventoryInsightsMinimal extends StatelessWidget {
     required this.fastMovingCount,
     this.onTapFastMoving,
   });
+  ProductNewController productNewController = Get.find<ProductNewController>();
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +38,26 @@ class InventoryInsightsMinimal extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Inventory Insights",
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: AppColors.mainColor,
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: "Inventory Insights ",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.mainColor,
+                  ),
+                ),
+                TextSpan(
+                  text: "(click to view more)",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.mainColor.withOpacity(0.7),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 10),
@@ -57,75 +75,102 @@ class InventoryInsightsMinimal extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
-          InkWell(
-            onTap: onTapFastMoving,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "See fast moving products",
-                  style: TextStyle(
-                    color: AppColors.mainColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 13,
-                  color: AppColors.mainColor,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _item(String title, int value, Color color) {
+  Widget _item(
+    String title,
+    int value,
+    Color color,
+  ) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         String type = "";
+        String stockMode = "";
+
+        // FAST MOVING
         if (title == "Fast moving") {
           type = "fastmoving";
-          Get.find<ProductController>().selectedSortOrderSearch.value = type;
-          Get.find<ProductController>().getProductsBySort(type: type);
-          Get.to(() => ProductInsightPage(
-                type: "fastmoving",
-              ));
+
+          productNewController.selectedSortOrderSearch.value = type;
+
+          productNewController.getProducts(
+              type: type,
+              shop: userController.currentUser.value?.primaryShop?.id ?? "",
+              page: 1,
+              limit: 40,
+              refresh: true);
+
+          Get.to(
+            () => ProductInsightPage(
+              type: type,
+            ),
+          );
+
           return;
         }
+
+        // DORMANT
         if (title == "Dormant") {
           type = "dormant";
-          Get.find<ProductController>().selectedSortOrderSearch.value = type;
-          Get.find<ProductController>().getProductsBySort(type: type);
-          Get.to(() => ProductInsightPage(
-                type: "dormant",
-              ));
+
+          productNewController.selectedSortOrderSearch.value = type;
+
+          productNewController.getProducts(
+              type: type,
+              shop: userController.currentUser.value?.primaryShop?.id ?? "",
+              page: 1,
+              limit: 40,
+              refresh: true);
+
+          Get.to(
+            () => ProductInsightPage(
+              type: type,
+            ),
+          );
+
           return;
         }
+
+        // OUT OF STOCK
         if (title == "Out of stock") {
-          type = "outofstock";
+          stockMode = "outofstock";
         }
+
+        // RUNNING LOW
         if (title == "Running low") {
-          type = "runninglow";
+          stockMode = "runninglow";
         }
-        Get.find<ProductController>().selectedSortOrderSearch.value = type;
-        Get.find<ProductController>().getProductsBySort(type: type);
+
+        productNewController.stockMode.value = stockMode;
+
+        productNewController.getProducts(
+            stockMode: stockMode,
+            shop: userController.currentUser.value?.primaryShop?.id ?? "",
+            page: 1,
+            limit: 40,
+            refresh: true);
+
         Get.to(() => ProductPage());
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 7,
+        ),
         decoration: BoxDecoration(
           color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(
+            30,
+          ),
         ),
         child: RichText(
           text: TextSpan(
-            style: const TextStyle(fontSize: 12),
+            style: const TextStyle(
+              fontSize: 12,
+            ),
             children: [
               TextSpan(
                 text: "$value ",

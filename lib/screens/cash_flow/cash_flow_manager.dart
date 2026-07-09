@@ -1,5 +1,3 @@
-
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,7 +24,7 @@ class CashFlowManager extends StatelessWidget {
   final ShopController shopController = Get.find<ShopController>();
   final CashFlowController cashFlowController = Get.find<CashFlowController>();
   final CustomerController customerController = Get.find<CustomerController>();
-  final  ExpenseController expensesController = Get.find<ExpenseController>();
+  final ExpenseController expensesController = Get.find<ExpenseController>();
   final SalesController salesController = Get.find<SalesController>();
   final ProductController productController = Get.find<ProductController>();
 
@@ -102,11 +100,7 @@ class CashFlowManager extends StatelessWidget {
           ],
         ),
         actions: [
-          IconButton(
-              onPressed: () {
-
-              },
-              icon: const Icon(Icons.download))
+          IconButton(onPressed: () {}, icon: const Icon(Icons.download))
         ],
       ),
       body: SafeArea(
@@ -252,7 +246,7 @@ class CashFlowManager extends StatelessWidget {
                             width: 30,
                           ),
                           InkWell(
-                            child:  Icon(
+                            child: Icon(
                               Icons.filter_list,
                               size: 30,
                               color: AppColors.mainColor,
@@ -268,8 +262,8 @@ class CashFlowManager extends StatelessWidget {
                           await filterByDate(context);
                         },
                         child: Container(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 5),
                           decoration: BoxDecoration(
                               border: Border.all(color: AppColors.mainColor),
                               borderRadius: BorderRadius.circular(5)),
@@ -277,7 +271,7 @@ class CashFlowManager extends StatelessWidget {
                         ),
                       ),
               ),
-               Divider(
+              Divider(
                 color: AppColors.mainColor,
               )
             ],
@@ -310,17 +304,12 @@ class CashFlowManager extends StatelessWidget {
               padding: const EdgeInsets.only(left: 30.0, right: 30),
               child: InkWell(
                 onTap: () {
-                  if (isSmallScreen(context)) {
-                    Get.to(() => BanksTransactions());
-                  } else {
-                    Get.find<HomeController>().selectedWidget.value =
-                        BanksTransactions();
-                  }
+                  Get.to(() => BanksTransactions());
                 },
                 splashColor: Theme.of(context).splashColor,
                 child: Container(
-                  padding:
-                      const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, top: 10, bottom: 10),
                   decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10)),
@@ -347,16 +336,11 @@ class CashFlowManager extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   cashFlowController.getCashFlowCategoryWithTotals("cashin");
-                  if (!isSmallScreen(context)) {
-                    Get.find<HomeController>().selectedWidget.value =
-                        CashInLayout();
-                  } else {
-                    Get.to(() => CashInLayout());
-                  }
+                  Get.to(() => CashInLayout());
                 },
                 child: Container(
-                  padding:
-                      const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+                  padding: const EdgeInsets.only(
+                      top: 5, bottom: 5, left: 10, right: 10),
                   decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20)),
@@ -369,16 +353,11 @@ class CashFlowManager extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   cashFlowController.getCashFlowCategoryList("cashout");
-                  if (isSmallScreen(Get.context)) {
-                    Get.to(() => CashOutLayout());
-                  } else {
-                    Get.find<HomeController>().selectedWidget.value =
-                        CashOutLayout();
-                  }
+                  Get.to(() => CashOutLayout());
                 },
                 child: Container(
-                  padding:
-                      const EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
+                  padding: const EdgeInsets.only(
+                      top: 5, bottom: 5, left: 10, right: 10),
                   decoration: BoxDecoration(
                       color: Colors.grey.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20)),
@@ -410,9 +389,7 @@ class CashFlowManager extends StatelessWidget {
                 ),
                 child: Container(
                     margin: EdgeInsets.only(
-                      left: isSmallScreen(context)
-                          ? 0
-                          : MediaQuery.of(context).size.width * 0.2,
+                      left: 0,
                     ),
                     child: child),
               )
@@ -439,12 +416,7 @@ class CashFlowManager extends StatelessWidget {
     return InkWell(
       onTap: () {
         cashFlowController.getCashFlowCategoryWithTotals("cashin");
-        if (isSmallScreen(context)) {
-          Get.to(() => CashFlowCategories());
-        } else {
-          Get.find<HomeController>().selectedWidget.value =
-              CashFlowCategories();
-        }
+        Get.to(() => CashFlowCategories());
       },
       child: Container(
         margin: const EdgeInsets.all(10),

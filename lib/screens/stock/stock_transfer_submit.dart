@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/controllers/stockcontroller.dart';
 import 'package:pointify/screens/stock/products_selection.dart';
 import 'package:pointify/screens/stock/stockqty.dart';
@@ -19,6 +20,8 @@ class StockSubmit extends StatelessWidget {
   StockSubmit({Key? key, required this.toShop}) : super(key: key);
   final StockController stockTransferController = Get.find<StockController>();
   final ProductController productController = Get.find<ProductController>();
+  final ProductNewController productNewController =
+      Get.find<ProductNewController>();
   final ShopController shopController = Get.find<ShopController>();
 
   @override
@@ -58,11 +61,10 @@ class StockSubmit extends StatelessWidget {
                 : Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(10),
-
                     child: InkWell(
                       splashColor: Colors.transparent,
                       onTap: () {
-                        stockTransferController.submitTranster(
+                        productNewController.submitTranster(
                             toShop: toShop, context: context);
                       },
                       child: Container(
@@ -87,9 +89,10 @@ class StockSubmit extends StatelessWidget {
             return ListView.builder(
               shrinkWrap: true,
               itemBuilder: (context, index) {
-                var productTransfer =
-                    stockTransferController.selectedProducts.elementAt(index);
-                Product product = stockTransferController.selectedProducts
+                var productTransfer = productNewController
+                    .selectedTransferProducts
+                    .elementAt(index);
+                Product product = productNewController.selectedTransferProducts
                     .elementAt(index)["item"];
                 return Container(
                   width: double.infinity,
@@ -164,11 +167,11 @@ class StockSubmit extends StatelessWidget {
                                           onTap: () {
                                             if (productTransfer['quantity'] >
                                                 1) {
-                                              stockTransferController
-                                                      .selectedProducts[index]
-                                                  ["quantity"]--;
-                                              stockTransferController
-                                                  .selectedProducts
+                                              productNewController
+                                                      .selectedTransferProducts[
+                                                  index]["quantity"]--;
+                                              productNewController
+                                                  .selectedTransferProducts
                                                   .refresh();
                                             }
                                           },
@@ -179,20 +182,26 @@ class StockSubmit extends StatelessWidget {
                                       InkWell(
                                         onTap: () {
                                           stockDialog(
-
                                             index: index,
-                                            product:product,
+                                            product: product,
                                           );
                                         },
                                         child: Container(
                                             padding: const EdgeInsets.only(
-                                                top: 5, bottom: 5, right: 8, left: 8),
+                                                top: 5,
+                                                bottom: 5,
+                                                right: 8,
+                                                left: 8),
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(5),
-                                              border: Border.all(color: Colors.black, width: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              border: Border.all(
+                                                  color: Colors.black,
+                                                  width: 0.1),
                                             ),
                                             child: majorTitle(
-                                                title: "${productTransfer['quantity'] ?? 1}",
+                                                title:
+                                                    "${productTransfer['quantity'] ?? 1}",
                                                 color: Colors.black,
                                                 size: 12.0)),
                                       ),
@@ -205,17 +214,16 @@ class StockSubmit extends StatelessWidget {
                                       InkWell(
                                           onTap: () {
                                             if (product.quantity! >
-                                                stockTransferController
-                                                        .selectedProducts[index]
-                                                    ["quantity"]) {
-                                              stockTransferController
-                                                      .selectedProducts[index]
-                                                  ["quantity"]++;
-                                              stockTransferController
-                                                  .selectedProducts
+                                                productNewController
+                                                        .selectedTransferProducts[
+                                                    index]["quantity"]) {
+                                              productNewController
+                                                      .selectedTransferProducts[
+                                                  index]["quantity"]++;
+                                              productNewController
+                                                  .selectedTransferProducts
                                                   .refresh();
                                             }
-
                                           },
                                           child: const Icon(
                                               Icons.add_circle_outline)),
@@ -231,15 +239,17 @@ class StockSubmit extends StatelessWidget {
                                 flex: 2,
                                 child: InkWell(
                                   onTap: () {
-                                    stockTransferController.selectedProducts
+                                    productNewController
+                                        .selectedTransferProducts
                                         .removeWhere((element) =>
                                             element['product'] ==
                                             productTransfer['product']);
-                                    stockTransferController.selectedProducts
+                                    productNewController
+                                        .selectedTransferProducts
                                         .refresh();
                                     productController.products.refresh();
                                   },
-                                  child:  Icon(
+                                  child: Icon(
                                     Icons.clear,
                                     color: AppColors.mainColor,
                                   ),
@@ -251,15 +261,15 @@ class StockSubmit extends StatelessWidget {
                           alignment: Alignment.topRight,
                           child: InkWell(
                             onTap: () {
-                              stockTransferController.selectedProducts
+                              productNewController.selectedTransferProducts
                                   .removeWhere((element) =>
                                       element['product'] ==
                                       productTransfer['product']);
-                              stockTransferController.selectedProducts
+                              productNewController.selectedTransferProducts
                                   .refresh();
                               productController.products.refresh();
                             },
-                            child:  Icon(
+                            child: Icon(
                               Icons.clear,
                               color: AppColors.mainColor,
                             ),
@@ -269,7 +279,7 @@ class StockSubmit extends StatelessWidget {
                   ),
                 );
               },
-              itemCount: stockTransferController.selectedProducts.length,
+              itemCount: productNewController.selectedTransferProducts.length,
             );
           },
         ));

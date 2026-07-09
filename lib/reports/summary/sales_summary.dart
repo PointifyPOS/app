@@ -134,7 +134,7 @@ class SalesSummary extends StatelessWidget {
                                               .value = key;
                                           Get.to(() => SalesReport(
                                                 title:
-                                                    "${key.toString().capitalizeFirst} sales",
+                                                    "All ${key.toString().capitalizeFirst} sales",
                                                 keyFrom: key,
                                               ));
                                         }
@@ -200,7 +200,8 @@ class SalesSummary extends StatelessWidget {
                                                   reportsController
                                                       .filterStartDate.value,
                                                   reportsController
-                                                      .filterEndDate.value);
+                                                      .filterEndDate.value,
+                                                  '');
                                           Get.to(() => PaymentHistory());
                                         }
                                       }))),
