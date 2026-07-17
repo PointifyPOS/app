@@ -118,17 +118,20 @@ class SupplierController extends GetxController
     loadingsuppliers.value = true;
     suppliers.clear();
 
-    List<dynamic> suppliersList;
+    Map<String, dynamic> suppliersList;
+    List<dynamic> suppliersListDynamic = [];
     if (!await isConnected()) {
-      suppliersList = await DatabaseHelper().getSuppliersLocal();
+      suppliersListDynamic = await DatabaseHelper().getSuppliersLocal();
     } else {
       suppliersList = await SupplierService().getSuppliers(
           name: name,
           shop: userController.currentUser.value?.primaryShop?.id.toString(),
           type: type);
+      suppliersListDynamic = suppliersList['suppliers'];
     }
-
-    suppliers.addAll(suppliersList.map((e) => Supplier.fromJson(e)).toList());
+    print("Suppliers List: $suppliersListDynamic");
+    suppliers
+        .addAll(suppliersListDynamic.map((e) => Supplier.fromJson(e)).toList());
     filteredSuppliers.value = suppliers;
     loadingsuppliers.value = false;
   }

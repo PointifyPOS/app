@@ -189,16 +189,22 @@ class _HomeState extends State<Home> {
   // ─── connectivity gate ────────────────────────────────────────────────────
 
   Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
-    print('CONNECTIVITY CHANGED: $result');
     setState(() => _connectionStatus = result);
 
     // ConnectivityResult only reports interface type (is Wi-Fi/cellular
     // attached), not actual internet reachability — and it genuinely
     // flaps during transitions (none → wifi → none while the connection
-    // stabilizes). Treat every stream event as just a signal to re-check,
-    // and use isConnected()'s real DNS lookup as the authoritative answer,
-    // rather than trusting the raw stream value directly.
+    // stabilizes). Treat every stream/poll event as just a signal to
+    // re-check, and use isConnected()'s real DNS lookup as the
+    // authoritative answer, rather than trusting the raw stream value.
     final reallyConnected = await isConnected();
+
+    // Edge-triggered, not level-triggered: only act when the state
+    // actually *changes*. Without this, every stream event or 15-second
+    // poll re-confirming "still online" would kick off a full sync pass
+    // again, even though nothing changed since the last one.
+    final wasConnected = userController.internetConected.value;
+    if (reallyConnected == wasConnected) return;
 
     if (!reallyConnected) {
       // ── went offline ──

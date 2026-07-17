@@ -1,3 +1,4 @@
+import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/customer.dart';
 import 'package:pointify/models/mpesa_payment.dart';
@@ -46,7 +47,7 @@ class SalesService {
       String? attedandId = "",
       int page = 1,
       int limit = 50}) async {
-    if (userController.currentUser.value?.usertype == "attendant") {
+    if (userController.currentUser.value?.usertype == "attendant" && !verifyPermission(category: 'sales', permission: "view_all_sales")) {
       attendantId = userController.currentUser.value?.attendantId?.sId;
     }
     String url =
@@ -85,7 +86,7 @@ class SalesService {
       String? type = "",
       String? duesales = "",
       String? attendant = ""}) async {
-    if (userController.currentUser.value?.usertype == "attendant") {
+    if (userController.currentUser.value?.usertype == "attendant" && !verifyPermission(category: 'sales', permission: "view_all_sales")) {
       attendant = userController.currentUser.value?.attendantId?.sId;
     }
     var response = await DbBase().databaseRequest(

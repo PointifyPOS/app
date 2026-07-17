@@ -6,19 +6,14 @@ import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/loading_dialog.dart';
 import 'package:switcher_button/switcher_button.dart';
 
 import '../../../../utils/colors.dart';
-import '../../../controllers/homecontroller.dart';
 import '../../../models/usermodel.dart';
 import '../../../widgets/alert.dart';
 import '../../../widgets/attendant_user_inputs.dart';
 import '../../../widgets/delete_dialog.dart';
 import '../../../widgets/major_title.dart';
-import '../../../widgets/minor_title.dart';
-import 'attendants_page.dart';
 
 class AttendantDetails extends StatelessWidget {
   final UserModel? userModel;
@@ -590,7 +585,7 @@ class Permissions extends StatelessWidget {
       },
       {
         "key": "sales",
-        "value": ['view_sales', "return", "delete", "view_profit"],
+        "value": ['view_sales', "return", "delete", "view_profit","view_all_sales"],
       },
       {
         "key": "reports",

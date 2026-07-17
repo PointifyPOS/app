@@ -49,7 +49,7 @@ class PaymentController extends GetxController {
           Get.find<UserController>().currentUser.value!.primaryShop!.id!,
           Get.find<ReportsController>().filterStartDate.value,
           Get.find<ReportsController>().filterEndDate.value,
-          value,
+          value
         );
       },
       time: const Duration(milliseconds: 500),
@@ -75,8 +75,7 @@ class PaymentController extends GetxController {
   }
 
   getPaymentsByShopAndDate(
-      String shop, String fromDate, String toDate, String? search,
-      String? attendant) async {
+      String shop, String fromDate, String toDate, String? search) async {
     isPaymentLoading.value = true;
 
     if (!await isConnected()) {
@@ -92,7 +91,6 @@ class PaymentController extends GetxController {
       fromDate,
       toDate,
       search,
-      String? attendant
     );
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();

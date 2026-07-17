@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/widgets/major_title.dart';
 
 import '../controllers/salescontroller.dart';
@@ -16,7 +15,7 @@ showShopModalBottomSheet(context) {
   SalesController salesController = Get.find<SalesController>();
   showModalBottomSheet(
     context: context,
-    backgroundColor: isSmallScreen(context) ? Colors.white : Colors.transparent,
+    backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
           topRight: Radius.circular(15), topLeft: Radius.circular(15)),

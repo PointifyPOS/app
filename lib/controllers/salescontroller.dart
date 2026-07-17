@@ -1843,7 +1843,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       shopId: shop,
       paymentType: paymentType,
       customerId: customerid,
-      attendantId: attendantId,
+      attendantId: attendantId ,
       page: salesPaginageSettings['page'] ?? 1,
       limit: 50,
     );

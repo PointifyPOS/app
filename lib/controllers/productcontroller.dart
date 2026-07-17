@@ -170,7 +170,7 @@ class ProductController extends GetxController {
   RxBool bundleEnabled = RxBool(false);
   RxBool virtualProduct = RxBool(false);
   RxBool taxable = RxBool(false);
-  RxBool generateBarcodeOnSave = RxBool(true);
+  RxBool generateBarcodeOnSave = RxBool(false);
   RxBool addminPrice = RxBool(false);
   RxBool managexpiry = RxBool(false);
   RxBool managewholesale = RxBool(false);
@@ -274,7 +274,7 @@ class ProductController extends GetxController {
     monthlyBadStocks.refresh();
   }
 
-getProductPurchasesGroupedByMonth(String product,
+  getProductPurchasesGroupedByMonth(String product,
       {String? fromDate, String? toDate}) async {
     productMonthPurchases.clear();
 

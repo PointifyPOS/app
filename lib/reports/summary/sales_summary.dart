@@ -3,15 +3,16 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/controllers/paymentcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
+import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/models/usermodel.dart';
 import 'package:pointify/reports/sales/sales_report.dart';
 import 'package:pointify/reports/sales/salesreturns_report.dart';
-import 'package:pointify/services/user.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/filter_dates.dart';
 import 'package:pointify/widgets/no_items_found.dart';
+import 'package:pointify/widgets/shop_list_bottomsheet.dart';
 import 'package:printing/printing.dart';
 
 import '../../../main.dart';
@@ -218,12 +219,12 @@ class SalesSummary extends StatelessWidget {
                                         if (key == "debtpaid") {
                                           paymentController
                                               .getPaymentsByShopAndDate(
-                                                  shop: userController
+                                                  userController
                                                       .currentUser
                                                       .value!
                                                       .primaryShop!
                                                       .id!,
-                                                  fromDate: reportsController
+                                                  reportsController
                                                       .filterStartDate.value,
                                                   reportsController
                                                       .filterEndDate.value,
@@ -248,6 +249,18 @@ class SalesSummary extends StatelessWidget {
           style: TextStyle(color: AppColors.mainColor),
         ),
         actions: [
+          // if(userController.currentUser.value?.usertype !="attendant")IconButton(
+          //   icon: Icon(
+          //     Icons.people_alt_outlined,
+          //     color: AppColors.mainColor,
+          //   ),
+          //   onPressed: () async {
+          //     await Get.find<ShopController>().getShops();
+          //                                         showShopModalBottomSheet(
+          //                                             Get.context);
+          //   },
+          // ),
+          // if(userController.currentUser.value?.usertype !="attendant")
           IconButton(
             icon: Icon(
               Icons.people_alt_outlined,

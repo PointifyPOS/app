@@ -1,4 +1,4 @@
-const apiEndPoint = "https://api.pointifypos.com/";
+const apiEndPoint = "https://staging.pointifypos.com/";
 const storeurl = "https://store.pointifypos.com/";
 const apiEndPointv_2 = '${apiEndPoint}api/v2/';
 
