@@ -43,7 +43,7 @@ class ShopController {
   TextEditingController paybillAcc = TextEditingController();
   TextEditingController paybillTill = TextEditingController();
   TextEditingController address = TextEditingController();
-RxBool viewAllCustomers = false.obs;
+  RxBool viewAllCustomers = false.obs;
   TextEditingController nameController = TextEditingController();
   TextEditingController backupemail = TextEditingController();
   TextEditingController businessController = TextEditingController();
@@ -63,6 +63,7 @@ RxBool viewAllCustomers = false.obs;
   RxBool useWarehouse = RxBool(false);
   RxBool allowbatchtracking = RxBool(false);
   RxBool allownegativesales = RxBool(false);
+  RxBool isRestaurant = RxBool(false);
   RxBool allowBackup = RxBool(false);
   RxBool onlinesellingsettings = RxBool(false);
   Rxn<ShopTypes> selectedCategory = Rxn(null);
@@ -465,11 +466,13 @@ RxBool viewAllCustomers = false.obs;
       String backupemail = "",
       String? location = "",
       String latitude = "",
+      bool? isRestaurant = false,
       bool? allowBackup,
       bool? allowOnlineSelling,
       String longitude = ""}) async {
     try {
       updateShopLoad.value = true;
+
       if (backup.isNotEmpty ||
           backupemail.isNotEmpty ||
           location != null ||
@@ -500,6 +503,7 @@ RxBool viewAllCustomers = false.obs;
         } else {
           var response = await _pushOrQueueShopUpdate(shop!.id!, {
             "name": nameController.text,
+            "isRestaurant": isRestaurant,
             "backupInterval": selectedbackupsendinterval['name'],
             "useWarehouse": useWarehouse.value,
             "tax": tax.text,
@@ -519,6 +523,7 @@ RxBool viewAllCustomers = false.obs;
           "backupInterval": selectedbackupsendinterval['name'],
           "production": productionEnabled.value,
           "useWarehouse": useWarehouse.value,
+          "isRestaurant": isRestaurant,
           "tax": tax.text,
           "currency": currency.value == ""
               ? Constants.currenciesData[0]

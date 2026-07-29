@@ -9,6 +9,8 @@ class EndPoints {
   static const requestpassword = "${apiEndPoint}auth/admin/request/password";
   static const resetpassword = "${apiEndPoint}auth/admin/reset/password";
   static const admin = "${apiEndPoint}auth/admin/";
+  // ACCOMPANIMENTS (restaurant mode)
+  static const accompaniment = "${apiEndPoint}accompaniment/";
 
   //SHOP
   static const shop = "${apiEndPoint}shop/";

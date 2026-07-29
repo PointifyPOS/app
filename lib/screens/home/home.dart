@@ -191,18 +191,8 @@ class _HomeState extends State<Home> {
   Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
     setState(() => _connectionStatus = result);
 
-    // ConnectivityResult only reports interface type (is Wi-Fi/cellular
-    // attached), not actual internet reachability — and it genuinely
-    // flaps during transitions (none → wifi → none while the connection
-    // stabilizes). Treat every stream/poll event as just a signal to
-    // re-check, and use isConnected()'s real DNS lookup as the
-    // authoritative answer, rather than trusting the raw stream value.
     final reallyConnected = await isConnected();
 
-    // Edge-triggered, not level-triggered: only act when the state
-    // actually *changes*. Without this, every stream event or 15-second
-    // poll re-confirming "still online" would kick off a full sync pass
-    // again, even though nothing changed since the last one.
     final wasConnected = userController.internetConected.value;
     if (reallyConnected == wasConnected) return;
 
@@ -223,12 +213,6 @@ class _HomeState extends State<Home> {
       _syncAllOfflineData();
     }
   }
-
-  // ─── master sync ─────────────────────────────────────────────────────────
-  // Pushes every pending offline record to the server. Products sync first —
-  // any sale/adjustment referencing an offline-created product's local id
-  // needs that product to have a real server id before it can sync too.
-  // Each table is independent — a failure in one does not block the others.
 
   Future<void> _syncAllOfflineData() async {
     if (_isSyncing) return;

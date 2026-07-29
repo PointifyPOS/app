@@ -14,12 +14,14 @@ class SaleItem {
   double? lineDiscount;
   double? tax;
   String? createdAt;
+  String? salesnote;
 
   SaleItem(
       {this.id,
       this.product,
       this.quantity,
       this.tax,
+      this.salesnote,
       this.totalLinePrice,
       this.unitPrice,
       this.receiptNo,
@@ -36,6 +38,7 @@ class SaleItem {
         json['product'] != null ? Product.fromJson(json['product']) : null;
     quantity = json['quantity'].toDouble();
     totalLinePrice = json['quantity'].toDouble() * json['unitPrice'].toDouble();
+    salesnote = json['salesnote'] ?? '';
     unitPrice = json['unitPrice'].toDouble();
     receiptNo = json['sale'] != null && json['sale'] is String == false
         ? json['sale']['receiptNo']

@@ -1,3 +1,4 @@
+import 'package:pointify/models/accompaniment.dart';
 import 'package:pointify/models/batch.dart';
 import 'package:pointify/models/bundleitem.dart';
 import 'package:pointify/models/productcategory.dart';
@@ -52,6 +53,7 @@ class ProductDisplay {
     this.name,
     this.sId,
     this.image,
+    this.accompanimentGroups,
     this.type,
     this.measureUnit,
     this.buyingPrice,
@@ -82,7 +84,12 @@ class ProductDisplay {
   ProductDisplay.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     sId = json['_id'];
-
+    if (json['accompaniment'] is Map &&
+        json['accompaniment']['groups'] is List) {
+      accompanimentGroups = (json['accompaniment']['groups'] as List)
+          .map((g) => AccompanimentGroup.fromJson(g))
+          .toList();
+    }
     image = json['image'];
 
     type = json['productType'] ?? json['type'] ?? "product";

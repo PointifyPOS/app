@@ -6,6 +6,7 @@ import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/screens/purchases/create_purchase.dart';
+import 'package:pointify/screens/sales/pending_orders_page.dart';
 import 'package:pointify/screens/usage/extend_usage.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/widgets/snackbars.dart';
@@ -18,6 +19,14 @@ import '../screens/home/home.dart';
 import '../screens/sales/create_sale.dart';
 import '../screens/shop/create_shop.dart';
 import 'dart:convert';
+
+bool hasPermission(String group, String action) {
+  final user = userController.currentUser.value;
+  if (user?.usertype == "admin") return true; // admins can do everything
+  final perms = user?.permisions ?? [];
+  final g = perms.firstWhereOrNull((p) => p["key"] == group);
+  return g != null && (g["value"] as List).contains(action);
+}
 
 Future<T?> safeApiCall<T>(
   Future<T> Function() call, {
@@ -113,13 +122,12 @@ class Helper extends StatelessWidget {
   ];
 
   Helper(
-      {Key? key,
+      {super.key,
       required this.widget,
       this.appBar,
       this.bottomNavigationBar,
       this.floatButton,
-      this.page})
-      : super(key: key);
+      this.page});
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +244,11 @@ class Helper extends StatelessWidget {
                                             page: "shortcut",
                                             clearInputs: true,
                                           ));
+                                    }
+                                    break;
+                                  case 6:
+                                    {
+                                      Get.to(() => const PendingOrdersPage());
                                     }
                                     break;
                                 }

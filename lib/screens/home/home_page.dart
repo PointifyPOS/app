@@ -78,6 +78,14 @@ class HomePage extends StatelessWidget {
         "production": userController.currentUser.value!.primaryShop!.production!
       },
       {"title": "POS", "icon": Icons.sell_rounded, "category": "pos"},
+      {"title": "POS", "icon": Icons.sell_rounded, "category": "pos"},
+      if (userController.currentUser.value?.primaryShop?.isRestaurant == true &&
+          hasPermission('pos', 'cashier'))
+        {
+          "title": "Pending Orders",
+          "icon": Icons.receipt_long,
+          "category": "pos",
+        },
       {
         "title": "Stock",
         "icon": Icons.production_quantity_limits,

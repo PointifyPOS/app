@@ -677,7 +677,12 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     final unitPrice = getProductSellingPrice(product);
     final total = unitPrice * qty;
     final shopTax = userController.currentUser.value?.primaryShop?.tax ?? 0.0;
-
+    final groups =
+        product.accompanimentGroups ?? shopAccompaniments[product.id];
+    if (accompaniments == null && groups != null && groups.isNotEmpty) {
+      showAccompanimentSheet(product, groups);
+      return;
+    }
     final item = SaleItem(
       product: product,
       tax: product.taxable == true ? shopTax * total / 100 : 0,
@@ -926,6 +931,17 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
       if (status == 'hold') {
         showSnackBar(message: 'sale put on hold', color: Colors.green);
+        if (userController.currentUser.value?.primaryShop?.isRestaurant ==
+            true) {
+          final receiptNo = response['sale']?['receiptNo']?.toString() ?? '';
+          await Sunmi().printKitchenOrder(
+            orderNumber: receiptNo,
+            shopName: userController.currentUser.value?.primaryShop?.name ??
+                'Kitchen',
+            attendantName: userController.currentUser.value?.username ?? '',
+            items: receiptData.items ?? [], // the cart's SaleItem list
+          );
+        }
         getSalesByDate(shop: _shopId!, status: 'hold');
         Get.to(() => OnHoldSales());
         refresh();
@@ -1843,7 +1859,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       shopId: shop,
       paymentType: paymentType,
       customerId: customerid,
-      attendantId: attendantId ,
+      attendantId: attendantId,
       page: salesPaginageSettings['page'] ?? 1,
       limit: 50,
     );

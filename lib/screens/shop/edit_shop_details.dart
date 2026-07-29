@@ -34,6 +34,7 @@ class EditShopDetails extends StatelessWidget {
     shopController.currencyController.text = shopModel.currency ?? "";
     shopController.selectedCategory.value = shopModel.shopCategoryId;
     shopController.currency.value = shopModel.currency ?? "";
+    shopController.isRestaurant.value = shopModel.isRestaurant ?? false;
     shopController.allownegativesales.value =
         shopModel.allownegativeselling ?? false;
     shopController.allowbatchtracking.value =
@@ -208,32 +209,18 @@ class EditShopDetails extends StatelessWidget {
         const SizedBox(height: 6),
         InkWell(
           onTap: () {
-            if (isSmallScreen(context)) {
-              Get.to(
-                () => ShopCategories(
-                  shopModel: shopModel,
-                  page: "details",
-                  selectedItemsCallback: (ShopTypes s) async {
-                    Get.back();
-                    shopController.selectedCategory.value = s;
-                    shopController.selectedCategory.refresh();
-                    await shopController.updateShop(shop: shopModel);
-                  },
-                ),
-              );
-            } else {
-              Get.find<HomeController>().selectedWidget.value = ShopCategories(
+            Get.to(
+              () => ShopCategories(
                 shopModel: shopModel,
                 page: "details",
                 selectedItemsCallback: (ShopTypes s) async {
-                  Get.find<HomeController>().selectedWidget.value =
-                      EditShopDetails(shopModel: shopModel);
+                  Get.back();
                   shopController.selectedCategory.value = s;
                   shopController.selectedCategory.refresh();
                   await shopController.updateShop(shop: shopModel);
                 },
-              );
-            }
+              ),
+            );
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -294,6 +281,26 @@ class EditShopDetails extends StatelessWidget {
   Widget _buildStockSettingsContent() {
     return Column(
       children: [
+        Obx(
+          () => _buildSwitchTile(
+            title: "Restaurant Mode",
+            subtitle: "Kitchen tickets, accompaniments and cashier flow",
+            value: shopController.isRestaurant.value,
+            onChanged: (value) async {
+              shopModel.isRestaurant = value;
+              shopController.isRestaurant.value = value;
+
+              await ShopService().updateShop(shopModel.id!, {
+                "isRestaurant": value,
+              });
+
+              var response = await ShopService.getShop(shopModel.id!);
+              userController.currentUser.value?.primaryShop =
+                  Shop.fromJson(response);
+              userController.currentUser.refresh();
+            },
+          ),
+        ),
         Obx(
           () => _buildSwitchTile(
             title: "Allow Negative Selling",

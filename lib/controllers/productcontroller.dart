@@ -11,11 +11,13 @@ import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/stockcontroller.dart';
 import 'package:pointify/controllers/warehousecontroller.dart';
 import 'package:pointify/main.dart';
+import 'package:pointify/models/accompaniment.dart';
 import 'package:pointify/models/batch.dart';
 import 'package:pointify/models/bundleitem.dart';
 import 'package:pointify/models/invoice.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/screens/product/create_product.dart';
+import 'package:pointify/services/accompaniment_service.dart';
 import 'package:pointify/services/product_service.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -44,6 +46,8 @@ class ProductController extends GetxController {
   RxList<Batch> filteredBatches = RxList([]);
   Rxn<ProductCategory> selectedCategory = Rxn(null);
   RxString activeAdjustmentFilter = RxString('today');
+  final RxList<AccompanimentGroup> accompanimentGroups = RxList([]);
+  RxBool manageAccompaniments = false.obs;
   RxList<TransferItem> productHistoryList = RxList([]);
   RxList<ProductTrasferHistory> historytrasfer = RxList([]);
   RxList<Adjustment> adjustment = RxList([]);
@@ -178,6 +182,8 @@ class ProductController extends GetxController {
   RxBool manufacturer = RxBool(false);
   RxBool managedealer = RxBool(false);
   RxBool manageorderlevel = RxBool(false);
+  RxBool manageBarcode = false.obs;
+  RxBool manageDescription = RxBool(false);
   RxBool managediscount = RxBool(false);
   Rxn<ImagePicker> picker = Rxn(ImagePicker());
   var filteredProducts = <Product>[].obs;
@@ -448,7 +454,6 @@ class ProductController extends GetxController {
         "bundle": bundleEnabled.value,
         "virtual": virtualProduct.value
       };
-      print("product $product");
 
       var response =
           await ProductService.updateProduct(product, productData!.sId!);
@@ -457,6 +462,7 @@ class ProductController extends GetxController {
         showSnackBar(message: response["Error"], color: Colors.red);
         return;
       } else {
+        await _saveAccompaniments(productData.sId!);
         List<CustomImage> images = selectedImages
             .where((element) => element.imgType == ImageType.local)
             .toList();
@@ -698,6 +704,7 @@ class ProductController extends GetxController {
       if (response["error"] != null) {
         showSnackBar(message: response['error'], color: Colors.red);
       } else {
+        await _saveAccompaniments(Product.fromJson(response).sId!);
         List<CustomImage> images = selectedImages
             .where((element) => element.imgType == ImageType.local)
             .toList();
@@ -807,10 +814,14 @@ class ProductController extends GetxController {
     wholeSalePriceController.text = "";
     bundledProducts.clear();
     bundleEnabled.value = false;
+    accompanimentGroups.clear();
+
     dealerPriceController.text = "";
     managewholesale.value = false;
     taxable.value = false;
     managedealer.value = false;
+    manageBarcode.value = false;
+    manageDescription.value = false;
     bundleEnabled.value = false;
     managexpiry.value = false;
     managediscount.value = false;
@@ -1003,6 +1014,7 @@ class ProductController extends GetxController {
     wholeSalePriceController.text = productModel.wholesalePrice != null
         ? productModel.wholesalePrice!.toStringAsFixed(2)
         : "";
+
     dealerPriceController.text = productModel.dealerPrice != null
         ? productModel.dealerPrice!.toStringAsFixed(2)
         : "";
@@ -1046,10 +1058,37 @@ class ProductController extends GetxController {
     measureController.text = productModel.measureUnit ?? "";
     productType.value = productModel.type!;
     selectedImages.value = productModel.images ?? [];
-    bundleEnabled.value = productModel.bundleItems!.isNotEmpty;
+    bundleEnabled.value = productModel.bundleItems != null &&
+        productModel.bundleItems!.isNotEmpty;
     bundledProducts.value = productModel.bundleItems ?? [];
     generateBarcodeOnSave.value =
         (storage.getString("print_barcode") ?? false) as bool;
+
+    if (userController.currentUser.value?.primaryShop?.isRestaurant == true &&
+        productModel.sId != null) {
+      AccompanimentService.byProduct(
+        productModel.sId!,
+        userController.currentUser.value!.primaryShop!.id!,
+      ).then((groups) {
+        accompanimentGroups.value = groups;
+        if (groups.isNotEmpty) {
+          manageAccompaniments.value = true;
+        }
+      });
+    }
+  }
+
+  Future<void> _saveAccompaniments(String productId) async {
+    if (userController.currentUser.value?.primaryShop?.isRestaurant != true) {
+      return;
+    }
+    final shopId = userController.currentUser.value!.primaryShop!.id!;
+    if (accompanimentGroups.isNotEmpty) {
+      await AccompanimentService.save(
+          productId, shopId, accompanimentGroups.toList());
+    } else {
+      await AccompanimentService.remove(productId, shopId);
+    }
   }
 
   getBadStock(

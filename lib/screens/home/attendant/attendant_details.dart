@@ -555,6 +555,9 @@ class Permissions extends StatelessWidget {
           'can_sell_to_dealer_&_wholesaler',
           'discount',
           "edit_price",
+          if (userController.currentUser.value?.primaryShop?.isRestaurant ==
+              true)
+            'cashier',
         ],
       },
       {
@@ -585,7 +588,13 @@ class Permissions extends StatelessWidget {
       },
       {
         "key": "sales",
-        "value": ['view_sales', "return", "delete", "view_profit","view_all_sales"],
+        "value": [
+          'view_sales',
+          "return",
+          "delete",
+          "view_profit",
+          "view_all_sales"
+        ],
       },
       {
         "key": "reports",

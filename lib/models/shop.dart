@@ -34,6 +34,7 @@ class Shop {
   String? paybillAccount;
   String? paybillTill;
   String? addressReceipt;
+  bool? isRestaurant;
 
   Shop(
       {this.primary,
@@ -61,10 +62,12 @@ class Shop {
       this.adminId,
       this.paybillTill,
       this.paybillAccount,
+      this.isRestaurant,
       this.contact,
       this.addressReceipt});
 
   Shop.fromJson(Map<String, dynamic> json) {
+    isRestaurant = _toBool(json['isRestaurant']);
     primary = _toBool(json['primary']);
     allowBackup = json['allowBackup'] == 1 || json['allowBackup'] == true
         ? true
@@ -134,10 +137,12 @@ class Shop {
     data['primary'] = primary;
     data['_id'] = id;
     data['name'] = name;
+
     data['location'] = location;
     data['shopCategoryId'] = shopCategoryId;
     data['currency'] = currency;
     data['adminId'] = adminId;
+    data['isRestaurant'] = isRestaurant;
     return data;
   }
 }
