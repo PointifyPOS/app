@@ -1277,7 +1277,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     final result = await PrintBluetoothThermal.writeBytes(ticket);
     print('Bluetooth print result: $result');
 
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     await PrintBluetoothThermal.disconnect;
   }
   // ─── credit-payment ask dialog ─────────────────────────────────────────

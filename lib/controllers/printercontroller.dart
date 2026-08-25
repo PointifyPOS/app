@@ -29,12 +29,12 @@ class PrinterController extends GetxController {
   }) async {
     List<int> bytes = [];
 
-    final itemWidth = is80mm ? 5 : 6;
+    final itemWidth = is80mm ? 6 : 7;
     final qtyWidth = 2;
-    final priceWidth = is80mm ? 2 : 2;
-    final totalWidth = is80mm ? 3 : 2;
+    final priceWidth = is80mm ? 2 : 1;
+    final totalWidth = is80mm ? 2 : 2;
 
-    final itemCharLimit = is80mm ? 26 : 18;
+    final itemCharLimit = is80mm ? 26 : 16;
 
     final profile = await CapabilityProfile.load();
 
@@ -365,7 +365,7 @@ class PrinterController extends GetxController {
       ),
     );
 
-    bytes += generator.feed(3);
+    bytes += generator.feed(6);
 
     bytes += generator.cut();
 

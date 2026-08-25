@@ -95,8 +95,7 @@ class AuthController {
     // try {
     if (connected) {
       if ((await prefs.getString('id')) == null) return;
-      userController.currentUserId.value =
-          '6690f18c097feb9e00ff2e73'; //(await prefs.getString('id'))!;
+      userController.currentUserId.value = (await prefs.getString('id'))!;
       if (userController.currentUserId.value.isEmpty) logOut();
       var usertype = await prefs.getString('user_type');
       var response;
