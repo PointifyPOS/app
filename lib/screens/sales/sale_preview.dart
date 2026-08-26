@@ -728,7 +728,7 @@ class _SalePreviewState extends State<SalePreview> {
   Widget _buildMpesaSection() {
     return Obx(() {
       if (!salesController.shopHasMpesa) {
-        return _buildMpesaManualCode();
+        return _mpesaCodeBody();
       }
       final mode = salesController.mpesaEntryMode.value;
       return Column(

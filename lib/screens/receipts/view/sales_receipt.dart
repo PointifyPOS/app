@@ -374,7 +374,9 @@ class SalesReceipt extends StatelessWidget {
                                             ),
                                             const SizedBox(height: 3),
                                             Text(
-                                              "${receiptitem.quantity} × ${htmlPrice(receiptitem.unitPrice)}",
+                                              receiptitem.manageByPrice == true
+                                                  ? "${receiptitem.quantity} units • ${htmlPrice(receiptitem.unitPrice)} entered"
+                                                  : "${receiptitem.quantity} × ${htmlPrice(receiptitem.unitPrice)}",
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey.shade600,
@@ -397,7 +399,7 @@ class SalesReceipt extends StatelessWidget {
                                         children: [
                                           Text(
                                             htmlPrice(
-                                              receiptitem.totalLinePrice ?? 0,
+                                              receiptitem.receiptLineTotal,
                                             ),
                                             textAlign: TextAlign.right,
                                             style: const TextStyle(

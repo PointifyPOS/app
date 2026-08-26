@@ -748,6 +748,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   void decrementItem(int index) {
     final item = receipt.value?.items?[index];
     if (item == null || item.quantity == 1) return;
+    final currentQuantity = item.quantity ?? 0;
+
+    if (currentQuantity <= 1) return;
 
     item.quantity = item.quantity! - 1;
     receipt.refresh();
@@ -758,10 +761,20 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     final item = receipt.value?.items?[index];
     if (item == null) return;
 
+    final currentQuantity = item.quantity ?? 0;
+    final availableQuantity = item.product?.quantity ?? 0;
     final isPhysicalProduct = item.product?.type == 'product';
-    if (isPhysicalProduct && item.product?.quantity == 0) return;
 
-    item.quantity = (item.quantity ?? 0) + 1;
+    if (isPhysicalProduct && currentQuantity + 1 > availableQuantity) {
+      generalAlert(
+        title: "Error",
+        message: "Quantity cannot be greater than $availableQuantity",
+      );
+      return;
+    }
+
+    item.quantity = currentQuantity + 1;
+
     receipt.refresh();
     _recalcLine(index);
   }
@@ -815,8 +828,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         : basePrice - totalDiscount;
 
     line.lineDiscount = totalDiscount;
-    line.totalLinePrice = (line.unitPrice ?? 0) * (line.quantity ?? 0);
-
+    line.totalLinePrice = line.manageByPrice == true
+        ? (line.unitPrice ?? 0)
+        : (line.unitPrice ?? 0) * (line.quantity ?? 0);
     r.totalWithDiscount = _sumLineTotals(r.items!);
     getTotalCredit();
     receipt.refresh();

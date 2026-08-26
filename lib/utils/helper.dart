@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
+import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/screens/purchases/create_purchase.dart';
 import 'package:pointify/screens/usage/extend_usage.dart';
 import 'package:pointify/utils/colors.dart';
@@ -29,6 +30,7 @@ void printFull(Object? obj) {
     );
   }
 }
+
 missingValueDialog(context, message) {
   showDialog(
       context: context,
@@ -45,6 +47,7 @@ missingValueDialog(context, message) {
         );
       });
 }
+
 Color parseColor(String? hex) {
   if (hex == null || hex.isEmpty) return Colors.grey; // fallback
   hex = hex.replaceAll('#', '');
@@ -251,6 +254,13 @@ Future<bool> isConnected() async {
   }
 }
 
+double saleItemTotal(SaleItem item) {
+  final price = item.unitPrice ?? 0;
+  final quantity = item.quantity ?? 0;
+
+  return item.manageByPrice == true ? price : price * quantity;
+}
+
 generateReportAlert(BuildContext context, String type) {
   ProductController productController = Get.find<ProductController>();
   Dialog errorDialog = Dialog(
@@ -285,7 +295,7 @@ generateReportAlert(BuildContext context, String type) {
                     reportStatus: type,
                     email: productController.backupemail);
               },
-              child:  Text(
+              child: Text(
                 'Send',
                 style: TextStyle(color: AppColors.mainColor, fontSize: 18.0),
               ))

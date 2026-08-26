@@ -11,8 +11,6 @@ import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
 
-import 'constants.dart';
-
 class Sunmi {
   // initialize sunmi printer
   Future<void> initialize() async {
@@ -142,9 +140,12 @@ class Sunmi {
         column1: "Product", column2: "Quantity", column3: "Price");
     for (var item in saleModel.items!) {
       await printRowAndColumns(
-          column1: "${item.product?.name} - ${item.product?.measureUnit}",
-          column2: "${item.quantity.toString()} x ${item.unitPrice.toString()}",
-          column3: htmlPrice(item.totalLinePrice.toString()));
+        column1: "${item.product?.name} - ${item.product?.measureUnit}",
+        column2: item.product?.manageByPrice == true
+            ? "${item.quantity} units"
+            : "${item.quantity} x ${item.unitPrice}",
+        column3: htmlPrice(item.receiptLineTotal),
+      );
     }
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.line(ch: '-');
