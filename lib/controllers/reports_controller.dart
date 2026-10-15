@@ -62,16 +62,70 @@ class ReportsController extends GetxController {
   String paymentType = "all";
   String exportType = "excel";
   RxBool isPaymentLoading = false.obs;
+  // Stock report pagination state
+  int stockReportPage = 1;
+  int stockReportLimit = 50;
+  String? stockReportShopId;
+  String stockReportName = "";
+  RxBool hasMoreStockReport = RxBool(true);
+  RxBool loadingMoreStockReport = RxBool(false);
+
+  /// Loads the first page (resets the list). Used on open, search and clear.
   getStockReport(
       {String? shopid, int page = 1, int limit = 50, String? name = ""}) async {
+    stockReportShopId = shopid;
+    stockReportName = name ?? "";
+    stockReportLimit = limit;
+    stockReportPage = page;
+    hasMoreStockReport.value = true;
     isLoadingReports.value = true;
-    Map<String, dynamic> respose = await ReportsService()
-        .getStockReport(shopid: shopid, page: page, limit: limit, name: name);
-    List result = respose['data'];
-    List<StockReport> stockreports =
-        result.map((e) => StockReport.fromJson(e)).toList();
-    stockReports.assignAll(stockreports);
-    isLoadingReports.value = false;
+    try {
+      final items = await _fetchStockReportPage(page);
+      stockReports.assignAll(items);
+    } catch (e) {
+      stockReports.clear();
+      hasMoreStockReport.value = false;
+    } finally {
+      isLoadingReports.value = false;
+    }
+  }
+
+  /// Fetches the next page and appends it. Called when the list nears the bottom.
+  Future<void> loadMoreStockReport() async {
+    if (loadingMoreStockReport.isTrue ||
+        isLoadingReports.isTrue ||
+        hasMoreStockReport.isFalse) {
+      return;
+    }
+    loadingMoreStockReport.value = true;
+    try {
+      final items = await _fetchStockReportPage(stockReportPage + 1);
+      if (items.isNotEmpty) {
+        stockReportPage += 1;
+        stockReports.addAll(items);
+      }
+    } catch (e) {
+      // leave hasMore as is so the user can retry by scrolling again
+    } finally {
+      loadingMoreStockReport.value = false;
+    }
+  }
+
+  Future<List<StockReport>> _fetchStockReportPage(int page) async {
+    Map<String, dynamic> response = await ReportsService().getStockReport(
+        shopid: stockReportShopId,
+        page: page,
+        limit: stockReportLimit,
+        name: stockReportName);
+    List result = response['data'] ?? [];
+    final items = result.map((e) => StockReport.fromJson(e)).toList();
+
+    // Prefer server paging metadata when present; otherwise infer from page size.
+    final totalPages = int.tryParse("${response['totalPages'] ?? ''}");
+    hasMoreStockReport.value = totalPages != null
+        ? page < totalPages
+        : items.length >= stockReportLimit;
+    return items;
   }
 
   getPurchasesReport({

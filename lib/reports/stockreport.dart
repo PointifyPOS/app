@@ -22,7 +22,7 @@ class StockReportScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title:  Text(
+        title: Text(
           "Stock Report",
           style: TextStyle(color: AppColors.mainColor),
         ),
@@ -39,7 +39,7 @@ class StockReportScreen extends StatelessWidget {
                       ),
                     ));
               },
-              icon:  Icon(
+              icon: Icon(
                 Icons.picture_as_pdf,
                 color: AppColors.mainColor,
               ))
@@ -48,7 +48,7 @@ class StockReportScreen extends StatelessWidget {
           onPressed: () {
             Get.back();
           },
-          icon:  Icon(
+          icon: Icon(
             Icons.clear,
             color: AppColors.mainColor,
           ),
@@ -139,18 +139,18 @@ class StockReportScreen extends StatelessWidget {
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                  Wrap(
+                                    spacing: 12,
+                                    runSpacing: 4,
                                     children: [
                                       Text(
-                                          "Qty: ${stockReport.inStockQuantity}"),
+                                          "Qty: ${stockReport.inStockQuantity ?? 0}"),
                                       Text(
-                                          "Sold: ${stockReport.totalSoldQuantity}"),
+                                          "Sold: ${stockReport.totalSoldQuantity ?? 0}"),
                                       Text(
-                                          "Sales: ${htmlPrice(stockReport.totalSales)}"),
+                                          "Sales: ${htmlPrice(stockReport.totalSales ?? 0)}"),
                                       Text(
-                                          "Profit: ${htmlPrice(stockReport.totalProfit)}"),
+                                          "Profit: ${htmlPrice(stockReport.totalProfit ?? 0)}"),
                                     ],
                                   ),
                                 ],

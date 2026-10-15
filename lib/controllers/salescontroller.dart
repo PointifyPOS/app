@@ -765,7 +765,10 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     final availableQuantity = item.product?.quantity ?? 0;
     final isPhysicalProduct = item.product?.type == 'product';
 
-    if (isPhysicalProduct && currentQuantity + 1 > availableQuantity) {
+    if (isPhysicalProduct &&
+        currentQuantity + 1 > availableQuantity &&
+        userController.currentUser.value?.primaryShop?.allownegativeselling ==
+            false) {
       generalAlert(
         title: "Error",
         message: "Quantity cannot be greater than $availableQuantity",

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/productcontroller.dart';
+import 'package:pointify/main.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/widgets/alert.dart';
 
@@ -64,7 +65,10 @@ salesDialog(
                 final availableQuantity = receiptItem.product?.quantity ?? 0;
 
                 if (receiptItem.product?.type != "service" &&
-                    quantity > availableQuantity) {
+                    quantity > availableQuantity &&
+                    userController.currentUser.value?.primaryShop
+                            ?.allownegativeselling ==
+                        false) {
                   generalAlert(
                     title: "Error",
                     message:
@@ -85,23 +89,6 @@ salesDialog(
                       0,
                 );
               },
-              // onPressed: () {
-              //   if (receiptItem.product?.type != "service" &&
-              //       double.parse(controller.text) >
-              //           receiptItem.product!.quantity!) {
-              //     generalAlert(
-              //         message:
-              //             "quantity cannot be greater than ${receiptItem.product!.quantity}",
-              //         title: "Error");
-              //   } else {
-              //     Navigator.pop(context);
-              //     receiptItem.quantity = double.parse(controller.text);
-              //     controller.text = "";
-              //     salesController.calculateAmount(index,
-              //         totalDiscount: salesController
-              //             .receipt.value!.items![index].lineDiscount!);
-              //   }
-              // },
               child: Text(
                 "Save now".toUpperCase(),
                 style: const TextStyle(color: Colors.blue),

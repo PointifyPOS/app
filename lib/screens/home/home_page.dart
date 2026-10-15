@@ -12,6 +12,7 @@ import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/reports/expenses/expense_page.dart';
+import 'package:pointify/reports/stockreport.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/screens/home/profile_page.dart';
 import 'package:pointify/screens/home/widgets/inventory_insights_section.dart';
@@ -54,7 +55,8 @@ class HomePage extends StatelessWidget {
   final ExpenseController expenseController = Get.put(ExpenseController());
   final UserController attendantController = Get.put(UserController());
   final AuthController authController = Get.find<AuthController>();
-  final ProductNewController productController = Get.find<ProductNewController>();
+  final ProductNewController productController =
+      Get.find<ProductNewController>();
   final DateTime now = DateTime.now();
   WareHouseController wareHouseController = Get.put(WareHouseController());
 
@@ -557,9 +559,9 @@ class HomePage extends StatelessWidget {
                               fastMovingCount: productController
                                       .productStats['fastmoving']?.length ??
                                   0,
-                              dormant: productController
-                                      .productStats['dormant'] ??
-                                  0,
+                              dormant:
+                                  productController.productStats['dormant'] ??
+                                      0,
                             ),
                           const SizedBox(height: 20),
                           majorTitle(
