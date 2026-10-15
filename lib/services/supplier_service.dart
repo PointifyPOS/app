@@ -28,7 +28,7 @@ class SupplierService {
   }
 
   getSupplierSupplies({String? supplierId, String? shop}) async {
-    String url = "${EndPoints.supplies}/$supplierId/?shopId=${shop ?? ""}";
+    String url = "${EndPoints.supplies}supplier/$supplierId?shopId=${shop ?? ""}";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }

@@ -17,6 +17,7 @@ import '../screens/customers/customers_page.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
 import 'homecontroller.dart';
+import 'package:pointify/services/client.dart';
 
 class CustomerController extends GetxController
     with SingleGetTickerProviderMixin {
@@ -155,7 +156,7 @@ class CustomerController extends GetxController
       deposits.clear();
     }
     List response =
-        await CustomerService.getCustomersPayments(type, customerId);
+        asList(await CustomerService.getCustomersPayments(type, customerId));
     if (reason == "download") {
       downloadPaymentsHistory.value =
           response.map((e) => Payment.fromJson(e)).toList();

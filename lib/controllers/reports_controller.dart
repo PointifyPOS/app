@@ -1,3 +1,4 @@
+import 'package:pointify/services/preference_manager.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
@@ -20,6 +21,7 @@ import 'package:pointify/widgets/snackbars.dart';
 import '../main.dart';
 import '../models/debtor.dart';
 import '../models/payment.dart';
+import 'package:pointify/services/client.dart';
 
 class ReportsController extends GetxController {
   RxBool isLoadingReports = RxBool(false);
@@ -295,7 +297,7 @@ class ReportsController extends GetxController {
       isLoadingReports.value = false;
       return;
     }
-    List result = response['data'];
+    List result = asList(response['data']);
     debtors.addAll(result.map((e) => Debtor.fromJson(e)).toList());
     isLoadingReports.value = false;
   }
@@ -311,6 +313,7 @@ class ReportsController extends GetxController {
       }
 
       final dio.Dio dioInstance = dio.Dio();
+      final token = await PreferenceManager().getString('user_token');
       final directory = await getApplicationDocumentsDirectory();
       final filePath = '${directory.path}/customers_with_debt.xlsx';
 
@@ -318,6 +321,7 @@ class ReportsController extends GetxController {
       dio.Response response = await dioInstance.get(
         '${EndPoints.debtorexcel}?shopId=${userController.currentUser.value!.primaryShop!.id!}',
         options: Options(
+          headers: {"Authorization": "Bearer $token"},
           responseType: ResponseType.bytes,
           followRedirects: false,
           validateStatus: (status) {
@@ -327,15 +331,25 @@ class ReportsController extends GetxController {
       );
 
       // Ensure the response data is not empty
-      if (response.data != null && response.data is List<int>) {
+      if (response.statusCode == 200 &&
+          response.data != null &&
+          response.data is List<int>) {
         // Save the file
         File file = File(filePath);
         await file.writeAsBytes(response.data);
 
         // Open the file using the `open_file` package
         final result = await OpenFile.open(filePath);
+      } else {
+        showSnackBar(
+            message: "Could not download the file, please try again",
+            color: Colors.red);
       }
-    } catch (e) {}
+    } catch (e) {
+      showSnackBar(
+          message: "Could not download the file, please try again",
+          color: Colors.red);
+    }
   }
 
   // Future<void> downloadExcelFile() async {
@@ -368,7 +382,7 @@ class ReportsController extends GetxController {
       isLoadingReports.value = false;
       return;
     }
-    List result = response['data'];
+    List result = asList(response['data']);
     debtors.addAll(result.map((e) => Debtor.fromJson(e)).toList());
     isLoadingReports.value = false;
   }
@@ -420,7 +434,7 @@ class ReportsController extends GetxController {
         toDate: toDate,
         product: product,
         saleType: saleType);
-    List result = response['items'];
+    List result = asList(response['items']);
     productsReport.addAll(result.map((e) => SaleItem.fromJson(e)).toList());
     for (var element in productsReport) {
       if (element.currentSale != null) {
@@ -455,7 +469,7 @@ class ReportsController extends GetxController {
         toDate: toDate,
         product: product,
         saleType: saleType);
-    List result = response['items'];
+    List result = asList(response['items']);
     discountsReport.addAll(result.map((e) => SaleItem.fromJson(e)).toList());
     for (var element in discountsReport) {
       if (element.currentSale != null) {
@@ -530,7 +544,7 @@ class ReportsController extends GetxController {
         Get.back();
       }
 
-      if (response != null) {
+      if (response is List<int>) {
         File file = File(filePath);
 
         await file.writeAsBytes(response);

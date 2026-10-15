@@ -17,6 +17,8 @@ import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/warehousecontroller.dart';
+import 'package:pointify/services/client.dart';
+import 'package:pointify/services/end_points.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/screens/authentication/admin/admin_login.dart';
 import 'package:pointify/screens/authentication/landing.dart';
@@ -89,6 +91,33 @@ class AuthController {
     return response;
   }
 
+  // An error / 401 / 403 body is a Map without the user's id: never treat it as a profile.
+  bool _isUserDoc(dynamic r) =>
+      r is Map && r["error"] == null && (r["_id"] != null || r["id"] != null);
+
+  static DateTime? _lastTokenRefresh;
+
+  // Sessions last 30 days on the server; trading the token for a fresh one when the app starts
+  // keeps anyone who uses the app regularly signed in. Older servers have no /auth/refresh: the
+  // reply is not a token and is ignored.
+  // Returns false when the server says the account must sign in again.
+  Future<bool> _refreshSessionToken() async {
+    final last = _lastTokenRefresh;
+    if (last != null && DateTime.now().difference(last) < const Duration(hours: 6)) return true;
+    try {
+      final r = await DbBase()
+          .databaseRequest(EndPoints.refreshtoken, DbBase().postRequestType, body: {});
+      if (r is Map && r["token"] is String && (r["token"] as String).isNotEmpty) {
+        await prefs.saveString('user_token', r["token"]);
+        _lastTokenRefresh = DateTime.now();
+      } else if (r is Map && r["message"] == "Please sign in again") {
+        await logOut();
+        return false;
+      }
+    } catch (_) {}
+    return true;
+  }
+
   initUser({String type = ""}) async {
     bool connected = await isConnected();
 
@@ -97,14 +126,16 @@ class AuthController {
       if ((await prefs.getString('id')) == null) return;
       userController.currentUserId.value = (await prefs.getString('id'))!;
       if (userController.currentUserId.value.isEmpty) logOut();
+      if (!await _refreshSessionToken()) return;
       var usertype = await prefs.getString('user_type');
       var response;
       if (usertype == "admin") {
         response = await Authentication.getUser(
           userController.currentUserId.value,
         );
-        if (response["error"] != null) {
-          logOut();
+        if (!_isUserDoc(response)) {
+          await logOut();
+          return;
         }
         response["usertype"] = usertype;
 
@@ -114,8 +145,9 @@ class AuthController {
         var response = await Authentication.getAttendant(
           userController.currentUserId.value,
         );
-        if (response["error"] != null) {
-          logOut();
+        if (!_isUserDoc(response)) {
+          await logOut();
+          return;
         }
         response["usertype"] = usertype;
         userController.currentUser.value = UserModel.fromJson(response);

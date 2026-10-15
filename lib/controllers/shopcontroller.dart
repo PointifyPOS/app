@@ -23,6 +23,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
 import '../widgets/snackbars.dart';
+import 'package:pointify/functions/functions.dart';
 
 class ShopController {
   RxBool gettingShopsLoad = RxBool(false);
@@ -149,16 +150,16 @@ RxBool viewAllCustomers = false.obs;
         response = await databaseHelper.getAllShops();
       } else {
         if (type == "warehouse") {
-          response = await ShopService.getShops(
+          response = asList(await ShopService.getShops(
             userController.currentUser.value!.primaryShop!.adminId!,
             name: name,
             type: type,
-          );
+          ));
         } else {
-          response = await ShopService.getShops(
+          response = asList(await ShopService.getShops(
               userController.currentUserId.value,
               name: name,
-              type: type);
+              type: type));
         }
       }
       gettingShopsLoad.value = false;
@@ -192,9 +193,9 @@ RxBool viewAllCustomers = false.obs;
       if (!connected) {
         response = await databaseHelper.getAllShops();
       } else {
-        response = await ShopService.getWarehouses(
+        response = asList(await ShopService.getWarehouses(
             userController.currentUserId.value,
-            name: name);
+            name: name));
       }
       loadingwarehouses.value = false;
       if (response.isNotEmpty) {
@@ -426,7 +427,7 @@ RxBool viewAllCustomers = false.obs;
   getCategories() async {
     try {
       loadingcateries.value = true;
-      List<dynamic> response = await ShopService().getShopTypes();
+      List<dynamic> response = asList(await ShopService().getShopTypes());
       categories.value = response.map((e) => ShopTypes.fromJson(e)).toList();
       loadingcateries.value = false;
     } catch (e) {
@@ -603,14 +604,15 @@ RxBool viewAllCustomers = false.obs;
       lng: longitude,
     );
     shopsAroundLoad.value = false;
-    List shops = response;
+    // The API only lists nearby shops for platform staff now; anything else (403/401 map) is empty.
+    List shops = response is List ? response : [];
     shopsAround.value = shops.map((e) => Shop.fromJson(e)).toList();
   }
 
   void backupNow({required Shop shopModel}) async {
     isBacking.value = true;
     var response = await ShopService().backupNow(shopModel.id!);
-    print(response);
+    debugPrintMessage(response);
     isBacking.value = false;
     generalAlert(
       title: "Backup",

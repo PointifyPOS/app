@@ -14,6 +14,7 @@ import 'package:pointify/models/package.dart';
 import '../services/client.dart';
 import '../services/end_points.dart';
 import '../widgets/alert.dart';
+import 'package:pointify/functions/functions.dart';
 
 class InappPurchasesController extends GetxController {
   late StreamSubscription<List<PurchaseDetails>> _purchaseUpdates;
@@ -92,15 +93,23 @@ class InappPurchasesController extends GetxController {
                 .first
                 .amountDouble,
           };
-          print("payload ${payload}");
+          debugPrintMessage("payload ${payload}");
           var response = await DbBase().databaseRequest(
               EndPoints.inpappsubscribe, DbBase().postRequestType,
               body: payload);
-          print("payload ${response}");
+          debugPrintMessage("payload ${response}");
 
           loading.value = false;
           Get.back();
-          if (response["status"] == 400) {
+          if (response["status"] != 400 && response["error"] != null) {
+            // Transient failure (offline, timeout, server error): the server has not recorded the
+            // purchase, so keep the Apple transaction pending (do NOT finish it) and it is delivered again.
+            generalAlert(
+                title: "Could not confirm your purchase",
+                message:
+                    "Your payment is safe. Please check your connection and reopen the app to finish activating your subscription.",
+                function: () {});
+          } else if (response["status"] == 400) {
             generalAlert(
                 title: "Error",
                 message: response["message"],
@@ -190,9 +199,9 @@ class InappPurchasesController extends GetxController {
       // '65673711072fb2ad5957da39',
       // '6567373c072fb2ad5957da3c',
     }.toSet());
-    print(response.productDetails);
+    debugPrintMessage(response.productDetails);
     if (response.error != null) {
-      print('Error fetching subscription products: ${response.error}');
+      debugPrintMessage('Error fetching subscription products: ${response.error}');
       return;
     }
     productsList.clear();

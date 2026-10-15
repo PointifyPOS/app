@@ -12,6 +12,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
 import 'homecontroller.dart';
+import 'package:pointify/services/client.dart';
 
 class UserController {
   TextEditingController textEditingCredit = TextEditingController();
@@ -113,15 +114,23 @@ class UserController {
 
   deleteAccount() async {
     profileupdateLoading.value = true;
-    await User.deleteAccount();
-    authController.logOut();
+    var response = await User.deleteAccount();
     profileupdateLoading.value = false;
+    if (response is! Map || response["message"] != "account deleted") {
+      generalAlert(
+          title: "Error",
+          message: response is Map
+              ? "${response["error"] ?? response["message"] ?? "Could not delete account"}"
+              : "Could not delete account");
+      return;
+    }
+    authController.logOut();
   }
 
   getAttendants() async {
     if (attendantsloading.isTrue) return;
     attendantsloading.value = true;
-    List<dynamic> response = await User.getAttendants();
+    List<dynamic> response = asList(await User.getAttendants());
     attendants.value = response.map((e) => UserModel.fromJson(e)).toList();
     attendantsloading.value = false;
   }
@@ -135,9 +144,14 @@ class UserController {
       generalAlert(title: "Error", message: "Enter password");
       return;
     }
+    if (userController.passwordController.text.length < 6) {
+      generalAlert(
+          title: "Error", message: "Password must be at least 6 characters");
+      return;
+    }
     profileupdateLoading.value = true;
     attendants.clear();
-    await User.createAttendant({
+    var createResponse = await User.createAttendant({
       "password": userController.passwordController.text,
       "username": userController.nameController.text,
       "uniqueDigits": userController.attendantId.text,
@@ -145,7 +159,12 @@ class UserController {
       "adminId": userController.currentUser.value!.id,
       "permissions": all
     });
-    List<dynamic> attendantResponse = await User.getAttendants();
+    if (createResponse is Map && createResponse["error"] != null) {
+      profileupdateLoading.value = false;
+      generalAlert(title: "Error", message: "${createResponse["error"]}");
+      return;
+    }
+    List<dynamic> attendantResponse = asList(await User.getAttendants());
     profileupdateLoading.value = false;
 
     attendants.addAll(attendantResponse.map((e) => UserModel.fromJson(e)));
@@ -194,7 +213,7 @@ class UserController {
 
       attendants.refresh();
 
-      List<dynamic> attendantResponse = await User.getAttendants();
+      List<dynamic> attendantResponse = asList(await User.getAttendants());
 
       attendants.addAll(
         attendantResponse.map((e) => UserModel.fromJson(e)),

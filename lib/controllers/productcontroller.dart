@@ -37,6 +37,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/async_progress_dialog.dart';
 import '../widgets/loading_dialog.dart';
+import 'package:pointify/services/client.dart';
 
 class ProductController extends GetxController {
   RxList<Product> products = RxList([]);
@@ -234,7 +235,7 @@ class ProductController extends GetxController {
     if (response["error"] != null) {
       showSnackBar(message: response["error"], color: Colors.red);
     } else {
-      List purchses = response["purchases"];
+      List purchses = asList(response["purchases"]);
       productPurchases.value =
           purchses.map((e) => InvoiceItem.fromJson(e)).toList();
     }
@@ -242,7 +243,7 @@ class ProductController extends GetxController {
 
   getProductsCountsHistory({required String product}) async {
     countHistory.clear();
-    List allproducts = await ProductService.getProductsCountsHistory(product);
+    List allproducts = asList(await ProductService.getProductsCountsHistory(product));
     List<CountHistory> products =
         allproducts.map((e) => CountHistory.fromJson(e)).toList();
     countHistory.addAll(products);
@@ -263,7 +264,7 @@ class ProductController extends GetxController {
       product: product,
       year: year,
     );
-    List result = productsHistory["result"];
+    List result = asList(productsHistory["result"]);
     monthlyBadStocks.addAll(result
         .map((e) => {
               "month": e["month"],
@@ -992,8 +993,8 @@ class ProductController extends GetxController {
     try {
       saveBadstockLoad.value = true;
       badstocks.clear();
-      List<dynamic> response = await ProductService.getBadStock(
-          product: product, fromDate: fromDate, toDate: toDate);
+      List<dynamic> response = asList(await ProductService.getBadStock(
+          product: product, fromDate: fromDate, toDate: toDate));
       badstocks.addAll(response.map((e) => BadStock.fromJson(e)).toList());
       saveBadstockLoad.value = false;
     } catch (e) {
@@ -1099,7 +1100,7 @@ class ProductController extends GetxController {
         limit: 100,
         fromDate: fromDate,
         toDate: toDate);
-    List<dynamic> result = response["data"];
+    List<dynamic> result = asList(response["data"]);
     historytrasfer.value =
         result.map((e) => ProductTrasferHistory.fromJson(e)).toList();
     loadingAdjustments.value = false;
@@ -1116,7 +1117,7 @@ class ProductController extends GetxController {
         limit: 100,
         fromDate: fromDate,
         toDate: toDate);
-    List<dynamic> result = response["data"];
+    List<dynamic> result = asList(response["data"]);
     adjustment.value = result.map((e) => Adjustment.fromJson(e)).toList();
     loadingAdjustments.value = false;
   }

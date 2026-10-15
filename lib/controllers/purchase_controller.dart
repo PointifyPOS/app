@@ -22,6 +22,7 @@ import '../widgets/loading_dialog.dart';
 import '../widgets/major_title.dart';
 import '../widgets/minor_title.dart';
 import '../widgets/snackBars.dart';
+import 'package:pointify/services/client.dart';
 
 class PurchaseController extends GetxController {
   Rxn<Invoice> invoice = Rxn(null);
@@ -255,7 +256,7 @@ class PurchaseController extends GetxController {
       limit: limit,
     );
 
-    List<dynamic> purchasesresponse = response['purchases'];
+    List<dynamic> purchasesresponse = asList(response['purchases']);
 
     if (purchasesresponse.length < limit) {
       hasMore.value = false;
@@ -288,8 +289,8 @@ class PurchaseController extends GetxController {
       String? toDate = ""}) async {
     invoices.clear();
     isLoadingPurchases.value = true;
-    List<dynamic> response = await PurchaseService.getReturnedPurchases(
-        fromDate: fromDate, toDate: toDate, shopId: shopid, supplier: supplier);
+    List<dynamic> response = asList(await PurchaseService.getReturnedPurchases(
+        fromDate: fromDate, toDate: toDate, shopId: shopid, supplier: supplier));
     isLoadingPurchases.value = false;
     invoices.addAll(response.map((e) => Invoice.fromJson(e)).toList());
     filteredInvoices.value =
@@ -478,7 +479,7 @@ class PurchaseController extends GetxController {
     }
     returningIvoiceLoad.value = true;
     List<dynamic> response =
-        await PurchaseService.getReturns(invoice: invoice, supplier: supplier);
+        asList(await PurchaseService.getReturns(invoice: invoice, supplier: supplier));
     returningIvoiceLoad.value = false;
     List<Invoice> invoiceReturn =
         response.map((e) => Invoice.fromJson(e)).toList();
@@ -508,6 +509,6 @@ class PurchaseController extends GetxController {
     Get.back();
     Get.back();
     generalAlert(message: response["message"], title: "Success");
-    print(response);
+    debugPrintMessage(response);
   }
 }

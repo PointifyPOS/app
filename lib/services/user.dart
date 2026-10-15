@@ -42,7 +42,7 @@ class User {
       "${EndPoints.attendantsfilter}?adminId=${userController.currentUser.value?.id}",
       DbBase().getRequestType,
     );
-    return response;
+    return response is List ? response : [];
   }
 
   static createAttendant(Map<String, dynamic> map) async {

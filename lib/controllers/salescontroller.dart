@@ -2166,7 +2166,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     Get.back();
     Get.back();
     generalAlert(message: response['message'], title: 'Success');
-    print(response);
+    debugPrintMessage(response);
   }
 
   void deleteOrder(OrderItem salesModel) {

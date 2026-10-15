@@ -73,7 +73,7 @@ class PurchaseService {
   static Future<List> getReturns({Invoice? invoice, Supplier? supplier}) async {
     String url = "${EndPoints.purchasereturn}?supplierId=${supplier!.id!}";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
-    return response;
+    return asList(response);
   }
 
   static sendReportEmail({

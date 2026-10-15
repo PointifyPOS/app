@@ -10,6 +10,7 @@ import '../models/expensecategory.dart';
 import '../models/expensestransaction.dart';
 import '../widgets/alert.dart';
 import 'cashflowcontroller.dart';
+import 'package:pointify/services/client.dart';
 
 class ExpenseController {
   RxList<ExpenseModel> expenses = RxList([]);
@@ -92,10 +93,10 @@ class ExpenseController {
       fromDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
       toDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
     }
-    List response = await ExpensesServices.getExpenses(
+    List response = asList(await ExpensesServices.getExpenses(
         shop: userController.currentUser.value?.primaryShop!.id,
         fromDate: fromDate,
-        toDate: toDate);
+        toDate: toDate));
     expenses.value = response.map((e) => ExpenseModel.fromJson(e)).toList();
     return response;
   }
@@ -108,7 +109,7 @@ class ExpenseController {
 
   getExpensesCategorytransactions(String s) async {
     expensesCategoryTransactions.clear();
-    List<dynamic> response = await ExpensesServices.getExpensestransactions(s);
+    List<dynamic> response = asList(await ExpensesServices.getExpensestransactions(s));
     expensesCategoryTransactions.addAll(
         response.map((e) => ExpensesTransactionModel.fromJson(e)).toList());
     expensesCategoryTransactions.refresh();
@@ -140,10 +141,10 @@ class ExpenseController {
     }
     isLoadingExpense.value = true;
     List<dynamic> response =
-        await ExpensesServices.getExpensesCategoryWithTotals(
+        asList(await ExpensesServices.getExpensesCategoryWithTotals(
             userController.currentUser.value?.primaryShop?.id,
             fromDatee,
-            toDatee!);
+            toDatee!));
     isLoadingExpense.value = false;
     expensesCategotyWithTotals
         .addAll(response.map((e) => ExpenseCategory.fromJson(e)).toList());

@@ -1,4 +1,6 @@
-const apiEndPoint = "https://api.pointifypos.com/";
+// Override per build, e.g. `flutter run --dart-define=API_BASE=https://dev.pointifypos.com/`
+const apiEndPoint = String.fromEnvironment('API_BASE',
+    defaultValue: "https://api.pointifypos.com/");
 const storeurl = "https://store.pointifypos.com/";
 const apiEndPointv_2 = '${apiEndPoint}api/v2/';
 
@@ -6,6 +8,7 @@ class EndPoints {
   //AUTH
   static const register = "${apiEndPoint}auth/register";
   static const login = "${apiEndPoint}auth/login";
+ static const refreshtoken = "${apiEndPoint}auth/refresh";
   static const requestpassword = "${apiEndPoint}auth/admin/request/password";
   static const resetpassword = "${apiEndPoint}auth/admin/reset/password";
   static const admin = "${apiEndPoint}auth/admin/";

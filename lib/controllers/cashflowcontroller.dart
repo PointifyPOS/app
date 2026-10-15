@@ -14,6 +14,7 @@ import '../models/bank.dart';
 import '../screens/sales/all_sales.dart';
 import '../services/cashflow.dart';
 import '../widgets/snackBars.dart';
+import 'package:pointify/services/client.dart';
 
 class CashFlowController extends GetxController {
   RxList<CashFlowModel> cashflows = RxList([]);
@@ -116,10 +117,10 @@ class CashFlowController extends GetxController {
       fromDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
       toDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
     }
-    List response = await getCashFlow(
+    List response = asList(await getCashFlow(
         shop: userController.currentUser.value?.primaryShop!.id,
         fromDate: fromDate,
-        toDate: toDate);
+        toDate: toDate));
     cashflows.value = response.map((e) => CashFlowModel.fromJson(e)).toList();
     return response;
   }
@@ -256,8 +257,8 @@ class CashFlowController extends GetxController {
 
   getCashFlowCategoryList(String type) async {
     cashFlowCategotyLists.clear();
-    List<dynamic> response = await CashFlowServices.getCashFlowCategoryList(
-        userController.currentUser.value?.primaryShop?.id, type);
+    List<dynamic> response = asList(await CashFlowServices.getCashFlowCategoryList(
+        userController.currentUser.value?.primaryShop?.id, type));
     cashFlowCategotyLists
         .addAll(response.map((e) => CashFlowCategory.fromJson(e)).toList());
 
@@ -270,8 +271,8 @@ class CashFlowController extends GetxController {
         .format(DateTime(fromDate.value.year, fromDate.value.month, 1));
     String to = DateFormat("yyyy-MM-dd").format(toDate.value);
     List<dynamic> response =
-        await CashFlowServices.getCashFlowCategoryWithTotals(
-            userController.currentUser.value?.primaryShop?.id, type, from, to);
+        asList(await CashFlowServices.getCashFlowCategoryWithTotals(
+            userController.currentUser.value?.primaryShop?.id, type, from, to));
     cashFlowCategotyWithTotals
         .addAll(response.map((e) => CashFlowCategory.fromJson(e)).toList());
     getCashFlowCategoriesPreview();
@@ -284,8 +285,8 @@ class CashFlowController extends GetxController {
 
   getCashflowtransactions() async {
     categoryCashflowTransactions.clear();
-    List<dynamic> response = await CashFlowServices.getCashflowtransactions(
-        userController.currentUser.value?.primaryShop?.id);
+    List<dynamic> response = asList(await CashFlowServices.getCashflowtransactions(
+        userController.currentUser.value?.primaryShop?.id));
     categoryCashflowTransactions
         .addAll(response.map((e) => CashFlowTransaction.fromJson(e)).toList());
     categoryCashflowTransactions.refresh();
@@ -294,8 +295,8 @@ class CashFlowController extends GetxController {
   void getBanks() async {
     bankslist.clear();
     isLoadingBanksTransactions.value = true;
-    List banks = await CashFlowServices()
-        .getBanks(userController.currentUser.value!.primaryShop!.id!);
+    List banks = asList(await CashFlowServices()
+        .getBanks(userController.currentUser.value!.primaryShop!.id!));
     isLoadingBanksTransactions.value = false;
     bankslist.addAll(banks.map((e) => BankModel.fromJson(e)).toList());
   }
@@ -347,8 +348,8 @@ class CashFlowController extends GetxController {
 
   Future<void> getCategoryHistory(CashFlowCategory cashFlowCategory) async {
     categoryCashflowTransactions.clear();
-    List response = await CashFlowServices.getCashflowCategoryTransactions(
-        cashFlowCategory.id!);
+    List response = asList(await CashFlowServices.getCashflowCategoryTransactions(
+        cashFlowCategory.id!));
     categoryCashflowTransactions.addAll(response.map((e) {
       return CashFlowTransaction.fromJson(e);
     }));
@@ -361,7 +362,7 @@ class CashFlowController extends GetxController {
 
   Future<void> getBankTransactions(BankModel bank) async {
     categoryCashflowTransactions.clear();
-    List response = await CashFlowServices.getBankTransactions(bank.id!);
+    List response = asList(await CashFlowServices.getBankTransactions(bank.id!));
     categoryCashflowTransactions.addAll(response.map((e) {
       return CashFlowTransaction.fromJson(e);
     }));

@@ -14,6 +14,7 @@ import '../models/product.dart';
 import '../models/shop.dart';
 import '../screens/stock/transfer_history.dart';
 import '../utils/colors.dart';
+import 'package:pointify/services/client.dart';
 
 class StockController extends GetxController {
 
@@ -125,11 +126,11 @@ class StockController extends GetxController {
     try {
       transferHistory.clear();
       gettingTransferHistoryLoad.value = true;
-      List<dynamic> response = await ProductService().getTransferHistory(
+      List<dynamic> response = asList(await ProductService().getTransferHistory(
           startDate: startDate,
           toDate: toDate,
           shopid: shopid,
-          direction: direction);
+          direction: direction));
       transferHistory
           .addAll(response.map((e) => TransferHistory.fromJson(e)).toList());
       gettingTransferHistoryLoad.value = false;
@@ -167,10 +168,10 @@ class StockController extends GetxController {
       {Product? product, String? fromDate = "", String? toDate = ""}) async {
     countHistory.clear();
     isLoadingCount.value = true;
-    List<dynamic> productCountHistory = await ProductService.getCountHistory(
+    List<dynamic> productCountHistory = asList(await ProductService.getCountHistory(
         shop: userController.currentUser.value!.primaryShop!.id,
         toDate: toDate,
-        fromDate: fromDate);
+        fromDate: fromDate));
     countHistory.addAll(
         productCountHistory.map((e) => ProductCount.fromJson(e)).toList());
     isLoadingCount.value = false;

@@ -9,6 +9,7 @@ import 'package:pointify/services/product_service.dart';
 import 'package:pointify/widgets/alert.dart';
 import 'package:pointify/widgets/loading_dialog.dart';
 import 'package:pointify/widgets/snackbars.dart';
+import 'package:pointify/services/client.dart';
 
 class ProductNewController extends GetxController {
   RxList<ProductDisplay> productlist = RxList([]);
@@ -171,7 +172,7 @@ class ProductNewController extends GetxController {
   ) async {
     try {
       var response = await ProductService.getProductStats(shop);
-      if (response == null) return;
+      if (response == null || response["error"] != null) return;
       productStats.value = response["stats"] ?? {};
 
       productStats["fastmoving"] = response["fastmoving"] ?? [];
@@ -317,8 +318,8 @@ class ProductNewController extends GetxController {
   Future<void> getProductCategiories() async {
     loadingproductCategories.value = true;
     productCategories.clear();
-    List<dynamic> productCategoriesResponse = await ProductService()
-        .getProductCategories(userController.currentUser.value!.id!);
+    List<dynamic> productCategoriesResponse = asList(await ProductService()
+        .getProductCategories(userController.currentUser.value!.id!));
     productCategories.addAll(productCategoriesResponse
         .map((e) => ProductCategory.fromJson(e))
         .toList());
@@ -380,7 +381,7 @@ class ProductNewController extends GetxController {
         stockMode: stockMode,
       );
 
-      if (response != null) {
+      if (response != null && response["error"] == null) {
         List products = response["data"] ?? [];
 
         final parsedProducts = products

@@ -123,13 +123,29 @@ class _HomeState extends State<Home> {
           "paymentType": data['paymentType'],
           "paymentTag": data['paymentTag'],
           "totalDiscount": data['totalDiscount'],
-          "customerId": data['customerId']
+          "customerId": data['customerId'],
+          // Same value on every retry, so a sale the server already saved (but whose reply we
+          // never received) is not recorded twice.
+          "clientRef":
+              "offline-${data['shopId']}-${data['attendantId']}-${data['id']}-${data['createdAt']}"
         };
-        await SalesService.createSale(sale);
-        databaseHelper.deleteSale(data['id']);
+        final res = await SalesService.createSale(sale);
+        // Only forget the local copy once the server confirms it. A rejected sale
+        // (expired token, validation, outage) stays on the device and is retried later.
+        final saved = res is Map && res['error'] == null && res['sale'] != null;
+        if (!saved) {
+          if (res is Map &&
+              (res['message'] == 'Invalid or expired token' ||
+                  res['message'] == 'Access token required')) {
+            break; // signed out: stop, the rest sync after the next login
+          }
+          continue;
+        }
+        await databaseHelper.deleteSale(data['id']);
       }
 
-      salesController.offlinesales.value = 0;
+      salesController.offlinesales.value = (await databaseHelper.getSales()).length;
+
       Get.find<ProductController>().getProductsBySort(type: 'all');
       Get.find<CustomerController>().getCustomersInShop('');
     });

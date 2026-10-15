@@ -18,6 +18,8 @@ import '../screens/receipts/pdf/sales/warehouse_invoice.dart';
 import '../services/product_service.dart';
 import '../utils/colors.dart';
 import '../widgets/loading_dialog.dart';
+import 'package:pointify/services/client.dart';
+import 'package:pointify/functions/functions.dart';
 
 class WareHouseController extends GetxController {
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
@@ -194,7 +196,7 @@ class WareHouseController extends GetxController {
     LoadingDialog.showLoadingDialog(
         context: Get.context!, title: "Please wait", key: _keyLoader);
     var response = await ProductService.productStockinRequest(productdata);
-    print(response);
+    debugPrintMessage(response);
     Get.back();
     if (response["error"] != null) {
       generalAlert(message: response["error"], title: "Error");
@@ -215,7 +217,7 @@ class WareHouseController extends GetxController {
     try {
       isLoadingCount.value = true;
       warehouseInvoices.clear();
-      List<dynamic> response = await ProductService().getRequests(
+      List<dynamic> response = asList(await ProductService().getRequests(
           warehouse: warehouse,
           from: from,
           to: to,
@@ -225,7 +227,7 @@ class WareHouseController extends GetxController {
                   ? userController.currentUser.value!.primaryShop!.id
                   : shop,
           production:
-              userController.currentUser.value!.primaryShop!.production);
+              userController.currentUser.value!.primaryShop!.production));
       warehouseInvoices
           .addAll(response.map((e) => WareHouseInvoice.fromJson(e)).toList());
       isLoadingCount.value = false;

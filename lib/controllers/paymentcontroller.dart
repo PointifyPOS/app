@@ -9,6 +9,7 @@ import 'package:pointify/services/payment.dart';
 import '../models/awards.dart';
 import '../models/payment.dart';
 import '../models/payment_methods.dart';
+import 'package:pointify/services/client.dart';
 
 class PaymentController extends GetxController {
   RxBool isPaymentLoading = false.obs;
@@ -19,7 +20,7 @@ class PaymentController extends GetxController {
   getSalesPaymentByPurchaseId(String id) async {
     isPaymentLoading.value = true;
     List<dynamic> response =
-        await PaymentService.getSalesPaymentByPurchaseId(id);
+        asList(await PaymentService.getSalesPaymentByPurchaseId(id));
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();
     paymentData.sort((a, b) => b.date!.compareTo(a.date!));
@@ -47,7 +48,7 @@ class PaymentController extends GetxController {
 
   getAwardTransactions(String id) async {
     isPaymentLoading.value = true;
-    List<dynamic> response = await PaymentService.getAwardTransactions(id);
+    List<dynamic> response = asList(await PaymentService.getAwardTransactions(id));
     List<Awards> paymentData = response.map((e) => Awards.fromJson(e)).toList();
     paymentData.sort((a, b) => b.date!.compareTo(a.date!));
     awardpayments.assignAll(paymentData);
@@ -57,12 +58,12 @@ class PaymentController extends GetxController {
   getPaymentsByShopAndDate(
       String shop, String fromDate, String toDate, String? search) async {
     isPaymentLoading.value = true;
-    List<dynamic> response = await PaymentService.getPaymentsByShopAndDate(
+    List<dynamic> response = asList(await PaymentService.getPaymentsByShopAndDate(
       shop,
       fromDate,
       toDate,
       search,
-    );
+    ));
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();
     payments.assignAll(paymentData);
@@ -98,7 +99,7 @@ class PaymentController extends GetxController {
 
   getSalesPaymentBySaleId(String id) async {
     isPaymentLoading.value = true;
-    List<dynamic> response = await PaymentService.getSalesPaymentBySaleId(id);
+    List<dynamic> response = asList(await PaymentService.getSalesPaymentBySaleId(id));
     List<Payment> paymentData =
         response.map((e) => Payment.fromJson(e)).toList();
     payments.assignAll(paymentData);
@@ -107,7 +108,7 @@ class PaymentController extends GetxController {
 
   getPaymentMethods() async {
     isPaymentLoading.value = true;
-    List<dynamic> response = await PaymentService.getPaymentMethods();
+    List<dynamic> response = asList(await PaymentService.getPaymentMethods());
     List<PaymentMethods> paymentData =
         response.map((e) => PaymentMethods.fromJson(e)).toList();
     paymentmethods.assignAll(paymentData);
