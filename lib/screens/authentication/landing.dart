@@ -141,7 +141,7 @@ class _LandingState extends State<Landing> {
   Widget landingContent() {
     return Column(
       children: [
-        if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250,),
+        if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250, errorWidget: (_, __, ___) => const SizedBox.shrink(),),
 
         loading ? const Text("") :  Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
         const SizedBox(

@@ -6,6 +6,7 @@ import 'package:pointify/main.dart';
 import 'package:pointify/screens/product/barcode_scanner.dart';
 import 'package:pointify/screens/product/products_page.dart';
 import 'package:pointify/screens/sales/onholdsales.dart';
+import 'package:pointify/screens/sales/quick_sale.dart';
 import 'package:pointify/screens/sales/sale_preview.dart';
 import 'package:pointify/widgets/alert.dart';
 
@@ -506,6 +507,8 @@ class CreateSale extends StatelessWidget {
                                   )
                                 : ListView.builder(
                                     shrinkWrap: true,
+                                    // room so the floating button never covers the last item
+                                    padding: const EdgeInsets.only(bottom: 80),
                                     itemCount: salesController
                                         .receipt.value!.items?.length,
                                     itemBuilder: (context, index) {
@@ -524,6 +527,17 @@ class CreateSale extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endFloat,
+            floatingActionButton: FloatingActionButton(
+              heroTag: 'quick_sale_fab',
+              mini: true,
+              tooltip: 'Quick sale',
+              backgroundColor: AppColors.mainColor,
+              foregroundColor: Colors.white,
+              onPressed: () => Get.to(() => const QuickSale()),
+              child: const Icon(Icons.flash_on),
             ),
             bottomNavigationBar: SafeArea(
               child: Container(

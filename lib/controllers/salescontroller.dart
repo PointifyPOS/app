@@ -897,6 +897,13 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         amountTotalPaid: amountTotalPaid,
       );
 
+      // TEMP DIAGNOSTIC: remove once the split M-Pesa figure is confirmed.
+      debugPrint('[SPLIT-DEBUG] sent: type=${sale['paymentType']} '
+          'tag=${sale['paymentTag']} amountPaid=${sale['amountPaid']} '
+          'mpesaTotal=${sale['mpesaTotal']} bankTotal=${sale['bankTotal']} '
+          '| fields cash=${cashPaid.text} mpesa=${mpesaCashPaid.text} '
+          'bank=${bankCashPaid.text}');
+
       // Validate split payment is fully paid.
       if (sale['paymentTag'] == 'split' &&
           (receiptData.outstandingBalance ?? 0) > 0) {
@@ -931,6 +938,10 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
       Get.back(); // close loader
       saveSaleLoad.value = false;
+      debugPrint('[SPLIT-DEBUG] server stored: '
+          'mpesaNewTotal=${response['sale']?['mpesaNewTotal']} '
+          'bankTotal=${response['sale']?['bankTotal']} '
+          'amountPaid=${response['sale']?['amountPaid']}');
 
       if (response['error'] != null) {
         _handleSaveError(response['error'], receiptData);
@@ -1003,13 +1014,17 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       'batchTrack': shop?.allowbatchtracking ?? false,
       'allownegativeselling': shop?.allownegativeselling ?? false,
       'mpesaTransId': mpesaTransId.text.isNotEmpty ? mpesaTransId.text : '',
+      // Pure M-Pesa sale → the amount paid; split → the M-Pesa share entered
+      // in the split dialog (it was never sent before, so it showed as 0).
       'mpesaTotal': paymentType.value?.toLowerCase() == 'mpesa'
           ? _parseOrZero(amountPaid.text)
-          : 0.0,
-      'bankTotal': _splitChannelAmount(
-        channel: 'Bank',
-        controller: bankCashPaid,
-      ),
+          : (isSplit ? _parseOrZero(mpesaCashPaid.text) : 0.0),
+      // Pure bank sale → the amount paid (bankCashPaid is only filled by the
+      // split dialog, so this used to be 0 and the sale never appeared under
+      // the bank filter); split → the bank share from the dialog.
+      'bankTotal': paymentType.value?.toLowerCase() == 'bank'
+          ? _parseOrZero(amountPaid.text)
+          : _splitChannelAmount(channel: 'Bank', controller: bankCashPaid),
       'amountPaid': _parseOrZero(amountPaid.text),
       'outstandingBalance': receiptData.outstandingBalance,
       'paymentType': isSplit ? 'cash' : paymentType.value?.toLowerCase(),

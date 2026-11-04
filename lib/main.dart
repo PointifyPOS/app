@@ -41,8 +41,9 @@ void main() async {
 
   final data = await SettingsApi.getThemes();
 
+  final logoPath = (data['image'] ?? "").toString();
   AppConfig.app_logo =
-      apiEndPoint + (data['image']?.replaceFirst("/", "") ?? "");
+      logoPath.isEmpty ? "" : apiEndPoint + logoPath.replaceFirst("/", "");
   AppConfig.app_name = data['APP_NAME'] ?? "Pointify";
   AppConfig.app_slogan = data['APP_SLOGAN'] ?? "";
 

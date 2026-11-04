@@ -23,7 +23,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
 import '../widgets/snackbars.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:pointify/functions/functions.dart' hide authController;
 
 class ShopController {
   RxBool gettingShopsLoad = RxBool(false);
