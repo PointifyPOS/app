@@ -20,6 +20,7 @@ import 'package:pointify/services/product_service.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/widgets/snackBars.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/adjustment.dart';
 import '../models/badstock.dart';
@@ -1064,6 +1065,28 @@ class ProductController extends GetxController {
         data: data,
         reportStatus: reportStatus);
     Get.back();
+    if (response["success"] == true &&
+        response["emailSent"] == false &&
+        response["url"] != null) {
+      // email could not be sent, let the user download the file instead
+      Get.dialog(AlertDialog(
+        title: const Text("Download report"),
+        content: Text(response["message"] ?? "Email could not be sent"),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text("Close")),
+          TextButton(
+            onPressed: () async {
+              Get.back();
+              await launchUrl(Uri.parse(response["url"]),
+                  mode: LaunchMode.externalApplication);
+            },
+            child: Text("Download",
+                style: TextStyle(color: AppColors.mainColor)),
+          ),
+        ],
+      ));
+      return;
+    }
     if (response["success"] != null && response["success"] == true) {
       generalAlert(
         title: "Success",
