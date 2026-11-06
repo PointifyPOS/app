@@ -23,6 +23,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
 import '../widgets/snackbars.dart';
+import 'package:pointify/functions/functions.dart' hide authController;
 
 class ShopController {
   RxBool gettingShopsLoad = RxBool(false);
@@ -43,7 +44,7 @@ class ShopController {
   TextEditingController paybillAcc = TextEditingController();
   TextEditingController paybillTill = TextEditingController();
   TextEditingController address = TextEditingController();
-  RxBool viewAllCustomers = false.obs;
+RxBool viewAllCustomers = false.obs;
   TextEditingController nameController = TextEditingController();
   TextEditingController backupemail = TextEditingController();
   TextEditingController businessController = TextEditingController();
@@ -63,7 +64,6 @@ class ShopController {
   RxBool useWarehouse = RxBool(false);
   RxBool allowbatchtracking = RxBool(false);
   RxBool allownegativesales = RxBool(false);
-  RxBool isRestaurant = RxBool(false);
   RxBool allowBackup = RxBool(false);
   RxBool onlinesellingsettings = RxBool(false);
   Rxn<ShopTypes> selectedCategory = Rxn(null);
@@ -89,10 +89,6 @@ class ShopController {
   ]);
 
   createShop({required page, required context, String? type = "shop"}) async {
-    if (!await isConnected()) {
-      generalAlert(title: "Error", message: "No internet connection");
-      return;
-    }
     if (nameController.text.trim().isEmpty) {
       generalAlert(title: "Error", message: "Please enter  name");
       return;
@@ -154,16 +150,16 @@ class ShopController {
         response = await databaseHelper.getAllShops();
       } else {
         if (type == "warehouse") {
-          response = await ShopService.getShops(
+          response = asList(await ShopService.getShops(
             userController.currentUser.value!.primaryShop!.adminId!,
             name: name,
             type: type,
-          );
+          ));
         } else {
-          response = await ShopService.getShops(
+          response = asList(await ShopService.getShops(
               userController.currentUserId.value,
               name: name,
-              type: type);
+              type: type));
         }
       }
       gettingShopsLoad.value = false;
@@ -197,9 +193,9 @@ class ShopController {
       if (!connected) {
         response = await databaseHelper.getAllShops();
       } else {
-        response = await ShopService.getWarehouses(
+        response = asList(await ShopService.getWarehouses(
             userController.currentUserId.value,
-            name: name);
+            name: name));
       }
       loadingwarehouses.value = false;
       if (response.isNotEmpty) {
@@ -431,33 +427,12 @@ class ShopController {
   getCategories() async {
     try {
       loadingcateries.value = true;
-
-      if (!await isConnected()) {
-        loadingcateries.value = false;
-        showSnackBar(
-            message: "Shop categories require an internet connection",
-            color: Colors.orange);
-        return;
-      }
-
-      List<dynamic> response = await ShopService().getShopTypes();
+      List<dynamic> response = asList(await ShopService().getShopTypes());
       categories.value = response.map((e) => ShopTypes.fromJson(e)).toList();
       loadingcateries.value = false;
     } catch (e) {
       loadingcateries.value = false;
     }
-  }
-
-  Future<Map<String, dynamic>> _pushOrQueueShopUpdate(
-      String shopId, Map<String, dynamic> payload) async {
-    if (!await isConnected()) {
-      await DatabaseHelper().insertShopUpdateOffline(shopId, payload);
-      showSnackBar(
-          message: "Saved offline — will sync when connected",
-          color: Colors.orange);
-      return {};
-    }
-    return await ShopService().updateShop(shopId, payload);
   }
 
   updateShop(
@@ -466,24 +441,23 @@ class ShopController {
       String backupemail = "",
       String? location = "",
       String latitude = "",
-      bool? isRestaurant = false,
       bool? allowBackup,
       bool? allowOnlineSelling,
       String longitude = ""}) async {
     try {
       updateShopLoad.value = true;
-
       if (backup.isNotEmpty ||
           backupemail.isNotEmpty ||
           location != null ||
           allowOnlineSelling != null ||
           allowBackup != null) {
         if (allowOnlineSelling != null) {
-          await _pushOrQueueShopUpdate(
+          await ShopService().updateShop(
               shop!.id!, {"allowOnlineSelling": allowOnlineSelling});
         }
         if (allowBackup != null) {
-          await _pushOrQueueShopUpdate(shop!.id!, {"allowBackup": allowBackup});
+          await ShopService()
+              .updateShop(shop!.id!, {"allowBackup": allowBackup});
         }
         if (location != "") {
         } else if (backup.isNotEmpty) {
@@ -493,7 +467,7 @@ class ShopController {
           }
           LoadingDialog.showLoadingDialog(
               context: Get.context!, title: "Please wait...", key: _keyLoader);
-          await _pushOrQueueShopUpdate(shop!.id!, {
+          await ShopService().updatebackupiterval(shop!.id!, {
             "backupInterval": selectedbackupsendinterval['name'],
             "backupemail": shop.backupemail,
           });
@@ -501,9 +475,8 @@ class ShopController {
           generalAlert(message: "Update interval updated", title: "Success");
         } else if (backupemail.isNotEmpty) {
         } else {
-          var response = await _pushOrQueueShopUpdate(shop!.id!, {
+          var response = await ShopService().updateShop(shop!.id!, {
             "name": nameController.text,
-            "isRestaurant": isRestaurant,
             "backupInterval": selectedbackupsendinterval['name'],
             "useWarehouse": useWarehouse.value,
             "tax": tax.text,
@@ -518,12 +491,11 @@ class ShopController {
           }
         }
       } else {
-        var response = await _pushOrQueueShopUpdate(shop!.id!, {
+        var response = await ShopService().updateShop(shop!.id!, {
           "name": nameController.text,
           "backupInterval": selectedbackupsendinterval['name'],
           "production": productionEnabled.value,
           "useWarehouse": useWarehouse.value,
-          "isRestaurant": isRestaurant,
           "tax": tax.text,
           "currency": currency.value == ""
               ? Constants.currenciesData[0]
@@ -632,14 +604,15 @@ class ShopController {
       lng: longitude,
     );
     shopsAroundLoad.value = false;
-    List shops = response;
+    // The API only lists nearby shops for platform staff now; anything else (403/401 map) is empty.
+    List shops = response is List ? response : [];
     shopsAround.value = shops.map((e) => Shop.fromJson(e)).toList();
   }
 
   void backupNow({required Shop shopModel}) async {
     isBacking.value = true;
     var response = await ShopService().backupNow(shopModel.id!);
-    print(response);
+    debugPrintMessage(response);
     isBacking.value = false;
     generalAlert(
       title: "Backup",

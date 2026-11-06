@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/sqlite/helper.dart';
-import 'package:pointify/utils/helper.dart';
 import 'package:pointify/widgets/snackBars.dart';
 
 import '../functions/functions.dart';
@@ -69,40 +67,26 @@ class SupplierController extends GetxController
   }
 
   createSupplier({required BuildContext context, required page}) async {
-    try {
-      LoadingDialog.showLoadingDialog(
-          context: context, title: "Creating supplier...", key: _keyLoader);
-      creatingSupplierLoad.value = true;
-      var supplier = {
-        "name": nameController.text,
-        "shopId": userController.currentUser.value?.primaryShop?.id,
-        "phoneNumber": phoneController.text,
-      };
+    // try {
+    LoadingDialog.showLoadingDialog(
+        context: context, title: "Creating supplier...", key: _keyLoader);
+    creatingSupplierLoad.value = true;
+    var supplier = {
+      "name": nameController.text,
+      "shopId": userController.currentUser.value?.primaryShop?.id,
+      "phoneNumber": phoneController.text,
+    };
+    await SupplierService().createSupplier(supplier);
+    await getSuppliers('');
+    clearTexts();
+    Get.back();
+    Get.back();
 
-      if (!await isConnected()) {
-        await DatabaseHelper().insertSupplierOffline(supplier);
-        await getSuppliers('');
-        clearTexts();
-        Get.back();
-        Get.back();
-        creatingSupplierLoad.value = false;
-        showSnackBar(
-            message: "Supplier saved offline — will sync when connected",
-            color: Colors.orange);
-        return;
-      }
-
-      await SupplierService().createSupplier(supplier);
-      await getSuppliers('');
-      clearTexts();
-      Get.back();
-      Get.back();
-
-      creatingSupplierLoad.value = false;
-    } catch (e) {
-      debugPrintMessage(e);
-      creatingSupplierLoad.value = false;
-    }
+    creatingSupplierLoad.value = false;
+    // } catch (e) {
+    //   debugPrintMessage(e);
+    //   creatingSupplierLoad.value = false;
+    // }
   }
 
   clearTexts() {
@@ -117,23 +101,14 @@ class SupplierController extends GetxController
   getSuppliers(type, {String? name, String? shop}) async {
     loadingsuppliers.value = true;
     suppliers.clear();
-
-    Map<String, dynamic> suppliersList;
-    List<dynamic> suppliersListDynamic = [];
-    if (!await isConnected()) {
-      suppliersListDynamic = await DatabaseHelper().getSuppliersLocal();
-    } else {
-      suppliersList = await SupplierService().getSuppliers(
-          name: name,
-          shop: userController.currentUser.value?.primaryShop?.id.toString(),
-          type: type);
-      suppliersListDynamic = suppliersList['suppliers'];
-    }
-    print("Suppliers List: $suppliersListDynamic");
-    suppliers
-        .addAll(suppliersListDynamic.map((e) => Supplier.fromJson(e)).toList());
-    filteredSuppliers.value = suppliers;
+    Map<String, dynamic> suppliersData = await SupplierService().getSuppliers(
+        name: name,
+        shop: userController.currentUser.value?.primaryShop?.id.toString(),
+        type: type);
     loadingsuppliers.value = false;
+    List suppliersList = suppliersData['suppliers'] ?? [];
+    suppliers.addAll(suppliersList.map((e) => Supplier.fromJson(e)).toList());
+    filteredSuppliers.value = suppliers;
   }
 
   assignTextFields(Supplier supplierModel) {

@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/screens/purchases/create_purchase.dart';
-import 'package:pointify/screens/sales/pending_orders_page.dart';
 import 'package:pointify/screens/usage/extend_usage.dart';
 import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/snackbars.dart';
 
 import '../controllers/homecontroller.dart';
 import '../main.dart';
@@ -19,47 +17,6 @@ import '../screens/home/home.dart';
 import '../screens/sales/create_sale.dart';
 import '../screens/shop/create_shop.dart';
 import 'dart:convert';
-
-bool hasPermission(String group, String action) {
-  final user = userController.currentUser.value;
-  if (user?.usertype == "admin") return true; // admins can do everything
-  final perms = user?.permisions ?? [];
-  final g = perms.firstWhereOrNull((p) => p["key"] == group);
-  return g != null && (g["value"] as List).contains(action);
-}
-
-Future<T?> safeApiCall<T>(
-  Future<T> Function() call, {
-  String? offlineMessage,
-  bool silent = false,
-}) async {
-  if (!await isConnected()) {
-    if (!silent) {
-      showSnackBar(
-        message: offlineMessage ?? "This requires an internet connection",
-        color: Colors.orange,
-      );
-    }
-    return null;
-  }
-  try {
-    return await call();
-  } catch (e) {
-    debugPrintMessage(e);
-    if (!silent) {
-      showSnackBar(
-          message: "Something went wrong. Please try again.",
-          color: Colors.red);
-    }
-    return null;
-  }
-}
-
-bool hasSyncedServerId(String? id) {
-  return id != null &&
-      !id.startsWith('offline_') &&
-      RegExp(r'^[a-f0-9]{24}$').hasMatch(id);
-}
 
 void printFull(Object? obj) {
   final text =
@@ -122,12 +79,13 @@ class Helper extends StatelessWidget {
   ];
 
   Helper(
-      {super.key,
+      {Key? key,
       required this.widget,
       this.appBar,
       this.bottomNavigationBar,
       this.floatButton,
-      this.page});
+      this.page})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -246,11 +204,6 @@ class Helper extends StatelessWidget {
                                           ));
                                     }
                                     break;
-                                  case 6:
-                                    {
-                                      Get.to(() => const PendingOrdersPage());
-                                    }
-                                    break;
                                 }
 
                                 if (index == 0) {
@@ -289,14 +242,23 @@ class Helper extends StatelessWidget {
 }
 
 Future<bool> isConnected() async {
+  if (userController.enableOffline.isFalse) {
+    return true;
+  }
+  // return true;
   try {
     final result = await InternetAddress.lookup('google.com');
     return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
   } on SocketException catch (_) {
     return false;
-  } catch (_) {
-    return false;
   }
+}
+
+double saleItemTotal(SaleItem item) {
+  final price = item.unitPrice ?? 0;
+  final quantity = item.quantity ?? 0;
+
+  return item.manageByPrice == true ? price : price * quantity;
 }
 
 generateReportAlert(BuildContext context, String type) {

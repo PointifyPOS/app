@@ -139,7 +139,7 @@ class ProductService {
     var response = await DbBase().databaseRequest(
         "${EndPoints.badstock}?shopId=${userController.currentUser.value?.primaryShop?.id}&product=$product&startDate=$fromDate&endDate=$toDate",
         DbBase().getRequestType);
-    return response;
+    return asList(response);
   }
 
   transferProduct(Map<String, Object?> transferData) async {
@@ -200,7 +200,7 @@ class ProductService {
     String url =
         "${EndPoints.countsproduct}/product/$product?shop=${userController.currentUser.value?.primaryShop?.id}";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
-    return response;
+    return asList(response);
   }
 
   static deleteProductCount(String sId) async {

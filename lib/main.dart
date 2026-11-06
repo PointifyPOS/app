@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:pointify/bindings.dart';
 import 'package:pointify/controllers/authcontroller.dart';
@@ -18,10 +19,10 @@ import 'package:pointify/services/end_points.dart';
 import 'package:pointify/services/settings.dart';
 import 'package:pointify/utils/app_config.dart';
 import 'package:pointify/utils/colors.dart';
+import 'package:pointify/utils/constants.dart';
 import 'package:pointify/utils/helper.dart';
 
 import 'controllers/cashflowcontroller.dart';
-import 'sqlite/helper.dart';
 import 'controllers/ordercontroller.dart';
 import 'controllers/paymentcontroller.dart';
 import 'controllers/printercontroller.dart';
@@ -38,51 +39,18 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Try fetching themes from server; fall back to SQLite cache when offline
-  dynamic data = await SettingsApi.getThemes();
-  bool fromCache = false;
-  print(data);
+  final data = await SettingsApi.getThemes();
 
-  if (data == null || data['error'] != null) {
-    // Offline or server unreachable — load from local cache
-    data = await DatabaseHelper().getOfflineSettings();
-    fromCache = true;
-  } else {
-    // Cache it now so the next offline launch has real theme data instead
-    // of falling back to grey.
-    await DatabaseHelper().insertSettings({
-      'image': data['image'],
-      'app_name_display': data['APP_NAME'],
-      'app_slogan': data['APP_SLOGAN'],
-      'primary_color': data['PRIMARY_COLOR'],
-      'button_color': data['BUTTON_COLOR'],
-      'text_color': data['TEXT_COLOR'],
-      'secondary_color': data['SECONDARY_COLOR'],
-    });
-  }
+  final logoPath = (data['image'] ?? "").toString();
+  AppConfig.app_logo =
+      logoPath.isEmpty ? "" : apiEndPoint + logoPath.replaceFirst("/", "");
+  AppConfig.app_name = data['APP_NAME'] ?? "Pointify";
+  AppConfig.app_slogan = data['APP_SLOGAN'] ?? "";
 
-  // Apply theme only if we have data (could still be null on very first
-  // offline launch before any cache exists — safe defaults used instead)
-  if (data != null) {
-    final imagePath = fromCache ? data['image'] : data['image'];
-    AppConfig.app_logo =
-        apiEndPoint + ((imagePath ?? '')?.replaceFirst("/", "") ?? "");
-    AppConfig.app_name = fromCache
-        ? (data['app_name_display'] ?? data['appName'] ?? "Pointify")
-        : (data['APP_NAME'] ?? data['appName'] ?? "Pointify");
-    AppConfig.app_slogan = fromCache
-        ? (data['app_slogan'] ?? data['shop_name'] ?? "")
-        : (data['APP_SLOGAN'] ?? data['shop_name'] ?? "");
-
-    AppColors.mainColor =
-        parseColor(fromCache ? data['primary_color'] : data["PRIMARY_COLOR"]);
-    AppColors.button_color =
-        parseColor(fromCache ? data['button_color'] : data["BUTTON_COLOR"]);
-    AppColors.text_color =
-        parseColor(fromCache ? data['text_color'] : data["TEXT_COLOR"]);
-    AppColors.secondary_color = parseColor(
-        fromCache ? data['secondary_color'] : data["SECONDARY_COLOR"]);
-  }
+  AppColors.mainColor = parseColor(data["PRIMARY_COLOR"]);
+  AppColors.button_color = parseColor(data["BUTTON_COLOR"]);
+  AppColors.text_color = parseColor(data["TEXT_COLOR"]);
+  AppColors.secondary_color = parseColor(data["SECONDARY_COLOR"]);
 
   runApp(const MyApp());
 }

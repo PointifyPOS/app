@@ -8,11 +8,9 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/main.dart';
-import 'package:pointify/models/accompaniment.dart';
 import 'package:pointify/screens/product/product_categories.dart';
 import 'package:pointify/screens/product/products_page.dart';
 import 'package:pointify/screens/suppliers/suppliers_page.dart';
-import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/colors.dart';
@@ -86,90 +84,6 @@ class CreateProduct extends StatelessWidget {
             CustomImage(imgType: ImageType.local, path: path);
       }
     }
-  }
-
-  void _addGroupDialog(BuildContext context) {
-    final nameCtrl = TextEditingController();
-    String type = 'choice';
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text("New accompaniment group"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameCtrl,
-                decoration: const InputDecoration(
-                    hintText: "Group name e.g. Starch, Sides"),
-              ),
-              const SizedBox(height: 8),
-              RadioListTile<String>(
-                value: 'choice',
-                groupValue: type,
-                title: const Text("Customer chooses"),
-                onChanged: (v) => setState(() => type = v!),
-              ),
-              RadioListTile<String>(
-                value: 'fixed',
-                groupValue: type,
-                title: const Text("Always included"),
-                onChanged: (v) => setState(() => type = v!),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Get.back(), child: const Text("Cancel")),
-            TextButton(
-              onPressed: () {
-                if (nameCtrl.text.trim().isEmpty) return;
-                productController.accompanimentGroups.add(AccompanimentGroup(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  name: nameCtrl.text.trim(),
-                  type: type,
-                  options: [],
-                ));
-                Get.back();
-              },
-              child: const Text("Add"),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _addOptionDialog(BuildContext context, AccompanimentGroup group) {
-    final nameCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text("Add option to ${group.name}"),
-        content: TextField(
-          controller: nameCtrl,
-          autofocus: true,
-          decoration:
-              const InputDecoration(hintText: "e.g. Rice, Ugali, Chips"),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () {
-              if (nameCtrl.text.trim().isEmpty) return;
-              group.options.add(AccompanimentOption(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                name: nameCtrl.text.trim(),
-              ));
-              productController.accompanimentGroups.refresh();
-              Get.back();
-            },
-            child: const Text("Add"),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -1434,44 +1348,6 @@ class CreateProduct extends StatelessWidget {
                                     !productController.managexpiry.value;
                               },
                             ),
-                            InkWell(
-                              child: Obx(
-                                  () => productController.manageBarcode.isTrue
-                                      ? Container()
-                                      : const Text(
-                                          "+ Barcode",
-                                          style: TextStyle(color: Colors.blue),
-                                        )),
-                              onTap: () {
-                                productController.manageBarcode.value = true;
-                              },
-                            ),
-                            if (userController.currentUser.value?.primaryShop
-                                    ?.isRestaurant ==
-                                true)
-                              InkWell(
-                                child: Obx(() => productController
-                                        .manageAccompaniments.isTrue
-                                    ? Container()
-                                    : const Text(
-                                        "+ Accompaniments",
-                                        style: TextStyle(color: Colors.blue),
-                                      )),
-                                onTap: () {
-                                  productController.manageAccompaniments.value =
-                                      true;
-                                },
-                              ),
-                            InkWell(
-                              child: const Text(
-                                "+ Description",
-                                style: TextStyle(color: Colors.blue),
-                              ),
-                              onTap: () {
-                                productController.manageDescription.value =
-                                    !productController.manageDescription.value;
-                              },
-                            ),
                             if (productController.virtualProduct.isFalse)
                               InkWell(
                                 child: Obx(() => productController
@@ -1506,193 +1382,34 @@ class CreateProduct extends StatelessWidget {
                               ),
                           ],
                         ),
-                      if (userController
-                              .currentUser.value?.primaryShop?.isRestaurant ==
-                          true)
-                        Obx(() => productController.manageAccompaniments.isFalse
-                            ? Container()
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      const Expanded(
-                                        child: Text("Accompaniments",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                      ),
-                                      TextButton.icon(
-                                        onPressed: () =>
-                                            _addGroupDialog(context),
-                                        icon: const Icon(Icons.add, size: 18),
-                                        label: const Text("Add group"),
-                                      ),
-                                    ],
-                                  ),
-                                  ...productController.accompanimentGroups.map(
-                                    (group) => Card(
-                                      margin: const EdgeInsets.only(bottom: 8),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Text(group.name,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w600)),
-                                                ),
-                                                Text(
-                                                  group.type == 'fixed'
-                                                      ? "Always included"
-                                                      : "Customer chooses",
-                                                  style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: Colors.grey[600]),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                      Icons.delete_outline,
-                                                      size: 18,
-                                                      color: Colors.red),
-                                                  onPressed: () =>
-                                                      productController
-                                                          .accompanimentGroups
-                                                          .remove(group),
-                                                ),
-                                              ],
-                                            ),
-                                            Wrap(
-                                              spacing: 6,
-                                              children: [
-                                                ...group.options
-                                                    .map((o) => Chip(
-                                                          label: Text(o.name,
-                                                              style:
-                                                                  const TextStyle(
-                                                                      fontSize:
-                                                                          12)),
-                                                          onDeleted: () {
-                                                            group.options
-                                                                .remove(o);
-                                                            productController
-                                                                .accompanimentGroups
-                                                                .refresh();
-                                                          },
-                                                        )),
-                                                ActionChip(
-                                                  label: const Text("+ option"),
-                                                  onPressed: () =>
-                                                      _addOptionDialog(
-                                                          context, group),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )),
                       if (productController.managebyPrice.isFalse)
                         const SizedBox(height: 10),
-                      Obx(() => productController.manageDescription.isFalse
-                          ? Container()
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Text("Description"),
-                                    const Spacer(),
-                                    InkWell(
-                                      onTap: () {
-                                        productController.descriptionController
-                                            .clear();
-                                        productController
-                                            .manageDescription.value = false;
-                                      },
-                                      child: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                TextFormField(
-                                  controller:
-                                      productController.descriptionController,
-                                  minLines: 3,
-                                  maxLines: 6,
-                                  decoration: InputDecoration(
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    hintText: "Optional",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
+                      const Text("Description"),
                       const SizedBox(height: 5),
-                      Obx(() => productController.manageBarcode.isFalse
-                          ? Container()
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Text("Barcode"),
-                                    const Spacer(),
-                                    InkWell(
-                                      onTap: () {
-                                        productController.barcodeController
-                                            .clear();
-                                        productController.manageBarcode.value =
-                                            false;
-                                      },
-                                      child: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                TextFormField(
-                                  controller:
-                                      productController.barcodeController,
-                                  keyboardType: TextInputType.text,
-                                  decoration: InputDecoration(
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    hintText: "Type or scan barcode",
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    suffixIcon: IconButton(
-                                      tooltip: 'Scan barcode',
-                                      icon: Icon(
-                                        Icons.qr_code_scanner,
-                                        color: AppColors.mainColor,
-                                      ),
-                                      onPressed: () => _scanBarcode(context),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )),
-                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: productController.descriptionController,
+                        keyboardType: TextInputType.text,
+                        minLines: 3,
+                        maxLines: 6,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          hintText: "optional",
+                          labelStyle: const TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
                       buildUploadImagesTile(context),
                       if (productController.isProduct())
                         Obx(
@@ -1763,77 +1480,6 @@ class CreateProduct extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _scanBarcode(BuildContext context) {
-    final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-    QRViewController? qrController;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.black,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => SizedBox(
-        height: MediaQuery.of(context).size.height * 0.5,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text("Scan Barcode",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold)),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () {
-                      qrController?.dispose();
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: QRView(
-                key: qrKey,
-                onQRViewCreated: (controller) {
-                  qrController = controller;
-                  controller.scannedDataStream.listen((scanData) {
-                    final code = scanData.code;
-                    if (code != null && code.isNotEmpty) {
-                      productController.barcodeController.text = code;
-                      controller.dispose();
-                      Navigator.pop(context);
-                    }
-                  });
-                },
-                overlay: QrScannerOverlayShape(
-                  borderColor: AppColors.mainColor,
-                  borderRadius: 10,
-                  borderLength: 30,
-                  borderWidth: 8,
-                  cutOutSize: 220,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                "Point camera at barcode or QR code",
-                style: TextStyle(color: Colors.grey[400], fontSize: 13),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ).whenComplete(() => qrController?.dispose());
   }
 
   Widget buildUploadImagesTile(BuildContext context) {

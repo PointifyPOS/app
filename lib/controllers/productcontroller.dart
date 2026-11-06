@@ -11,13 +11,11 @@ import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/stockcontroller.dart';
 import 'package:pointify/controllers/warehousecontroller.dart';
 import 'package:pointify/main.dart';
-import 'package:pointify/models/accompaniment.dart';
 import 'package:pointify/models/batch.dart';
 import 'package:pointify/models/bundleitem.dart';
 import 'package:pointify/models/invoice.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/screens/product/create_product.dart';
-import 'package:pointify/services/accompaniment_service.dart';
 import 'package:pointify/services/product_service.dart';
 import 'package:pointify/utils/colors.dart';
 import 'package:pointify/widgets/snackBars.dart';
@@ -39,6 +37,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/async_progress_dialog.dart';
 import '../widgets/loading_dialog.dart';
+import 'package:pointify/services/client.dart';
 
 class ProductController extends GetxController {
   RxList<Product> products = RxList([]);
@@ -46,8 +45,6 @@ class ProductController extends GetxController {
   RxList<Batch> filteredBatches = RxList([]);
   Rxn<ProductCategory> selectedCategory = Rxn(null);
   RxString activeAdjustmentFilter = RxString('today');
-  final RxList<AccompanimentGroup> accompanimentGroups = RxList([]);
-  RxBool manageAccompaniments = false.obs;
   RxList<TransferItem> productHistoryList = RxList([]);
   RxList<ProductTrasferHistory> historytrasfer = RxList([]);
   RxList<Adjustment> adjustment = RxList([]);
@@ -68,8 +65,7 @@ class ProductController extends GetxController {
   RxList<Map<String, dynamic>> monthlyBadStocks = RxList([]);
   RxList<Map<String, dynamic>> productMonthPurchases = RxList([]);
   RxList<CountHistory> countHistory = RxList([]);
-  TextEditingController barcodeController = TextEditingController();
-  RxInt barcodeCounts = RxInt(3);
+
   RxList<SaleItem> productInvoices = RxList([]);
   RxList<List<Object?>> sampledata = RxList([
     [
@@ -171,10 +167,11 @@ class ProductController extends GetxController {
     DateTime.now().month,
     DateTime.now().day,
   ).obs;
+  RxInt barcodeCounts = RxInt(3);
   RxBool bundleEnabled = RxBool(false);
   RxBool virtualProduct = RxBool(false);
   RxBool taxable = RxBool(false);
-  RxBool generateBarcodeOnSave = RxBool(false);
+  RxBool generateBarcodeOnSave = RxBool(true);
   RxBool addminPrice = RxBool(false);
   RxBool managexpiry = RxBool(false);
   RxBool managewholesale = RxBool(false);
@@ -182,8 +179,6 @@ class ProductController extends GetxController {
   RxBool manufacturer = RxBool(false);
   RxBool managedealer = RxBool(false);
   RxBool manageorderlevel = RxBool(false);
-  RxBool manageBarcode = false.obs;
-  RxBool manageDescription = RxBool(false);
   RxBool managediscount = RxBool(false);
   Rxn<ImagePicker> picker = Rxn(ImagePicker());
   var filteredProducts = <Product>[].obs;
@@ -240,7 +235,7 @@ class ProductController extends GetxController {
     if (response["error"] != null) {
       showSnackBar(message: response["error"], color: Colors.red);
     } else {
-      List purchses = response["purchases"];
+      List purchses = asList(response["purchases"]);
       productPurchases.value =
           purchses.map((e) => InvoiceItem.fromJson(e)).toList();
     }
@@ -248,7 +243,7 @@ class ProductController extends GetxController {
 
   getProductsCountsHistory({required String product}) async {
     countHistory.clear();
-    List allproducts = await ProductService.getProductsCountsHistory(product);
+    List allproducts = asList(await ProductService.getProductsCountsHistory(product));
     List<CountHistory> products =
         allproducts.map((e) => CountHistory.fromJson(e)).toList();
     countHistory.addAll(products);
@@ -269,7 +264,7 @@ class ProductController extends GetxController {
       product: product,
       year: year,
     );
-    List result = productsHistory["result"];
+    List result = asList(productsHistory["result"]);
     monthlyBadStocks.addAll(result
         .map((e) => {
               "month": e["month"],
@@ -283,20 +278,9 @@ class ProductController extends GetxController {
   getProductPurchasesGroupedByMonth(String product,
       {String? fromDate, String? toDate}) async {
     productMonthPurchases.clear();
-
-    if (!await isConnected()) {
-      showSnackBar(
-          message: "Purchase history requires an internet connection",
-          color: Colors.orange);
-      return;
-    }
-
     var productsHistory =
         await ProductService.getProductPurchasesGroupedByMonth(
             product: product, startDate: fromDate, toDate: toDate);
-
-    if (productsHistory == null) return;
-
     List result = productsHistory;
     productMonthPurchases.addAll(result
         .map((e) => {
@@ -445,15 +429,13 @@ class ProductController extends GetxController {
         "reorderLevel": reorder == "" ? 0.0 : double.parse(reorder),
         "maxDiscount": discount == "" ? 0.0 : double.parse(discount),
         "description": descriptionController.text,
-        "barcode": barcodeController.text.trim().isEmpty
-            ? null
-            : barcodeController.text.trim(),
         "supplierId": pickedSupplier.value?.id,
         "admin": userController.currentUser.value!.id,
         "shop": userController.currentUser.value?.primaryShop?.id,
         "bundle": bundleEnabled.value,
         "virtual": virtualProduct.value
       };
+      print("product $product");
 
       var response =
           await ProductService.updateProduct(product, productData!.sId!);
@@ -462,7 +444,6 @@ class ProductController extends GetxController {
         showSnackBar(message: response["Error"], color: Colors.red);
         return;
       } else {
-        await _saveAccompaniments(productData.sId!);
         List<CustomImage> images = selectedImages
             .where((element) => element.imgType == ImageType.local)
             .toList();
@@ -653,9 +634,6 @@ class ProductController extends GetxController {
         "reorderLevel": reorder == "" ? 0 : double.parse(reorder),
         "maxDiscount": discount == "" ? 0 : double.parse(discount),
         "description": descriptionController.text,
-        "barcode": barcodeController.text.trim().isEmpty
-            ? null
-            : barcodeController.text.trim(),
         "supplierId": pickedSupplier.value == null
             ? ""
             : pickedSupplier.value!.id.toString(),
@@ -667,36 +645,6 @@ class ProductController extends GetxController {
       if (product["supplierId"] == "") {
         product["supplierId"] = null;
       }
-
-      // ── offline: save to SQLite immediately so it appears in the list ──
-      if (!await isConnected()) {
-        final offlineId = 'offline_${DateTime.now().millisecondsSinceEpoch}';
-        await DatabaseHelper().insertProduct({
-          ...product,
-          '_id': offlineId,
-          'shopId': {'_id': product['shopId']},
-          'attendantId': {
-            '_id': userController.currentUser.value?.attendantId?.sId
-          },
-          'productCategoryId': product['productCategoryId'] != null
-              ? {'_id': product['productCategoryId'], 'name': ''}
-              : null,
-          'supplierId': null,
-          'deleted': false,
-          'taxable': product['taxable'] ?? false,
-        }, synced: false);
-        creatingProductLoad.value = false;
-        pickedSupplier.value = null;
-        clearControllers();
-        getProductsBySort(type: 'all');
-        showSnackBar(
-            message: 'Product saved offline — will sync when connected',
-            color: Colors.orange);
-        Get.back();
-        return;
-      }
-      // ────────────────────────────────────────────────────────────────────
-
       var response = await ProductService().createProduct(product);
       creatingProductLoad.value = false;
       pickedSupplier.value = null;
@@ -704,7 +652,6 @@ class ProductController extends GetxController {
       if (response["error"] != null) {
         showSnackBar(message: response['error'], color: Colors.red);
       } else {
-        await _saveAccompaniments(Product.fromJson(response).sId!);
         List<CustomImage> images = selectedImages
             .where((element) => element.imgType == ImageType.local)
             .toList();
@@ -814,14 +761,10 @@ class ProductController extends GetxController {
     wholeSalePriceController.text = "";
     bundledProducts.clear();
     bundleEnabled.value = false;
-    accompanimentGroups.clear();
-
     dealerPriceController.text = "";
     managewholesale.value = false;
     taxable.value = false;
     managedealer.value = false;
-    manageBarcode.value = false;
-    manageDescription.value = false;
     bundleEnabled.value = false;
     managexpiry.value = false;
     managediscount.value = false;
@@ -834,7 +777,6 @@ class ProductController extends GetxController {
     reOrderController.text = "";
     discountController.text = "";
     descriptionController.text = "";
-    barcodeController.clear();
     category.text = "";
     minsellingPriceController.text = "";
     supplierName.value = "None";
@@ -927,16 +869,8 @@ class ProductController extends GetxController {
         }
       }
     } else {
-      final all = await DatabaseHelper().getProducts();
-      if (barcodeId.isNotEmpty) {
-        allproducts = all
-            .where((p) =>
-                (p['barcode'] ?? '').toString().toLowerCase() ==
-                barcodeId.toLowerCase())
-            .toList();
-      } else {
-        allproducts = all;
-      }
+      // Fetch products from SQLite when offline
+      allproducts = await DatabaseHelper().getProducts();
     }
 
     if (reason == "download") {
@@ -973,20 +907,8 @@ class ProductController extends GetxController {
       }
       Get.find<StockController>().productsCount.value = products;
       Get.find<WareHouseController>().productsCount.value = products;
-      if (scanningFrom == "sale") {
-        if (products.isNotEmpty) {
-          Get.find<SalesController>().addToCart(products.first);
-          if (Get.currentRoute != '/CreateSale') Get.back();
-        } else {
-          Get.back();
-          Get.snackbar(
-            'Not found',
-            'No product matched barcode: $barcodeId',
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            duration: const Duration(seconds: 2),
-          );
-        }
+      if (scanningFrom == "sale" && products.isNotEmpty) {
+        Get.find<SalesController>().addToCart(products.first);
       }
       if (scanningFrom == "purchase" && products.isNotEmpty) {
         Get.find<PurchaseController>().addNewPurchase(products.first);
@@ -1014,7 +936,6 @@ class ProductController extends GetxController {
     wholeSalePriceController.text = productModel.wholesalePrice != null
         ? productModel.wholesalePrice!.toStringAsFixed(2)
         : "";
-
     dealerPriceController.text = productModel.dealerPrice != null
         ? productModel.dealerPrice!.toStringAsFixed(2)
         : "";
@@ -1032,7 +953,6 @@ class ProductController extends GetxController {
         : "";
     discountController.text = productModel.maxDiscount!.toStringAsFixed(2);
     descriptionController.text = productModel.description ?? "";
-    barcodeController.text = productModel.barcode ?? "";
     addminPrice.value = minsellingPriceController.text.isNotEmpty;
     taxable.value = productModel.taxable!;
     managebyPrice.value = productModel.manageByPrice ?? false;
@@ -1058,37 +978,10 @@ class ProductController extends GetxController {
     measureController.text = productModel.measureUnit ?? "";
     productType.value = productModel.type!;
     selectedImages.value = productModel.images ?? [];
-    bundleEnabled.value = productModel.bundleItems != null &&
-        productModel.bundleItems!.isNotEmpty;
+    bundleEnabled.value = productModel.bundleItems!.isNotEmpty;
     bundledProducts.value = productModel.bundleItems ?? [];
     generateBarcodeOnSave.value =
         (storage.getString("print_barcode") ?? false) as bool;
-
-    if (userController.currentUser.value?.primaryShop?.isRestaurant == true &&
-        productModel.sId != null) {
-      AccompanimentService.byProduct(
-        productModel.sId!,
-        userController.currentUser.value!.primaryShop!.id!,
-      ).then((groups) {
-        accompanimentGroups.value = groups;
-        if (groups.isNotEmpty) {
-          manageAccompaniments.value = true;
-        }
-      });
-    }
-  }
-
-  Future<void> _saveAccompaniments(String productId) async {
-    if (userController.currentUser.value?.primaryShop?.isRestaurant != true) {
-      return;
-    }
-    final shopId = userController.currentUser.value!.primaryShop!.id!;
-    if (accompanimentGroups.isNotEmpty) {
-      await AccompanimentService.save(
-          productId, shopId, accompanimentGroups.toList());
-    } else {
-      await AccompanimentService.remove(productId, shopId);
-    }
   }
 
   getBadStock(
@@ -1100,8 +993,8 @@ class ProductController extends GetxController {
     try {
       saveBadstockLoad.value = true;
       badstocks.clear();
-      List<dynamic> response = await ProductService.getBadStock(
-          product: product, fromDate: fromDate, toDate: toDate);
+      List<dynamic> response = asList(await ProductService.getBadStock(
+          product: product, fromDate: fromDate, toDate: toDate));
       badstocks.addAll(response.map((e) => BadStock.fromJson(e)).toList());
       saveBadstockLoad.value = false;
     } catch (e) {
@@ -1201,29 +1094,16 @@ class ProductController extends GetxController {
       String? fromDate = "",
       String? toDate = ""}) async {
     loadingAdjustments.value = true;
-
-    if (!await isConnected()) {
-      loadingAdjustments.value = false;
-      showSnackBar(
-          message: "Transfer history requires an internet connection",
-          color: Colors.orange);
-      return;
-    }
-
     var response = await ProductService.getProductTrasferHistory(
         product: product,
         page: 1,
         limit: 100,
         fromDate: fromDate,
         toDate: toDate);
-
-    loadingAdjustments.value = false;
-
-    if (response == null || response["data"] == null) return;
-
-    List<dynamic> result = response["data"];
+    List<dynamic> result = asList(response["data"]);
     historytrasfer.value =
         result.map((e) => ProductTrasferHistory.fromJson(e)).toList();
+    loadingAdjustments.value = false;
   }
 
   void getProductAdjustmentHistory(
@@ -1231,46 +1111,15 @@ class ProductController extends GetxController {
       String? fromDate = "",
       String? toDate = ""}) async {
     loadingAdjustments.value = true;
-
-    if (!await isConnected()) {
-      final rows = await DatabaseHelper().getAdjustmentsLocal(
-        productId: product.sId!,
-        fromDate: fromDate,
-        toDate: toDate,
-      );
-
-      final shopId = userController.currentUser.value?.primaryShop?.id;
-      final shopName = userController.currentUser.value?.primaryShop?.name;
-
-      adjustment.value = rows
-          .map((row) => Adjustment.fromJson({
-                '_id': row['id'],
-                'product': {'_id': row['productId'], 'name': product.name},
-                'shop': {'_id': shopId, 'name': shopName},
-                'before': row['before'],
-                'after': row['after'],
-                'adjusted': row['adjusted'],
-                'createdAt': row['createdAt'],
-              }))
-          .toList();
-
-      loadingAdjustments.value = false;
-      return;
-    }
-
     var response = await ProductService.getProductAdjustmentHistory(
         product: product,
         page: 1,
         limit: 100,
         fromDate: fromDate,
         toDate: toDate);
-
-    loadingAdjustments.value = false;
-
-    if (response == null || response["data"] == null) return;
-
-    List<dynamic> result = response["data"];
+    List<dynamic> result = asList(response["data"]);
     adjustment.value = result.map((e) => Adjustment.fromJson(e)).toList();
+    loadingAdjustments.value = false;
   }
 
   Future<void> removeBundleItem(String s, Product product) async {

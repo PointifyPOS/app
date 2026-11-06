@@ -8,10 +8,9 @@ class ReportsService {
     String? startDate,
     String? toDate,
     String? shopid,
-    String? attendantId = "",
   }) async {
     String url =
-        "${EndPoints.salesreport}?shopid=$shopid&fromDate=$startDate&toDate=$toDate&attendantId=$attendantId";
+        "${EndPoints.salesreport}?shopid=$shopid&fromDate=$startDate&toDate=$toDate";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }

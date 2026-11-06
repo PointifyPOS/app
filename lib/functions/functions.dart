@@ -22,8 +22,16 @@ debugPrintMessage(message) {
   }
 }
 
-String htmlPrice(amount, {String? currency}) {
-  return "${currency ?? userController.currentUser.value?.primaryShop?.currency!.toUpperCase()} $amount";
+String htmlPrice(dynamic amount, {String? currency}) {
+  final double value = amount is num
+      ? amount.toDouble()
+      : double.tryParse(amount?.toString() ?? '') ?? 0.0;
+
+  final currencyCode = currency?.toUpperCase() ??
+      userController.currentUser.value?.primaryShop?.currency?.toUpperCase() ??
+      '';
+
+  return "$currencyCode ${value.toStringAsFixed(2)}";
 }
 
 double toDouble(value) {

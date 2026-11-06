@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pointify/controllers/productcontroller.dart';
+import 'package:pointify/main.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/widgets/alert.dart';
 
@@ -11,7 +13,7 @@ salesDialog(
     required SaleItem receiptItem,
     required index}) {
   SalesController salesController = Get.find<SalesController>();
-  ProductController productController = Get.find<ProductController>();
+  Get.find<ProductController>();
   controller.text = receiptItem.quantity.toString();
   return showDialog(
       context: Get.context!,
@@ -22,7 +24,14 @@ salesDialog(
             padding: const EdgeInsets.all(5.0),
             child: TextFormField(
                 controller: controller,
-                keyboardType: TextInputType.number,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^\d*\.?\d{0,3}'),
+                  ),
+                ],
                 decoration: InputDecoration(
                     hintText: "0",
                     border: OutlineInputBorder(
@@ -41,21 +50,44 @@ salesDialog(
             ),
             TextButton(
               onPressed: () {
-                if (receiptItem.product?.type != "service" &&
-                    double.parse(controller.text) >
-                        receiptItem.product!.quantity!) {
+                final quantity = double.tryParse(
+                  controller.text.trim(),
+                );
+
+                if (quantity == null || quantity <= 0) {
                   generalAlert(
-                      message:
-                          "quantity cannot be greater than ${receiptItem.product!.quantity}",
-                      title: "Error");
-                } else {
-                  Navigator.pop(context);
-                  receiptItem.quantity = double.parse(controller.text);
-                  controller.text = "";
-                  salesController.calculateAmount(index,
-                      totalDiscount: salesController
-                          .receipt.value!.items![index].lineDiscount!);
+                    title: "Error",
+                    message: "Enter a valid quantity greater than zero",
+                  );
+                  return;
                 }
+
+                final availableQuantity = receiptItem.product?.quantity ?? 0;
+
+                if (receiptItem.product?.type != "service" &&
+                    quantity > availableQuantity &&
+                    userController.currentUser.value?.primaryShop
+                            ?.allownegativeselling ==
+                        false) {
+                  generalAlert(
+                    title: "Error",
+                    message:
+                        "Quantity cannot be greater than $availableQuantity",
+                  );
+                  return;
+                }
+
+                Navigator.pop(context);
+
+                receiptItem.quantity = quantity;
+                controller.clear();
+
+                salesController.calculateAmount(
+                  index,
+                  totalDiscount: salesController
+                          .receipt.value?.items?[index].lineDiscount ??
+                      0,
+                );
               },
               child: Text(
                 "Save now".toUpperCase(),

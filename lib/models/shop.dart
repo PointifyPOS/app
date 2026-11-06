@@ -34,7 +34,6 @@ class Shop {
   String? paybillAccount;
   String? paybillTill;
   String? addressReceipt;
-  bool? isRestaurant;
 
   Shop(
       {this.primary,
@@ -62,13 +61,11 @@ class Shop {
       this.adminId,
       this.paybillTill,
       this.paybillAccount,
-      this.isRestaurant,
       this.contact,
       this.addressReceipt});
 
   Shop.fromJson(Map<String, dynamic> json) {
-    isRestaurant = _toBool(json['isRestaurant']);
-    primary = _toBool(json['primary']);
+    primary = json['primary'] ?? false;
     allowBackup = json['allowBackup'] == 1 || json['allowBackup'] == true
         ? true
         : json['allowBackup'] == 0 || json['allowBackup'] == false
@@ -80,11 +77,11 @@ class Shop {
         : json['allowOnlineSelling'] == 0 || json['allowOnlineSelling'] == false
             ? false
             : false;
-    allowbatchtracking = _toBool(json['trackbatches']);
-    useWarehouse = _toBool(json['useWarehouse']);
-    production = _toBool(json['production']);
-    warehouse = _toBool(json['warehouse']);
-    allownegativeselling = _toBool(json['allownegativeselling']);
+    allowbatchtracking = json['trackbatches'] ?? false;
+    useWarehouse = json['useWarehouse'] ?? false;
+    production = json['production'] ?? false;
+    warehouse = json['warehouse'] ?? false;
+    allownegativeselling = json['allownegativeselling'] ?? false;
     warehouseemail = json['warehouseemail'] ?? '';
     receiptemail = json['receiptemail'] ?? '';
     backupInterval = json['backupInterval'] ?? '';
@@ -121,15 +118,6 @@ class Shop {
     paybillTill = json['paybill_till'];
     addressReceipt = json['address_receipt'];
   }
-
-  /// Safely converts SQLite int (0/1), bool, or null to bool.
-  static bool _toBool(dynamic v) {
-    if (v == null) return false;
-    if (v is bool) return v;
-    if (v is int) return v == 1;
-    return false;
-  }
-
   bool isInteger(num value) => value is int || value == value.roundToDouble();
 
   Map<String, dynamic> toJson() {
@@ -137,12 +125,10 @@ class Shop {
     data['primary'] = primary;
     data['_id'] = id;
     data['name'] = name;
-
     data['location'] = location;
     data['shopCategoryId'] = shopCategoryId;
     data['currency'] = currency;
     data['adminId'] = adminId;
-    data['isRestaurant'] = isRestaurant;
     return data;
   }
 }

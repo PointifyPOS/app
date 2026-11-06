@@ -1,10 +1,8 @@
-import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/models/customer.dart';
 import 'package:pointify/models/mpesa_payment.dart';
 import 'package:pointify/models/product.dart';
 import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/models/usermodel.dart';
 
 import 'client.dart';
 import 'end_points.dart';
@@ -44,14 +42,13 @@ class SalesService {
       String? status = "cashed",
       bool? production = false,
       String? customerId = "",
-      String? attedandId = "",
       int page = 1,
       int limit = 50}) async {
-    if (userController.currentUser.value?.usertype == "attendant" && !verifyPermission(category: 'sales', permission: "view_all_sales")) {
+    if (userController.currentUser.value?.usertype == "attendant") {
       attendantId = userController.currentUser.value?.attendantId?.sId;
     }
     String url =
-        "${EndPoints.salesfilter}?order=$order&paymentTag=$paymentTag&receiptNo=$receiptNo&start=$fromDate&saleType=$saleType&duedate=$dueDate&end=$toDate&shopId=$shopId&attendantId=$attendantId&paymentType=$paymentType&customerId=$customerId&status=$status&page=$page&limit=$limit&production=$production&attedandId=$attedandId";
+        "${EndPoints.salesfilter}?order=$order&paymentTag=$paymentTag&receiptNo=$receiptNo&start=$fromDate&saleType=$saleType&duedate=$dueDate&end=$toDate&shopId=$shopId&attendantId=$attendantId&paymentType=$paymentType&customerId=$customerId&status=$status&page=$page&limit=$limit&production=$production";
     var response = await DbBase().databaseRequest(url, DbBase().getRequestType);
     return response;
   }
@@ -86,7 +83,7 @@ class SalesService {
       String? type = "",
       String? duesales = "",
       String? attendant = ""}) async {
-    if (userController.currentUser.value?.usertype == "attendant" && !verifyPermission(category: 'sales', permission: "view_all_sales")) {
+    if (userController.currentUser.value?.usertype == "attendant") {
       attendant = userController.currentUser.value?.attendantId?.sId;
     }
     var response = await DbBase().databaseRequest(
@@ -113,7 +110,7 @@ class SalesService {
       {SaleModel? salesModel,
       Customer? customerModel,
       Product? product,
-      UserModel? attedandId,
+      Attendant? attedandId,
       String? type,
       String? shopid,
       String? fromDate,
@@ -126,7 +123,7 @@ class SalesService {
       url += "&customerId=${customerModel.sId}";
     }
     if (attedandId != null) {
-      url += "&attendantId=${attedandId.id}";
+      url += "&attendantId=${attedandId.sId}";
     }
     if (userController.currentUser.value?.usertype == "attendant") {
       url +=

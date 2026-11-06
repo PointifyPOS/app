@@ -426,40 +426,6 @@ class ProductPage extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 15),
-              //searching the categories
-              TextField(
-                onChanged: (value) {
-                  // productController.filterCategoriesLocally(value);
-                },
-                decoration: InputDecoration(
-                  hintText: "Search categories...",
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 12,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide(
-                      color: AppColors.mainColor,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
               Expanded(
                 child: Obx(() {
                   List<ProductCategory> categories = [

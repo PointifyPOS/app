@@ -6,14 +6,19 @@ import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/responsive/responsiveness.dart';
+import 'package:pointify/utils/helper.dart';
+import 'package:pointify/widgets/loading_dialog.dart';
 import 'package:switcher_button/switcher_button.dart';
 
 import '../../../../utils/colors.dart';
+import '../../../controllers/homecontroller.dart';
 import '../../../models/usermodel.dart';
 import '../../../widgets/alert.dart';
 import '../../../widgets/attendant_user_inputs.dart';
 import '../../../widgets/delete_dialog.dart';
 import '../../../widgets/major_title.dart';
+import '../../../widgets/minor_title.dart';
+import 'attendants_page.dart';
 
 class AttendantDetails extends StatelessWidget {
   final UserModel? userModel;
@@ -46,7 +51,12 @@ class AttendantDetails extends StatelessWidget {
         centerTitle: false,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            if (isSmallScreen(context)) {
+              Get.back();
+            } else {
+              Get.find<HomeController>().selectedWidget.value =
+                  AttendantsPage();
+            }
           },
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -555,9 +565,6 @@ class Permissions extends StatelessWidget {
           'can_sell_to_dealer_&_wholesaler',
           'discount',
           "edit_price",
-          if (userController.currentUser.value?.primaryShop?.isRestaurant ==
-              true)
-            'cashier',
         ],
       },
       {
@@ -588,13 +595,7 @@ class Permissions extends StatelessWidget {
       },
       {
         "key": "sales",
-        "value": [
-          'view_sales',
-          "return",
-          "delete",
-          "view_profit",
-          "view_all_sales"
-        ],
+        "value": ['view_sales', "return", "delete", "view_profit"],
       },
       {
         "key": "reports",

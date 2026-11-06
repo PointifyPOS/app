@@ -25,6 +25,13 @@ class ProductImage extends StatelessWidget {
                         width: size ?? 200,
                         child: Image.asset(imageplaceholder)),
                   ),
+                  // Missing/unreachable file (e.g. 404) → show the placeholder.
+                  errorWidget: (context, url, error) => Center(
+                    child: SizedBox(
+                        height: size ?? 200,
+                        width: size ?? 200,
+                        child: Image.asset(imageplaceholder)),
+                  ),
                   filterQuality: FilterQuality.high,
                   height: size ?? 200,
                   width: size ?? 200,

@@ -14,9 +14,7 @@ import 'attendant_details.dart';
 class AttendantsPage extends StatelessWidget {
   final String? type;
 
-  AttendantsPage({super.key, this.type}) {
-    userController.getAttendants();
-  }
+  AttendantsPage({super.key, this.type});
 
   final ShopController shopController = Get.find<ShopController>();
 

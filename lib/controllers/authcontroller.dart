@@ -17,6 +17,8 @@ import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/warehousecontroller.dart';
+import 'package:pointify/services/client.dart';
+import 'package:pointify/services/end_points.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/screens/authentication/admin/admin_login.dart';
 import 'package:pointify/screens/authentication/landing.dart';
@@ -89,49 +91,62 @@ class AuthController {
     return response;
   }
 
+  // An error / 401 / 403 body is a Map without the user's id: never treat it as a profile.
+  bool _isUserDoc(dynamic r) =>
+      r is Map && r["error"] == null && (r["_id"] != null || r["id"] != null);
+
+  static DateTime? _lastTokenRefresh;
+
+  // Sessions last 30 days on the server; trading the token for a fresh one when the app starts
+  // keeps anyone who uses the app regularly signed in. Older servers have no /auth/refresh: the
+  // reply is not a token and is ignored.
+  // Returns false when the server says the account must sign in again.
+  Future<bool> _refreshSessionToken() async {
+    final last = _lastTokenRefresh;
+    if (last != null && DateTime.now().difference(last) < const Duration(hours: 6)) return true;
+    try {
+      final r = await DbBase()
+          .databaseRequest(EndPoints.refreshtoken, DbBase().postRequestType, body: {});
+      if (r is Map && r["token"] is String && (r["token"] as String).isNotEmpty) {
+        await prefs.saveString('user_token', r["token"]);
+        _lastTokenRefresh = DateTime.now();
+      } else if (r is Map && r["message"] == "Please sign in again") {
+        await logOut();
+        return false;
+      }
+    } catch (_) {}
+    return true;
+  }
+
   initUser({String type = ""}) async {
     bool connected = await isConnected();
+
+    // try {
     if (connected) {
       if ((await prefs.getString('id')) == null) return;
       userController.currentUserId.value = (await prefs.getString('id'))!;
       if (userController.currentUserId.value.isEmpty) logOut();
+      if (!await _refreshSessionToken()) return;
       var usertype = await prefs.getString('user_type');
       var response;
       if (usertype == "admin") {
         response = await Authentication.getUser(
           userController.currentUserId.value,
         );
-        // Guard: response can be null if server unreachable despite isConnected()
-        if (response == null) {
-          // Fall back to SQLite cache
-          final id = await prefs.getString('id');
-          response = await DatabaseHelper().getUserByEmail(id: id);
-          if (response == null) {
-            logOut();
-            return;
-          }
-          response['_id'] = response['id'];
-        } else if (response["error"] != null) {
-          logOut();
+        if (!_isUserDoc(response)) {
+          await logOut();
           return;
         }
         response["usertype"] = usertype;
+
         DatabaseHelper().insertUser(response);
         userController.currentUser.value = UserModel.fromJson(response);
       } else if (usertype == "attendant") {
         var response = await Authentication.getAttendant(
           userController.currentUserId.value,
         );
-        if (response == null) {
-          final id = await prefs.getString('id');
-          response = await DatabaseHelper().getUserByEmail(id: id);
-          if (response == null) {
-            logOut();
-            return;
-          }
-          response['_id'] = response['id'];
-        } else if (response["error"] != null) {
-          logOut();
+        if (!_isUserDoc(response)) {
+          await logOut();
           return;
         }
         response["usertype"] = usertype;
@@ -158,8 +173,9 @@ class AuthController {
     var user = userController.currentUser.value;
     if (user != null) {
       if (user.usertype == "attendant") {
-        Get.offAll(() => HomePage());
+        Get.off(() => HomePage());
       } else {
+        final DateTime now = DateTime.now();
         if (userController.currentUser.value?.primaryShop != null) {
           if (type == "auth") {
             Get.offAll(() => const Home());
@@ -171,30 +187,21 @@ class AuthController {
         }
       }
     }
+    // } catch (e) {
+    //   print("Error: $e");
+    //   debugPrintMessage(e);
+    // } finally {
     SettingsApi.getSettings().then((data) async {
-      if (data == null) {
-        final cached = await DatabaseHelper().getOfflineSettings();
-        if (cached != null) {
-          AppConfig.offline_mode = (cached['offlineEnabled'] ?? 0) == 1;
-          userController.enableOffline.value = AppConfig.offline_mode;
-        }
-        return;
-      }
-
       var app = data['APP_CONFIG'];
       var themes = data['theme'];
       var general = data['GENERAL_CONFIG'];
       var stripe = data['STRIPE_CONFIG'];
-
       AppConfig.country_code =
           general == null ? "KES" : general['country_code'] ?? "US";
-
-      final stripeKey = stripe?['stripePublishKey'] ?? "";
-      AppConfig.stripePublishKey = stripeKey;
-      if (stripeKey.isNotEmpty && themes != null) {
-        Stripe.publishableKey = stripeKey;
-        Stripe.merchantIdentifier =
-            (themes['app_name'] ?? 'pointify').toLowerCase().trim();
+      AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
+      if (AppConfig.stripePublishKey.isNotEmpty) {
+        Stripe.publishableKey = AppConfig.stripePublishKey;
+        Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
         await Stripe.instance.applySettings();
       }
       if (app != null) {
@@ -203,16 +210,14 @@ class AuthController {
         AppConfig.demo_mode = app['demoEnabled'] ?? false;
         AppConfig.iosLink = app['iosLink'] ?? "";
       }
-      userController.enableOffline.value = AppConfig.offline_mode;
-
-      await DatabaseHelper().insertSettings({
-        'offlineEnabled': AppConfig.offline_mode,
-        'appName': themes?['app_name'],
-        'default_currency': general?['country_code'],
-      });
-
+      if (AppConfig.offline_mode == false) {
+        userController.enableOffline.value = false;
+      } else {
+        userController.enableOffline.value = true;
+      }
       checkForUpdate(app);
     });
+
     if (await isConnected()) {
       if (userController.currentUser.value != null &&
           userController.currentUser.value!.primaryShop != null) {
@@ -255,6 +260,7 @@ class AuthController {
       fromDate: Get.find<ReportsController>().filterStartDate.value,
       toDate: Get.find<ReportsController>().filterEndDate.value,
     );
+    // }
   }
 
   rateApp() async {

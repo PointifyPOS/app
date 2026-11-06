@@ -49,7 +49,8 @@ class ShopService {
 
   static getWarehouses(String adminId, {String name = ""}) async {
     var response = await DbBase().databaseRequest(
-        "${EndPoints.warehouse}$adminId?name=$name", DbBase().getRequestType);
+        "${EndPoints.getadminshop}$adminId?name=$name&type=warehouse",
+        DbBase().getRequestType);
     return response;
   }
 

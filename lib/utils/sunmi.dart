@@ -4,15 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
-import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/salemodel.dart';
 import 'package:pointify/utils/app_config.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
 import 'package:sunmi_printer_plus/sunmi_style.dart';
-
-import 'constants.dart';
 
 class Sunmi {
   // initialize sunmi printer
@@ -143,9 +140,12 @@ class Sunmi {
         column1: "Product", column2: "Quantity", column3: "Price");
     for (var item in saleModel.items!) {
       await printRowAndColumns(
-          column1: "${item.product?.name} - ${item.product?.measureUnit}",
-          column2: "${item.quantity.toString()} x ${item.unitPrice.toString()}",
-          column3: htmlPrice(item.totalLinePrice.toString()));
+        column1: "${item.product?.name} - ${item.product?.measureUnit}",
+        column2: item.product?.manageByPrice == true
+            ? "${item.quantity} units"
+            : "${item.quantity} x ${item.unitPrice}",
+        column3: htmlPrice(item.receiptLineTotal),
+      );
     }
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.line(ch: '-');
@@ -206,37 +206,6 @@ class Sunmi {
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.cut();
     await SunmiPrinter.submitTransactionPrint();
-    await closePrinter();
-  }
-
-  Future<void> printKitchenOrder({
-    required String orderNumber,
-    required String shopName,
-    required String attendantName,
-    required List<SaleItem> items,
-  }) async {
-    await initialize();
-    await SunmiPrinter.printText("*** KITCHEN ORDER ***",
-        style: SunmiStyle(
-            align: SunmiPrintAlign.CENTER,
-            bold: true,
-            fontSize: SunmiFontSize.LG));
-    await printText(shopName);
-    await printText("Order #: $orderNumber");
-    await printText("Waiter: $attendantName");
-    await printText(DateTime.now().toString().substring(0, 16));
-    await printText("--------------------------------");
-    for (final item in items) {
-      await SunmiPrinter.printText(
-          "${item.quantity?.toStringAsFixed(0)} x ${item.product?.name}",
-          style: SunmiStyle(bold: true));
-      final note = item.salesnote;
-      if (note != null && note.isNotEmpty) {
-        await printText("   $note"); // e.g. "Starch: Rice | Sides: Salad"
-      }
-    }
-    await printText("--------------------------------");
-    await SunmiPrinter.lineWrap(3);
     await closePrinter();
   }
 }

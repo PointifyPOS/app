@@ -14,18 +14,17 @@ class SaleItem {
   double? lineDiscount;
   double? tax;
   String? createdAt;
-  String? salesnote;
-
+  bool manageByPrice = false;
   SaleItem(
       {this.id,
       this.product,
       this.quantity,
       this.tax,
-      this.salesnote,
       this.totalLinePrice,
       this.unitPrice,
       this.receiptNo,
       this.currentSale,
+      this.manageByPrice = false,
       this.sale,
       this.attendant,
       this.lineDiscount,
@@ -33,13 +32,14 @@ class SaleItem {
   bool isInteger(num value) => value is int || value == value.roundToDouble();
 
   SaleItem.fromJson(Map<String, dynamic> json) {
+    quantity = (json['quantity'] as num?)?.toDouble() ?? 0;
+    unitPrice = (json['unitPrice'] as num?)?.toDouble() ?? 0;
+    totalLinePrice = receiptLineTotal;
+    manageByPrice = json['manageByPrice'] ?? false;
+
     id = json['_id'];
     product =
         json['product'] != null ? Product.fromJson(json['product']) : null;
-    quantity = json['quantity'].toDouble();
-    totalLinePrice = json['quantity'].toDouble() * json['unitPrice'].toDouble();
-    salesnote = json['salesnote'] ?? '';
-    unitPrice = json['unitPrice'].toDouble();
     receiptNo = json['sale'] != null && json['sale'] is String == false
         ? json['sale']['receiptNo']
         : '';
@@ -57,6 +57,14 @@ class SaleItem {
     lineDiscount = json['lineDiscount'].toDouble();
     createdAt = json['createdAt'];
   }
+  double get receiptLineTotal {
+    final price = unitPrice ?? 0;
+    final itemQuantity = quantity ?? 0;
+    if (manageByPrice == true) {
+      return price;
+    }
+    return price * itemQuantity;
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -65,6 +73,7 @@ class SaleItem {
     }
     data['quantity'] = quantity;
     data['unitPrice'] = unitPrice;
+    data['manageByPrice'] = manageByPrice;
     data['tax'] = tax;
     data['attendantId'] = attendant?.sId;
     data['inventory'] = product?.inventoryId;

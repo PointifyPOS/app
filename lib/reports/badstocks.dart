@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/responsive/responsiveness.dart';
@@ -274,8 +273,6 @@ class BadStockPage extends StatelessWidget {
 
 class CreateBadStock extends StatelessWidget {
   final String? page;
-  final ProductNewController productNewController =
-      Get.find<ProductNewController>();
   final ProductController productController = Get.find<ProductController>();
 
   CreateBadStock({super.key, required this.page});
@@ -316,7 +313,7 @@ class CreateBadStock extends StatelessWidget {
                 ),
                 InkWell(
                   onTap: () {
-                    if (productNewController.productlist.isEmpty) {
+                    if (productController.products.isEmpty) {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {

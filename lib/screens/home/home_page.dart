@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pointify/controllers/product_controller_new.dart';
+import 'package:pointify/controllers/productcontroller.dart';
 import 'package:pointify/controllers/reports_controller.dart';
 import 'package:pointify/controllers/shopcontroller.dart';
 import 'package:pointify/controllers/usercontroller.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/main.dart';
 import 'package:pointify/reports/expenses/expense_page.dart';
+import 'package:pointify/reports/stockreport.dart';
 import 'package:pointify/responsive/responsiveness.dart';
 import 'package:pointify/screens/home/profile_page.dart';
 import 'package:pointify/screens/home/widgets/inventory_insights_section.dart';
@@ -34,6 +36,8 @@ import '../../widgets/normal_text.dart';
 import '../../widgets/shop_list_bottomsheet.dart';
 import '../cash_flow/cash_flow_manager.dart';
 import '../customers/customers_page.dart';
+import '../discover/shop_tags.dart';
+import '../product/products_page.dart';
 import '../sales/all_sales.dart';
 import '../sales/create_sale.dart';
 import '../stock/stock_page.dart';
@@ -42,9 +46,8 @@ import '../usage/extend_usage.dart';
 import '../usage/share_and_use.dart';
 import '../warehouse/widgets/wh_invoice_card.dart';
 
-// ignore: must_be_immutable
 class HomePage extends StatelessWidget {
-  HomePage({super.key});
+  HomePage({Key? key}) : super(key: key);
 
   final ShopController shopController = Get.find<ShopController>();
   final ReportsController reportsController = Get.put(ReportsController());
@@ -78,14 +81,6 @@ class HomePage extends StatelessWidget {
         "production": userController.currentUser.value!.primaryShop!.production!
       },
       {"title": "POS", "icon": Icons.sell_rounded, "category": "pos"},
-      {"title": "POS", "icon": Icons.sell_rounded, "category": "pos"},
-      if (userController.currentUser.value?.primaryShop?.isRestaurant == true &&
-          hasPermission('pos', 'cashier'))
-        {
-          "title": "Pending Orders",
-          "icon": Icons.receipt_long,
-          "category": "pos",
-        },
       {
         "title": "Stock",
         "icon": Icons.production_quantity_limits,
@@ -517,7 +512,9 @@ class HomePage extends StatelessWidget {
                             const SizedBox(height: 20),
                           Obx(
                             () {
-                              return (salesController.homecards.isEmpty) ||
+                              return (salesController.homecards.isEmpty ||
+                                          userController
+                                              .internetConected.isFalse) ||
                                       userController.currentUser.value
                                               ?.primaryShop?.warehouse ==
                                           true
@@ -1105,15 +1102,11 @@ class HomePage extends StatelessWidget {
   }
 
   handleClickFunctions({required context, required title}) {
-    // // Only Reports and Invoices genuinely require a live connection —
-    // Reports needs full server-side history aggregation, Invoices needs
-    // both shops in a warehouse transfer to be online at once. Everything
-    // else (POS, Stock, Sales & Orders, Cashflow, Suppliers, Customers)
-    // has its own offline read/write handling built in, so it shouldn't be
-    // blocked here.
-    final offlineBlockedScreens = ["reports", "invoices"];
-    if (userController.internetConected.value == false &&
-        offlineBlockedScreens.contains(title)) {
+    if (userController.internetConected.value == false && title != "pos") {
+      if (title == "stock" || title == "stocks") {
+        Get.to(() => ProductPage());
+        return;
+      }
       showSnackBar(message: 'No Internet Connection', color: Colors.red);
       return;
     }

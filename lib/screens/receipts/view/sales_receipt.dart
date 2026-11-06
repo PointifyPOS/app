@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:pointify/controllers/paymentcontroller.dart';
 import 'package:pointify/functions/functions.dart';
 import 'package:pointify/models/saleitem.dart';
+import 'package:pointify/screens/receipts/pdf/credit_note_pdf.dart';
 import 'package:pointify/screens/receipts/view/receipt_preview_page.dart';
 import 'package:printing/printing.dart';
 
@@ -83,6 +84,20 @@ class SalesReceipt extends StatelessWidget {
                   ),
                 );
               }
+              if (value == 'Credit Note') {
+                Get.to(
+                  () => Scaffold(
+                    appBar: AppBar(
+                      title: const Text("Print Credit Note"),
+                    ),
+                    body: PdfPreview(
+                      build: (context) => creditNotePdf(
+                        salesController.currentReceipt.value!,
+                      ),
+                    ),
+                  ),
+                );
+              }
 
               if (value == 'Delete') {
                 if (verifyPermission(category: "sales", permission: "delete") &&
@@ -103,6 +118,10 @@ class SalesReceipt extends StatelessWidget {
                     value: 'Delete',
                     child: Text('Delete Receipt'),
                   ),
+                PopupMenuItem<String>(
+                  value: 'Credit Note',
+                  child: Text('Credit Note'),
+                ),
                 const PopupMenuItem<String>(
                   value: 'View',
                   child: Text('View receipt'),
@@ -355,7 +374,9 @@ class SalesReceipt extends StatelessWidget {
                                             ),
                                             const SizedBox(height: 3),
                                             Text(
-                                              "${receiptitem.quantity} × ${htmlPrice(receiptitem.unitPrice)}",
+                                              receiptitem.manageByPrice == true
+                                                  ? "${receiptitem.quantity} units • ${htmlPrice(receiptitem.unitPrice)} entered"
+                                                  : "${receiptitem.quantity} × ${htmlPrice(receiptitem.unitPrice)}",
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey.shade600,
@@ -378,7 +399,7 @@ class SalesReceipt extends StatelessWidget {
                                         children: [
                                           Text(
                                             htmlPrice(
-                                              receiptitem.totalLinePrice ?? 0,
+                                              receiptitem.receiptLineTotal,
                                             ),
                                             textAlign: TextAlign.right,
                                             style: const TextStyle(

@@ -151,12 +151,9 @@ class PurchasesSummary extends StatelessWidget {
                                         if (key == "paid") {
                                           paymentController
                                               .getPaymentsByShopAndDate(
-                                                   userController
-                                                      .currentUser
-                                                      .value!
-                                                      .primaryShop!
-                                                      .id!,
-                                                   reportsController
+                                                  userController.currentUser
+                                                      .value!.primaryShop!.id!,
+                                                  reportsController
                                                       .filterStartDate.value,
                                                   reportsController
                                                       .filterEndDate.value,

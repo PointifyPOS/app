@@ -1,3 +1,4 @@
+import 'package:pointify/services/preference_manager.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
@@ -11,10 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pointify/controllers/salescontroller.dart';
 import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/product.dart';
 import 'package:pointify/models/saleitem.dart';
 import 'package:pointify/models/stockreport.dart';
-import 'package:pointify/models/usermodel.dart';
 import 'package:pointify/services/end_points.dart';
 import 'package:pointify/services/reports.dart';
 import 'package:pointify/widgets/snackbars.dart';
@@ -22,6 +21,7 @@ import 'package:pointify/widgets/snackbars.dart';
 import '../main.dart';
 import '../models/debtor.dart';
 import '../models/payment.dart';
+import 'package:pointify/services/client.dart';
 
 class ReportsController extends GetxController {
   RxBool isLoadingReports = RxBool(false);
@@ -44,7 +44,6 @@ class ReportsController extends GetxController {
   RxMap<String, dynamic> filterPaymentTypeTotals =
       RxMap({'cash': 0, 'mpesa': 0, 'bank': 0});
   RxString activeFilter = RxString('today');
-  Rx<UserModel> selectedAttedant = Rx<UserModel>(UserModel());
   RxDouble totalSales = RxDouble(0.0);
   Map<String, dynamic> debtbreakdown = {
     "cash": 0.0,
@@ -65,16 +64,70 @@ class ReportsController extends GetxController {
   String paymentType = "all";
   String exportType = "excel";
   RxBool isPaymentLoading = false.obs;
+  // Stock report pagination state
+  int stockReportPage = 1;
+  int stockReportLimit = 50;
+  String? stockReportShopId;
+  String stockReportName = "";
+  RxBool hasMoreStockReport = RxBool(true);
+  RxBool loadingMoreStockReport = RxBool(false);
+
+  /// Loads the first page (resets the list). Used on open, search and clear.
   getStockReport(
       {String? shopid, int page = 1, int limit = 50, String? name = ""}) async {
+    stockReportShopId = shopid;
+    stockReportName = name ?? "";
+    stockReportLimit = limit;
+    stockReportPage = page;
+    hasMoreStockReport.value = true;
     isLoadingReports.value = true;
-    Map<String, dynamic> respose = await ReportsService()
-        .getStockReport(shopid: shopid, page: page, limit: limit, name: name);
-    List result = respose['data'];
-    List<StockReport> stockreports =
-        result.map((e) => StockReport.fromJson(e)).toList();
-    stockReports.assignAll(stockreports);
-    isLoadingReports.value = false;
+    try {
+      final items = await _fetchStockReportPage(page);
+      stockReports.assignAll(items);
+    } catch (e) {
+      stockReports.clear();
+      hasMoreStockReport.value = false;
+    } finally {
+      isLoadingReports.value = false;
+    }
+  }
+
+  /// Fetches the next page and appends it. Called when the list nears the bottom.
+  Future<void> loadMoreStockReport() async {
+    if (loadingMoreStockReport.isTrue ||
+        isLoadingReports.isTrue ||
+        hasMoreStockReport.isFalse) {
+      return;
+    }
+    loadingMoreStockReport.value = true;
+    try {
+      final items = await _fetchStockReportPage(stockReportPage + 1);
+      if (items.isNotEmpty) {
+        stockReportPage += 1;
+        stockReports.addAll(items);
+      }
+    } catch (e) {
+      // leave hasMore as is so the user can retry by scrolling again
+    } finally {
+      loadingMoreStockReport.value = false;
+    }
+  }
+
+  Future<List<StockReport>> _fetchStockReportPage(int page) async {
+    Map<String, dynamic> response = await ReportsService().getStockReport(
+        shopid: stockReportShopId,
+        page: page,
+        limit: stockReportLimit,
+        name: stockReportName);
+    List result = response['data'] ?? [];
+    final items = result.map((e) => StockReport.fromJson(e)).toList();
+
+    // Prefer server paging metadata when present; otherwise infer from page size.
+    final totalPages = int.tryParse("${response['totalPages'] ?? ''}");
+    hasMoreStockReport.value = totalPages != null
+        ? page < totalPages
+        : items.length >= stockReportLimit;
+    return items;
   }
 
   getPurchasesReport({
@@ -159,13 +212,7 @@ class ReportsController extends GetxController {
     String? startDate,
     String? toDate,
     String? shopid,
-    String? attendant = "",
   }) async {
-    if (selectedAttedant.value.id != null) {
-      attendant = selectedAttedant.value.id;
-    } else {
-      attendant = '';
-    }
     var types = [
       {
         "title": "Cash Sales",
@@ -205,11 +252,8 @@ class ReportsController extends GetxController {
       },
     ];
     isLoadingReports.value = true;
-    var respose = await ReportsService().getSalesReport(
-        startDate: startDate,
-        toDate: toDate,
-        shopid: shopid,
-        attendantId: attendant);
+    var respose = await ReportsService()
+        .getSalesReport(startDate: startDate, toDate: toDate, shopid: shopid);
     salesCard.clear();
     totalSales.value = 0.0;
 
@@ -253,7 +297,7 @@ class ReportsController extends GetxController {
       isLoadingReports.value = false;
       return;
     }
-    List result = response['data'];
+    List result = asList(response['data']);
     debtors.addAll(result.map((e) => Debtor.fromJson(e)).toList());
     isLoadingReports.value = false;
   }
@@ -269,6 +313,7 @@ class ReportsController extends GetxController {
       }
 
       final dio.Dio dioInstance = dio.Dio();
+      final token = await PreferenceManager().getString('user_token');
       final directory = await getApplicationDocumentsDirectory();
       final filePath = '${directory.path}/customers_with_debt.xlsx';
 
@@ -276,6 +321,7 @@ class ReportsController extends GetxController {
       dio.Response response = await dioInstance.get(
         '${EndPoints.debtorexcel}?shopId=${userController.currentUser.value!.primaryShop!.id!}',
         options: Options(
+          headers: {"Authorization": "Bearer $token"},
           responseType: ResponseType.bytes,
           followRedirects: false,
           validateStatus: (status) {
@@ -285,15 +331,25 @@ class ReportsController extends GetxController {
       );
 
       // Ensure the response data is not empty
-      if (response.data != null && response.data is List<int>) {
+      if (response.statusCode == 200 &&
+          response.data != null &&
+          response.data is List<int>) {
         // Save the file
         File file = File(filePath);
         await file.writeAsBytes(response.data);
 
         // Open the file using the `open_file` package
         final result = await OpenFile.open(filePath);
+      } else {
+        showSnackBar(
+            message: "Could not download the file, please try again",
+            color: Colors.red);
       }
-    } catch (e) {}
+    } catch (e) {
+      showSnackBar(
+          message: "Could not download the file, please try again",
+          color: Colors.red);
+    }
   }
 
   // Future<void> downloadExcelFile() async {
@@ -326,7 +382,7 @@ class ReportsController extends GetxController {
       isLoadingReports.value = false;
       return;
     }
-    List result = response['data'];
+    List result = asList(response['data']);
     debtors.addAll(result.map((e) => Debtor.fromJson(e)).toList());
     isLoadingReports.value = false;
   }
@@ -378,7 +434,7 @@ class ReportsController extends GetxController {
         toDate: toDate,
         product: product,
         saleType: saleType);
-    List result = response['items'];
+    List result = asList(response['items']);
     productsReport.addAll(result.map((e) => SaleItem.fromJson(e)).toList());
     for (var element in productsReport) {
       if (element.currentSale != null) {
@@ -413,7 +469,7 @@ class ReportsController extends GetxController {
         toDate: toDate,
         product: product,
         saleType: saleType);
-    List result = response['items'];
+    List result = asList(response['items']);
     discountsReport.addAll(result.map((e) => SaleItem.fromJson(e)).toList());
     for (var element in discountsReport) {
       if (element.currentSale != null) {
@@ -488,7 +544,7 @@ class ReportsController extends GetxController {
         Get.back();
       }
 
-      if (response != null) {
+      if (response is List<int>) {
         File file = File(filePath);
 
         await file.writeAsBytes(response);

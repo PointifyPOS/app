@@ -195,7 +195,7 @@ Future<Uint8List> generateThermalReceiptPdf(
                         pw.Expanded(
                           flex: 2,
                           child: pw.Text(
-                            (item.totalLinePrice ?? 0).toStringAsFixed(
+                            item.receiptLineTotal.toStringAsFixed(
                               2,
                             ),
                             textAlign: pw.TextAlign.right,
