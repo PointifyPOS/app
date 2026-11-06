@@ -79,9 +79,9 @@ class AuthController {
     var response = await Authentication.getUser(
       userController.currentUserId.value,
     );
-    if (response["error"] != null) {
-      logOut();
-    }
+    // An expired session is already handled by DbBase; a failed call here (offline, timeout,
+    // 5xx) must not sign the user out.
+    if (response["error"] != null) return response;
     userController.currentUser.value?.smscredit = response['smscredit'] == null
         ? 0.0
         : isInteger(response['smscredit'] ?? response['smscredit'])
@@ -118,6 +118,27 @@ class AuthController {
     return true;
   }
 
+  // Sets the user from the local copy; false when there is none.
+  Future<bool> _loadCachedUser() async {
+    final id = await prefs.getString('id');
+    if (id == null || id.isEmpty) return false;
+    final user = await DatabaseHelper().getUserByEmail(id: id);
+    if (user == null) return false;
+    user['primaryShop']['_id'] = user['primaryShop']['id'];
+    user['attendantId']['_id'] = user['attendantId']['id'];
+    user['_id'] = user['id'];
+    userController.currentUser.value = UserModel.fromJson(user);
+    return true;
+  }
+
+  Future<void> _serverUnreachable() async {
+    // DbBase may just have signed the user out (expired session) and shown its own message
+    if (await prefs.getString('id') == null) return;
+    showSnackBar(
+        message: "Could not reach the server, please check your connection and try again",
+        color: Colors.red);
+  }
+
   initUser({String type = ""}) async {
     bool connected = await isConnected();
 
@@ -134,38 +155,39 @@ class AuthController {
           userController.currentUserId.value,
         );
         if (!_isUserDoc(response)) {
-          await logOut();
-          return;
+          // Not a profile: the server was unreachable / erroring. Expired sessions were already
+          // signed out by DbBase, so keep the session and fall back to the saved copy.
+          if (!await _loadCachedUser()) {
+            await _serverUnreachable();
+            return;
+          }
+        } else {
+          response["usertype"] = usertype;
+          DatabaseHelper().insertUser(response);
+          userController.currentUser.value = UserModel.fromJson(response);
         }
-        response["usertype"] = usertype;
-
-        DatabaseHelper().insertUser(response);
-        userController.currentUser.value = UserModel.fromJson(response);
       } else if (usertype == "attendant") {
         var response = await Authentication.getAttendant(
           userController.currentUserId.value,
         );
         if (!_isUserDoc(response)) {
-          await logOut();
-          return;
+          if (!await _loadCachedUser()) {
+            await _serverUnreachable();
+            return;
+          }
+        } else {
+          response["usertype"] = usertype;
+          userController.currentUser.value = UserModel.fromJson(response);
         }
-        response["usertype"] = usertype;
-        userController.currentUser.value = UserModel.fromJson(response);
-        userController.getRoles(userController.currentUser.value!);
+        if (userController.currentUser.value != null) {
+          userController.getRoles(userController.currentUser.value!);
+        }
       }
     } else {
       if (await prefs.getString('id') == null) return;
-      String? id = await prefs.getString('id');
-      if (id!.isEmpty) return;
-      final dbHelper = DatabaseHelper();
-      final user = await dbHelper.getUserByEmail(id: id);
-      if (user != null) {
-        user['primaryShop']['_id'] = user['primaryShop']['id'];
-        user['attendantId']['_id'] = user['attendantId']['id'];
-        user['_id'] = user['id'];
-        userController.currentUser.value = UserModel.fromJson(user);
-      } else {
-        await logOut();
+      if (!await _loadCachedUser()) {
+        // nothing saved to work from while offline: keep the session, the user can retry
+        await _serverUnreachable();
         return;
       }
     }

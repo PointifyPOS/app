@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:pointify/controllers/authcontroller.dart';
 import 'package:pointify/functions/functions.dart';
+import 'package:pointify/services/end_points.dart';
 import 'package:pointify/services/preference_manager.dart';
 import 'package:pointify/utils/isrg_root_x1.dart';
 
@@ -29,6 +30,8 @@ List<dynamic> asList(dynamic response) {
   return <dynamic>[];
 }
 
+enum _Renewal { ok, unavailable, rejected }
+
 class DbBase {
   final postRequestType = "POST";
   final getRequestType = "GET";
@@ -49,6 +52,39 @@ class DbBase {
     if (d is! Map) return false;
     final m = d["message"];
     return m == "Invalid or expired token" || m == "Access token required";
+  }
+
+  // ok: a fresh token was saved. unavailable: server/network problem, the session may still be
+  // good so do not sign the user out. rejected: the server refuses to renew it.
+  static Future<_Renewal>? _renewing;
+
+  Future<_Renewal> _renewToken() => _renewing ??= _doRenewToken()
+      .whenComplete(() => _renewing = null);
+
+  Future<_Renewal> _doRenewToken() async {
+    try {
+      final prefs = PreferenceManager();
+      // same client as the other calls so the bundled root certificate applies
+      final r = await _dio.post(EndPoints.refreshtoken,
+          data: {},
+          options: Options(
+            sendTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 15),
+            headers: {
+              'Content-Type': 'application/json',
+              "Authorization": "Bearer ${await prefs.getString('user_token')}",
+            },
+          ));
+      final code = r.statusCode ?? 0;
+      final d = r.data;
+      if (code == 200 && d is Map && d["token"] is String && (d["token"] as String).isNotEmpty) {
+        await prefs.saveString('user_token', d["token"]);
+        return _Renewal.ok;
+      }
+      return code >= 500 || code == 0 ? _Renewal.unavailable : _Renewal.rejected;
+    } catch (_) {
+      return _Renewal.unavailable;
+    }
   }
 
   static Future<void> _onSessionExpired() async {
@@ -107,6 +143,8 @@ class DbBase {
   }) async {
     try {
       final prefs = PreferenceManager();
+      final defaultAuth = headers == null;
+      bool renewed = false;
       headers ??= {
         'Content-Type': 'application/json',
         "Authorization": "Bearer ${await prefs.getString('user_token')}",
@@ -167,7 +205,26 @@ class DbBase {
                   error: "Invalid request type");
           }
 
-          if (_isExpiredSession(response)) await _onSessionExpired();
+          if (_isExpiredSession(response)) {
+            // Try to trade the token for a fresh one and repeat the call once. Only sign the user
+            // out when the server refuses; a network / server problem must not end the session.
+            if (defaultAuth && !renewed) {
+              final renewal = await _renewToken();
+              if (renewal == _Renewal.ok) {
+                renewed = true;
+                headers = {
+                  'Content-Type': 'application/json',
+                  "Authorization": "Bearer ${await prefs.getString('user_token')}",
+                };
+                retryCount--;
+                continue;
+              }
+              if (renewal == _Renewal.unavailable) {
+                return failure("Network error, please try again");
+              }
+            }
+            await _onSessionExpired();
+          }
 
           final code = response.statusCode ?? 0;
           final data = response.data;
