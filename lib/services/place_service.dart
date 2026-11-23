@@ -40,7 +40,7 @@ class PlaceApiProvider {
   final client = Client();
   PlaceApiProvider(this.sessionToken);
   final String sessionToken;
-  final apiKey = Platform.isAndroid ? AppConfig.androidKey : AppConfig.androidKey ;
+  final apiKey = Platform.isAndroid ? AppConfig.androidKey : AppConfig.iosKey;
 
   Future<List<Suggestion>> fetchSuggestions(String input, String lang) async {
     final request =

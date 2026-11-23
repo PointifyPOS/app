@@ -213,18 +213,28 @@ class AuthController {
     //   print("Error: $e");
     //   debugPrintMessage(e);
     // } finally {
-    SettingsApi.getSettings().then((data) async {
+    SettingsApi.getSettings().then((response) async {
+      // Every settings group is optional (a fresh install has none of them).
+      final Map data = response is Map ? response : {};
       var app = data['APP_CONFIG'];
       var themes = data['theme'];
       var general = data['GENERAL_CONFIG'];
       var stripe = data['STRIPE_CONFIG'];
       AppConfig.country_code =
           general == null ? "KES" : general['country_code'] ?? "US";
-      AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
+      AppConfig.stripePublishKey =
+          (stripe is Map ? stripe['stripePublishKey'] : null) ?? "";
       if (AppConfig.stripePublishKey.isNotEmpty) {
-        Stripe.publishableKey = AppConfig.stripePublishKey;
-        Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
-        await Stripe.instance.applySettings();
+        try {
+          Stripe.publishableKey = AppConfig.stripePublishKey;
+          final merchant = (themes is Map ? themes['app_name'] : null) ??
+              AppConfig.app_name ??
+              "pointify";
+          Stripe.merchantIdentifier = merchant.toString().toLowerCase().trim();
+          await Stripe.instance.applySettings();
+        } catch (e) {
+          debugPrint("Stripe setup failed: $e");
+        }
       }
       if (app != null) {
         AppConfig.offline_mode = app['offlineEnabled'] ?? false;
@@ -274,14 +284,18 @@ class AuthController {
       Get.find<ShopController>().getShops();
     }
 
-    Get.find<ProductNewController>().getProducts(
-        type: "all",
-        shop: userController.currentUser.value?.primaryShop?.id ?? "");
-    Get.find<CustomerController>().getCustomersInShop('');
-    Get.find<SalesController>().getOrders(
-      fromDate: Get.find<ReportsController>().filterStartDate.value,
-      toDate: Get.find<ReportsController>().filterEndDate.value,
-    );
+    // A newly registered owner has no shop yet; shop data loads after one is created.
+    final primaryShopId = userController.currentUser.value?.primaryShop?.id;
+    if (primaryShopId != null && primaryShopId.isNotEmpty) {
+      Get.find<ProductNewController>()
+          .getProducts(type: "all", shop: primaryShopId);
+      Get.find<CustomerController>().getCustomersInShop('');
+      Get.find<SalesController>().getOrders(
+        fromDate: Get.find<ReportsController>().filterStartDate.value,
+        toDate: Get.find<ReportsController>().filterEndDate.value,
+      );
+    }
+
     // }
   }
 
@@ -331,13 +345,13 @@ class AuthController {
     }
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    int latestVersion = value['android_version'] == null
-        ? 0
-        : int.parse(value['android_version'] ?? 0);
+    if (value is! Map) value = {};
+    int latestVersion =
+        int.tryParse((value['android_version'] ?? 0).toString()) ?? 0;
     String buildNumber = packageInfo.buildNumber;
-    settingsData = value;
+    settingsData = Map<String, dynamic>.from(value);
     if (Platform.isAndroid) {
-      if (latestVersion > int.parse(buildNumber) &&
+      if (latestVersion > (int.tryParse(buildNumber) ?? 0) &&
           showingUpdateAlert.isFalse) {
         showingUpdateAlert.value = true;
         showUpdateAlert(value['forceUpdate']);

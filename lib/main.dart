@@ -39,7 +39,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final data = await SettingsApi.getThemes();
+  // Theme/branding is optional: fall back to defaults if the API is unreachable
+  // or has no theme saved yet, instead of failing before runApp().
+  Map data = {};
+  try {
+    final response = await SettingsApi.getThemes();
+    if (response is Map) data = response;
+  } catch (e) {
+    debugPrint("Could not load theme, using defaults: $e");
+  }
 
   final logoPath = (data['image'] ?? "").toString();
   AppConfig.app_logo =
@@ -47,10 +55,22 @@ void main() async {
   AppConfig.app_name = data['APP_NAME'] ?? "Pointify";
   AppConfig.app_slogan = data['APP_SLOGAN'] ?? "";
 
-  AppColors.mainColor = parseColor(data["PRIMARY_COLOR"]);
-  AppColors.button_color = parseColor(data["BUTTON_COLOR"]);
-  AppColors.text_color = parseColor(data["TEXT_COLOR"]);
-  AppColors.secondary_color = parseColor(data["SECONDARY_COLOR"]);
+  // Keep the built-in colours unless the theme provides a valid one.
+  Color themeColor(dynamic hex, Color fallback) {
+    if (hex is! String || hex.trim().isEmpty) return fallback;
+    try {
+      return parseColor(hex.trim());
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  AppColors.mainColor = themeColor(data["PRIMARY_COLOR"], AppColors.mainColor);
+  AppColors.button_color =
+      themeColor(data["BUTTON_COLOR"], AppColors.button_color);
+  AppColors.text_color = themeColor(data["TEXT_COLOR"], AppColors.text_color);
+  AppColors.secondary_color =
+      themeColor(data["SECONDARY_COLOR"], AppColors.secondary_color);
 
   runApp(const MyApp());
 }

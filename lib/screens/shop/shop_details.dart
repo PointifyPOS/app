@@ -966,14 +966,24 @@ class ShopDetails extends StatelessWidget {
     shopController.reqionController.text = result.description;
     shopController.shopLocation.value = result.description;
 
-    final locations = await locationFromAddress(result.description);
+    String latitude = "";
+    String longitude = "";
+    try {
+      final locations = await locationFromAddress(result.description);
+      latitude = locations.first.latitude.toString();
+      longitude = locations.first.longitude.toString();
+    } catch (_) {
+      // Address could not be geocoded: save the text without coordinates.
+    }
 
     shopController.updateShop(
       shop: shopModel,
       location: result.description,
-      latitude: locations.first.latitude.toString(),
-      longitude: locations.first.longitude.toString(),
+      latitude: latitude,
+      longitude: longitude,
     );
+
+
 
     shopController.shopLocation.refresh();
   }

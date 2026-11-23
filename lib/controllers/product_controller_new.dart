@@ -421,8 +421,12 @@ class ProductNewController extends GetxController {
     } finally {
       loading.value = false;
 
-      Get.find<ProductNewController>()
-          .getProductStats(userController.currentUser.value!.primaryShop!.id!);
+      final statsShop = shop.isNotEmpty
+          ? shop
+          : userController.currentUser.value?.primaryShop?.id;
+      if (statsShop != null && statsShop.isNotEmpty) {
+        Get.find<ProductNewController>().getProductStats(statsShop);
+      }
       loadingMore.value = false;
     }
   }

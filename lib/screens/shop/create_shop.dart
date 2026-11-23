@@ -156,6 +156,8 @@ class CreateShop extends StatelessWidget {
                 shopController.latitude.text = value.first.latitude.toString();
                 shopController.longitude.text =
                     value.first.longitude.toString();
+              }).catchError((_) {
+                // Address could not be geocoded: keep the text, skip coordinates.
               });
             }
           },

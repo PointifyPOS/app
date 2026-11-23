@@ -42,28 +42,39 @@ class AddressSearch extends SearchDelegate<Suggestion> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return FutureBuilder(
-      future: query == ""
-          ? null
-          : apiClient?.fetchSuggestions(
-              query, Localizations.localeOf(context).languageCode),
-      builder: (context, snapshot) => query == ''
-          ? Container(
-              padding: const EdgeInsets.all(16.0),
-              child: const Text('Enter your address'),
-            )
-          : snapshot.hasData
-              ? ListView.builder(
-                  itemBuilder: (context, index) => ListTile(
-                    title:
-                        Text((snapshot.data![index]).description),
-                    onTap: () {
-                      close(context, snapshot.data![index]);
-                    },
-                  ),
-                  itemCount: snapshot.data!.length,
-                )
-              : const Text('Loading...'),
+    if (query.trim().isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16.0),
+        child: const Text('Enter your address'),
+      );
+    }
+    // Typed text can always be used as-is, so a shop can be created even
+    // without a Google Places API key (or when the lookup fails).
+    final typed = ListTile(
+      leading: const Icon(Icons.edit_location_alt_outlined),
+      title: Text('Use "${query.trim()}"'),
+      onTap: () => close(context, Suggestion("", query.trim())),
+    );
+    return FutureBuilder<List<Suggestion>>(
+      future: apiClient?.fetchSuggestions(
+          query, Localizations.localeOf(context).languageCode),
+      builder: (context, snapshot) {
+        final items = snapshot.data ?? const <Suggestion>[];
+        return ListView(
+          children: [
+            typed,
+            if (snapshot.connectionState == ConnectionState.waiting)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text('Searching...'),
+              ),
+            ...items.map((s) => ListTile(
+                  title: Text(s.description),
+                  onTap: () => close(context, s),
+                )),
+          ],
+        );
+      },
     );
   }
 }
