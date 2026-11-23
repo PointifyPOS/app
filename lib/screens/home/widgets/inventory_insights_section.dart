@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/product_insightful.dart';
-import 'package:pointify/screens/product/products_page.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/product/product_insightful.dart';
+import 'package:reggypos/screens/product/products_page.dart';
+import 'package:reggypos/utils/colors.dart';
 
 // ignore: must_be_immutable
 class InventoryInsightsMinimal extends StatelessWidget {

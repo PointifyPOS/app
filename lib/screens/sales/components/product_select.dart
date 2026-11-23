@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../../models/product.dart';
 import '../../../widgets/product_image.dart';

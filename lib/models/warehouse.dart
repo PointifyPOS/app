@@ -1,4 +1,4 @@
-import 'package:pointify/models/usermodel.dart';
+import 'package:reggypos/models/usermodel.dart';
 
 class Warehouse {
   String? id;
@@ -16,11 +16,11 @@ class Warehouse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['currency'] = this.currency;
-    data['owner'] = this.owner;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['currency'] = currency;
+    data['owner'] = owner;
     return data;
   }
 }

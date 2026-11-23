@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/widgets/alert.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +20,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
   bool connected = false;
   List<BluetoothInfo> items = [];
 
-  String _selectSize = "2";
+  final String _selectSize = "2";
   bool _progress = false;
   String _msjprogress = "";
 
@@ -291,7 +291,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       _progress = false;
     });
 
-    if (listResult.length == 0) {
+    if (listResult.isEmpty) {
       _msj =
           "There are no bluetoohs linked, go to settings and link the printer";
     } else {
@@ -361,11 +361,11 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
   }
 
   Future<List<int>> testTicket({
-    String storeName = "Pointify Limited",
+    String storeName = "ReggyPOS Limited",
     String phone = "Phone: 0720 044 055",
-    String email = "Email: pointifypos@gmail.com",
+    String email = "Email: reggypos@gmail.com",
     String paymentType = "M-Pesa",
-    String receiptUrl = "https://pointifypos.com/receipt/INV12345678",
+    String receiptUrl = "https://yourdomain.com/receipt/INV12345678",
     required List<Map<String, dynamic>> items,
   }) async {
     List<int> bytes = [];
@@ -472,7 +472,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       styles: const PosStyles(align: PosAlign.center, bold: true),
     );
     bytes += generator.text(
-      'System by Pointify,\nwebsite: pointifypos.com',
+      'System by ReggyPOS,\nwebsite: yourdomain.com',
       styles: const PosStyles(align: PosAlign.center),
     );
     bytes += generator.cut();

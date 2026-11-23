@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:location/location.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/services/customer.dart';
-import 'package:pointify/services/order_services.dart';
-import 'package:pointify/utils/themer.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/services/customer.dart';
+import 'package:reggypos/services/order_services.dart';
+import 'package:reggypos/utils/themer.dart';
 
 import '../models/customer.dart';
 import '../models/salemodel.dart';

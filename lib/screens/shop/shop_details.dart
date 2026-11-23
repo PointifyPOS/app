@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/paymentcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/screens/shop/edit_shop_details.dart';
-import 'package:pointify/screens/usage/extend_usage.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/paymentcontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/screens/shop/edit_shop_details.dart';
+import 'package:reggypos/screens/usage/extend_usage.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../../main.dart';
 import '../../controllers/salescontroller.dart';
@@ -771,7 +771,7 @@ class ShopDetails extends StatelessWidget {
           const SizedBox(width: 10),
           CupertinoSwitch(
             value: value,
-            activeColor: AppColors.mainColor,
+            activeTrackColor: AppColors.mainColor,
             onChanged: onChanged,
           ),
         ],
@@ -966,13 +966,21 @@ class ShopDetails extends StatelessWidget {
     shopController.reqionController.text = result.description;
     shopController.shopLocation.value = result.description;
 
-    final locations = await locationFromAddress(result.description);
+    String latitude = "";
+    String longitude = "";
+    try {
+      final locations = await locationFromAddress(result.description);
+      latitude = locations.first.latitude.toString();
+      longitude = locations.first.longitude.toString();
+    } catch (_) {
+      // Address could not be geocoded: save the text without coordinates.
+    }
 
     shopController.updateShop(
       shop: shopModel,
       location: result.description,
-      latitude: locations.first.latitude.toString(),
-      longitude: locations.first.longitude.toString(),
+      latitude: latitude,
+      longitude: longitude,
     );
 
     shopController.shopLocation.refresh();

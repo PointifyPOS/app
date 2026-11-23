@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/productcategory.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/services/firestore_files_access_service.dart';
-import 'package:pointify/services/product_service.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/loading_dialog.dart';
-import 'package:pointify/widgets/snackbars.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/productcategory.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/services/firestore_files_access_service.dart';
+import 'package:reggypos/services/product_service.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/loading_dialog.dart';
+import 'package:reggypos/widgets/snackbars.dart';
+import 'package:reggypos/services/client.dart';
 
 class ProductNewController extends GetxController {
   RxList<ProductDisplay> productlist = RxList([]);
@@ -421,8 +421,12 @@ class ProductNewController extends GetxController {
     } finally {
       loading.value = false;
 
-      Get.find<ProductNewController>()
-          .getProductStats(userController.currentUser.value!.primaryShop!.id!);
+      final statsShop = shop.isNotEmpty
+          ? shop
+          : userController.currentUser.value?.primaryShop?.id;
+      if (statsShop != null && statsShop.isNotEmpty) {
+        Get.find<ProductNewController>().getProductStats(statsShop);
+      }
       loadingMore.value = false;
     }
   }

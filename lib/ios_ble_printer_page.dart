@@ -216,7 +216,7 @@ class _IosBlePrinterPageState extends State<IosBlePrinterPage> {
 
     bytes += generator.reset();
     bytes += generator.text(
-      "Pointify",
+      "ReggyPOS",
       styles: const PosStyles(
         align: PosAlign.center,
         bold: true,

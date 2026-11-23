@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/authcontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
+import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
 
 import '../../utils/app_config.dart';
 import '../../utils/colors.dart';
@@ -13,7 +13,7 @@ import 'admin/admin_login.dart';
 import 'attendant/attendant_login.dart';
 
 class Landing extends StatefulWidget {
-  const Landing({Key? key}) : super(key: key);
+  const Landing({super.key});
 
   @override
   State<Landing> createState() => _LandingState();
@@ -141,7 +141,14 @@ class _LandingState extends State<Landing> {
   Widget landingContent() {
     return Column(
       children: [
-        if(AppConfig.app_logo.isNotEmpty)CachedNetworkImage(imageUrl: AppConfig.app_logo ,width: 250, errorWidget: (_, __, ___) => const SizedBox.shrink(),),
+        AppConfig.app_logo.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: AppConfig.app_logo,
+                width: 250,
+                errorWidget: (_, __, ___) =>
+                    Image.asset("assets/images/logo2.png", width: 250),
+              )
+            : Image.asset("assets/images/logo2.png", width: 250),
 
         loading ? const Text("") :  Text(AppConfig.app_slogan ?? "An enterprise in your hands."),
         const SizedBox(

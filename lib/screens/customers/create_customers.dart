@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/customers/customers_page.dart';
-import 'package:pointify/screens/product/create_product.dart';
-import 'package:pointify/screens/sales/create_sale.dart';
+import 'package:reggypos/screens/customers/customers_page.dart';
 
 import '../../../../utils/colors.dart';
 import '../../controllers/customercontroller.dart';
-import '../../controllers/homecontroller.dart';
 import '../../controllers/shopcontroller.dart';
 import '../../controllers/suppliercontroller.dart';
 import '../../main.dart';
@@ -19,8 +15,7 @@ class CreateCustomer extends StatelessWidget {
   final String page;
   final Function? function;
 
-  CreateCustomer({Key? key, required this.page, this.function})
-      : super(key: key) {
+  CreateCustomer({super.key, required this.page, this.function}) {
     customersController.nameController.clear();
     customersController.phoneController.clear();
   }

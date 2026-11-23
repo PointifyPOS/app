@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../models/product.dart';
 

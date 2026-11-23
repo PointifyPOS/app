@@ -17,13 +17,13 @@ class AsyncProgressDialog extends StatefulWidget {
 
   const AsyncProgressDialog(
     this.future, {
-    Key? key,
+    super.key,
     this.decoration,
     this.opacity = 1.0,
     this.progress,
     this.message,
     this.onError,
-  }) : super(key: key);
+  });
 
   @override
   State<AsyncProgressDialog> createState() => _AsyncProgressDialogState();

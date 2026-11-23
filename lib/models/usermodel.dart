@@ -1,6 +1,6 @@
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/utils/constants.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/utils/constants.dart';
 
 class UserModel {
   String? id;

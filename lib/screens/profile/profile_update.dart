@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/home/profile_page.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/home/profile_page.dart';
 
 import '../../utils/colors.dart';
 import '../../widgets/major_title.dart';
@@ -11,7 +11,7 @@ import '../../widgets/profile_input_widget.dart';
 
 class ProfileUpdate extends StatelessWidget {
   final bool editemail;
-  ProfileUpdate({Key? key, this.editemail = false}) : super(key: key) {
+  ProfileUpdate({super.key, this.editemail = false}) {
     userController.nameController.text =
         userController.currentUser.value!.username ?? "";
     userController.emailController.text =

@@ -2,7 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:reggypos/functions/functions.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/salescontroller.dart';
@@ -12,7 +12,7 @@ import '../../utils/colors.dart';
 import 'financial_page.dart';
 
 class GraphAnalysis extends StatefulWidget {
-  const GraphAnalysis({Key? key}) : super(key: key);
+  const GraphAnalysis({super.key});
 
   @override
   State<GraphAnalysis> createState() => _GraphAnalysisState();

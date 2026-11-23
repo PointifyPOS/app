@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart' as stripe;
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/ordercontroller.dart';
-import 'package:pointify/controllers/paymentcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/package.dart';
+import 'package:reggypos/controllers/ordercontroller.dart';
+import 'package:reggypos/controllers/paymentcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/package.dart';
 
 import '../models/shop.dart';
 import '../models/shoptype.dart';
@@ -23,7 +23,7 @@ import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
 import '../widgets/snackbars.dart';
-import 'package:pointify/functions/functions.dart' hide authController;
+import 'package:reggypos/functions/functions.dart' hide authController;
 
 class ShopController {
   RxBool gettingShopsLoad = RxBool(false);
@@ -116,7 +116,7 @@ RxBool viewAllCustomers = false.obs;
       "allowOnlineSelling": allowOnlineSelling.value,
       "backupemail": userController.currentUser.value?.email,
       "longitude": longitude.text,
-      "shopCategoryId": selectedCategory.value?.id ?? null,
+      "shopCategoryId": selectedCategory.value?.id,
       "currency":
           currency.isEmpty ? Constants.currenciesData[0] : currency.value,
       "adminId": userController.currentUser.value?.id

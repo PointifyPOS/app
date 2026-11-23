@@ -4,7 +4,7 @@ import 'package:cs50sdkupdate/cs50sdkupdate.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/utils/app_config.dart';
+import 'package:reggypos/utils/app_config.dart';
 
 import '../functions/functions.dart';
 import '../main.dart';
@@ -46,7 +46,7 @@ class Cs50PrinterSetup {
   // 👉 ADD helper for formatting columns
   String col(String text, int width, {bool rightAlign = false}) {
     if (text.length > width) {
-      return text.substring(0, width - 1) + " ";
+      return "${text.substring(0, width - 1)} ";
     }
     return rightAlign ? text.padLeft(width) : text.padRight(width);
   }
@@ -59,7 +59,7 @@ class Cs50PrinterSetup {
     await _cs50sdkupdatePlugin.printSetAlign(1);
     await _printText(receiptTitle ?? "Cash Receipt");
     await _printText(
-      userController.currentUser.value?.primaryShop?.name ?? "Pointify",
+      userController.currentUser.value?.primaryShop?.name ?? "ReggyPOS",
     );
     await _printText("Phone No: ${saleModel.shopId?.owner?.phone ?? "000000"}");
     await _printText(
@@ -131,7 +131,7 @@ class Cs50PrinterSetup {
     await _printText("Paid by: ${saleModel.paymentType?.toUpperCase()}");
     await _printText("Served By: ${saleModel.attendant?.username ?? "admin"}");
     await _printText("Thank you for shopping with us");
-    await _printText("Powered by Pointify POS");
+    await _printText("Powered by ReggyPOS");
     await _printText("contacts  ${settingsData["contact"]}");
     await _printText(" ");
     await _printText(" ");

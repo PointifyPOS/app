@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/controllers/quick_sale_controller.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/quick_sale_controller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/functions/functions.dart';
 
 import '../../utils/colors.dart';
 

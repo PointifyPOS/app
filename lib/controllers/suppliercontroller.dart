@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../functions/functions.dart';
 import '../models/customer.dart';

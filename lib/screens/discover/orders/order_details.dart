@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/paymentcontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/screens/cash_flow/payment_history.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/paymentcontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/screens/cash_flow/payment_history.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 import 'package:printing/printing.dart';
 
 import '../../../controllers/salescontroller.dart';

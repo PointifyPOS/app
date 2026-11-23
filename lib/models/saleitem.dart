@@ -1,5 +1,5 @@
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/salemodel.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/salemodel.dart';
 
 class SaleItem {
   String? id;

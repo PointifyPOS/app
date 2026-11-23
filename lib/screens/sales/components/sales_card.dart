@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/screens/discover/orders/order_details.dart';
-import 'package:pointify/screens/receipts/view/sales_receipt.dart';
-import 'package:pointify/widgets/minor_title.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/screens/discover/orders/order_details.dart';
+import 'package:reggypos/screens/receipts/view/sales_receipt.dart';
+import 'package:reggypos/widgets/minor_title.dart';
 
 import '../../../models/salemodel.dart';
 import '../../../pdfFiles/pdfquotationpreview.dart';

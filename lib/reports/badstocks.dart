@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/product/products_page.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/screens/product/products_page.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/alert.dart';
 
-import '../controllers/homecontroller.dart';
 import '../controllers/productcontroller.dart';
 import '../controllers/reports_controller.dart';
 import '../controllers/shopcontroller.dart';
@@ -25,7 +23,7 @@ import '../widgets/no_items_found.dart';
 class BadStockPage extends StatelessWidget {
   final String? page;
 
-  BadStockPage({Key? key, required this.page}) : super(key: key) {
+  BadStockPage({super.key, required this.page}) {
     productController.getBadStock(
       shopId: userController.currentUser.value!.primaryShop!.id,
       fromDate: DateFormat('yyyy-MM-dd')

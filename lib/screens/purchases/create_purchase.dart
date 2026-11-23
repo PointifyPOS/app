@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/screens/product/barcode_scanner.dart';
-import 'package:pointify/screens/purchases/purchases_preview.dart';
-import 'package:pointify/screens/suppliers/suppliers_page.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/screens/product/barcode_scanner.dart';
+import 'package:reggypos/screens/purchases/purchases_preview.dart';
+import 'package:reggypos/screens/suppliers/suppliers_page.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../../../utils/colors.dart';
 import '../../controllers/productcontroller.dart';
@@ -17,7 +17,7 @@ import '../product/products_page.dart';
 import 'components/invoice_card.dart';
 
 class CreatePurchase extends StatelessWidget {
-  CreatePurchase({Key? key}) : super(key: key) {
+  CreatePurchase({super.key}) {
     purchaseController.selectedpaymentMethod.value = "Cash";
     supplierController.getSuppliers("all");
   }

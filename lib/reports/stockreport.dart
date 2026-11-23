@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/models/stockreport.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/models/stockreport.dart';
 import 'package:printing/printing.dart';
 
 import '../functions/functions.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/ordercontroller.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/screens/discover/shops_around.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/ordercontroller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/screens/discover/shops_around.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../widgets/major_title.dart';

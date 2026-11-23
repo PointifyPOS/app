@@ -9,11 +9,11 @@ class AppConfig {
   static var offline_mode = false;
   static var demo_mode = false;
   static var country_code;
-  static var privacy_policy = 'https://pointifypos.com/privacy';
+  static var privacy_policy = 'https://yourdomain.com/privacy';
   static var androidLink =
-    'https://play.google.com/store/apps/details?id=com.pointify.com';
-  static var iosLink = 'https://apps.apple.com/tr/app/pointify-pos/id6456891671';
-  static var androidKey = "AIzaSyAhhiH3PrL9td9IGJWfpK3CXnU3gtsIYHY";
-  static var iosKey = "AIzaSyAhhiH3PrL9td9IGJWfpK3CXnU3gtsIYHY";
-  static var appstoreId = '6456891671';
+    'https://play.google.com/store/apps/details?id=com.reggypos.app';
+  static var iosLink = 'https://apps.apple.com/app/idYOUR_APP_STORE_ID';
+  static var androidKey = "YOUR_GOOGLE_MAPS_API_KEY";
+  static var iosKey = "YOUR_GOOGLE_MAPS_API_KEY";
+  static var appstoreId = 'YOUR_APP_STORE_ID';
 }

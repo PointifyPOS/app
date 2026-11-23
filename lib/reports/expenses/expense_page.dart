@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/expense.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/finance/financial_page.dart';
-import 'package:pointify/screens/receipts/pdf/expenses/expenses_summary_pdf.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/expense.dart';
+import 'package:reggypos/screens/receipts/pdf/expenses/expenses_summary_pdf.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 import 'package:printing/printing.dart';
 
-import '../../controllers/homecontroller.dart';
 import '../../controllers/salescontroller.dart';
 import '../../controllers/shopcontroller.dart';
 import '../../screens/expenses/components/expense_card.dart';
@@ -25,8 +22,7 @@ import 'expenses_categories.dart';
 class ExpensePage extends StatelessWidget {
   final DateTime firstday;
   final DateTime lastday;
-  ExpensePage({Key? key, required this.firstday, required this.lastday})
-      : super(key: key) {
+  ExpensePage({super.key, required this.firstday, required this.lastday}) {
     expenseController.getExpenses(
         fromDate: DateFormat("yyyy-MM-dd").format(firstday),
         toDate: DateFormat("yyyy-MM-dd").format(lastday));

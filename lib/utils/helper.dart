@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/screens/purchases/create_purchase.dart';
-import 'package:pointify/screens/usage/extend_usage.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/screens/purchases/create_purchase.dart';
+import 'package:reggypos/screens/usage/extend_usage.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../controllers/homecontroller.dart';
 import '../main.dart';
@@ -79,13 +79,12 @@ class Helper extends StatelessWidget {
   ];
 
   Helper(
-      {Key? key,
+      {super.key,
       required this.widget,
       this.appBar,
       this.bottomNavigationBar,
       this.floatButton,
-      this.page})
-      : super(key: key);
+      this.page});
 
   @override
   Widget build(BuildContext context) {

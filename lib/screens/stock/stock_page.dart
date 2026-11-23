@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/reports/summary/purchases_summary.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/stock/import_products.dart';
-import 'package:pointify/screens/stock/stock_counts.dart';
-import 'package:pointify/screens/stock/stock_transfer.dart';
-import 'package:pointify/screens/warehouse/invoices.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/reports/summary/purchases_summary.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/stock/import_products.dart';
+import 'package:reggypos/screens/stock/stock_counts.dart';
+import 'package:reggypos/screens/stock/stock_transfer.dart';
+import 'package:reggypos/screens/warehouse/invoices.dart';
+import 'package:reggypos/utils/helper.dart';
 
 import '../../controllers/productcontroller.dart';
 import '../../controllers/shopcontroller.dart';

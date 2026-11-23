@@ -1,34 +1,28 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io' show Platform;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/warehousecontroller.dart';
-import 'package:pointify/services/client.dart';
-import 'package:pointify/services/end_points.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/authentication/admin/admin_login.dart';
-import 'package:pointify/screens/authentication/landing.dart';
-import 'package:pointify/screens/home/home.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/warehousecontroller.dart';
+import 'package:reggypos/services/client.dart';
+import 'package:reggypos/services/end_points.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/authentication/admin/admin_login.dart';
+import 'package:reggypos/screens/authentication/landing.dart';
+import 'package:reggypos/screens/home/home.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:uuid/uuid.dart';
 
 import '../functions/functions.dart';
 import '../models/usermodel.dart';
-import '../responsive/responsiveness.dart';
 import '../screens/home/home_page.dart';
 import '../screens/shop/create_shop.dart';
 import '../services/authentication.dart';
@@ -213,18 +207,28 @@ class AuthController {
     //   print("Error: $e");
     //   debugPrintMessage(e);
     // } finally {
-    SettingsApi.getSettings().then((data) async {
+    SettingsApi.getSettings().then((response) async {
+      // Every settings group is optional (a fresh install has none of them).
+      final Map data = response is Map ? response : {};
       var app = data['APP_CONFIG'];
       var themes = data['theme'];
       var general = data['GENERAL_CONFIG'];
       var stripe = data['STRIPE_CONFIG'];
       AppConfig.country_code =
           general == null ? "KES" : general['country_code'] ?? "US";
-      AppConfig.stripePublishKey = stripe['stripePublishKey'] ?? "";
+      AppConfig.stripePublishKey =
+          (stripe is Map ? stripe['stripePublishKey'] : null) ?? "";
       if (AppConfig.stripePublishKey.isNotEmpty) {
-        Stripe.publishableKey = AppConfig.stripePublishKey;
-        Stripe.merchantIdentifier = themes['app_name'].toLowerCase().trim();
-        await Stripe.instance.applySettings();
+        try {
+          Stripe.publishableKey = AppConfig.stripePublishKey;
+          final merchant = (themes is Map ? themes['app_name'] : null) ??
+              AppConfig.app_name ??
+              "reggypos";
+          Stripe.merchantIdentifier = merchant.toString().toLowerCase().trim();
+          await Stripe.instance.applySettings();
+        } catch (e) {
+          debugPrint("Stripe setup failed: $e");
+        }
       }
       if (app != null) {
         AppConfig.offline_mode = app['offlineEnabled'] ?? false;
@@ -274,14 +278,17 @@ class AuthController {
       Get.find<ShopController>().getShops();
     }
 
-    Get.find<ProductNewController>().getProducts(
-        type: "all",
-        shop: userController.currentUser.value?.primaryShop?.id ?? "");
-    Get.find<CustomerController>().getCustomersInShop('');
-    Get.find<SalesController>().getOrders(
-      fromDate: Get.find<ReportsController>().filterStartDate.value,
-      toDate: Get.find<ReportsController>().filterEndDate.value,
-    );
+    // A newly registered owner has no shop yet; shop data loads after one is created.
+    final primaryShopId = userController.currentUser.value?.primaryShop?.id;
+    if (primaryShopId != null && primaryShopId.isNotEmpty) {
+      Get.find<ProductNewController>()
+          .getProducts(type: "all", shop: primaryShopId);
+      Get.find<CustomerController>().getCustomersInShop('');
+      Get.find<SalesController>().getOrders(
+        fromDate: Get.find<ReportsController>().filterStartDate.value,
+        toDate: Get.find<ReportsController>().filterEndDate.value,
+      );
+    }
     // }
   }
 
@@ -331,13 +338,13 @@ class AuthController {
     }
 
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    int latestVersion = value['android_version'] == null
-        ? 0
-        : int.parse(value['android_version'] ?? 0);
+    if (value is! Map) value = {};
+    int latestVersion =
+        int.tryParse((value['android_version'] ?? 0).toString()) ?? 0;
     String buildNumber = packageInfo.buildNumber;
-    settingsData = value;
+    settingsData = Map<String, dynamic>.from(value);
     if (Platform.isAndroid) {
-      if (latestVersion > int.parse(buildNumber) &&
+      if (latestVersion > (int.tryParse(buildNumber) ?? 0) &&
           showingUpdateAlert.isFalse) {
         showingUpdateAlert.value = true;
         showUpdateAlert(value['forceUpdate']);
@@ -345,11 +352,10 @@ class AuthController {
         showingUpdateAlert.value = false;
       }
     } else if (Platform.isIOS) {
-      int latestVersion = value['ios_version'] == null
-          ? 0
-          : int.parse(value['ios_version'].toString());
+      int latestVersion =
+          int.tryParse((value['ios_version'] ?? 0).toString()) ?? 0;
       String buildNumber = packageInfo.buildNumber;
-      if (latestVersion > int.parse(buildNumber) &&
+      if (latestVersion > (int.tryParse(buildNumber) ?? 0) &&
           showingUpdateAlert.isFalse) {
         showingUpdateAlert.value = true;
         showUpdateAlert(value['forceUpdate']);
@@ -365,7 +371,7 @@ class AuthController {
         return AlertDialog(
           title: const Text('Update Available'),
           content: const Text(
-            'Pointify has new updated features, please update to get the most out of it.',
+            'ReggyPOS has new updated features, please update to get the most out of it.',
           ),
           actions: [
             if (forceUpdate == false)

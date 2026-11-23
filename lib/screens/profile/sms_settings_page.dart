@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/services/sms_service.dart';
-import 'package:pointify/services/user.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/services/sms_service.dart';
+import 'package:reggypos/services/user.dart';
+import 'package:reggypos/utils/colors.dart';
 
 class SmsSettingsPage extends StatelessWidget {
   SmsSettingsPage({super.key}) {
@@ -12,7 +12,7 @@ class SmsSettingsPage extends StatelessWidget {
   }
 
   final TextEditingController senderController =
-      TextEditingController(text: "POINTIFY");
+      TextEditingController(text: "REGGYPOS");
 
   final TextEditingController templateController = TextEditingController(
     text:
@@ -23,7 +23,7 @@ class SmsSettingsPage extends StatelessWidget {
   final RxBool saving = false.obs;
 
   final String sampleName = "John";
-  final String sampleShop = "Pointify Store";
+  final String sampleShop = "ReggyPOS Store";
   final String sampleAmount = "KES 2,500";
   final String sampleReceipt = "A102";
   final String sampleReceiptUrl = "https://ptfy.link/A102";
@@ -126,7 +126,7 @@ class SmsSettingsPage extends StatelessWidget {
                       controller: senderController,
                       enabled: userController.currentUser.value?.saleSmsEnabled,
                       decoration: _inputDecoration(
-                        hintText: "e.g POINTIFY",
+                        hintText: "e.g REGGYPOS",
                         prefixIcon: Icons.badge_outlined,
                       ),
                     ),
@@ -668,7 +668,7 @@ class SmsSettingsPage extends StatelessWidget {
           const SizedBox(width: 10),
           CupertinoSwitch(
             value: value,
-            activeColor: AppColors.mainColor,
+            activeTrackColor: AppColors.mainColor,
             onChanged: onChanged,
           ),
         ],

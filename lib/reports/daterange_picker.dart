@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 
 import '../widgets/major_title.dart';
 

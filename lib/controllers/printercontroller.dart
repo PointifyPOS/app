@@ -4,9 +4,9 @@ import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/extra_charge.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/extra_charge.dart';
+import 'package:reggypos/widgets/alert.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -352,14 +352,14 @@ class PrinterController extends GetxController {
     );
 
     bytes += generator.text(
-      'System by Pointify',
+      'System by ReggyPOS',
       styles: const PosStyles(
         align: PosAlign.center,
       ),
     );
 
     bytes += generator.text(
-      'pointifypos.com',
+      'yourdomain.com',
       styles: const PosStyles(
         align: PosAlign.center,
       ),

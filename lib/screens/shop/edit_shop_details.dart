@@ -2,20 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/authcontroller.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/shop/shop_address.dart';
-import 'package:pointify/screens/shop/shop_cagories.dart';
-import 'package:pointify/screens/shop/shops_page.dart';
-import 'package:pointify/services/place_service.dart';
-import 'package:pointify/services/shop_services.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/constants.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/shop_widget.dart';
+import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/shop/shop_address.dart';
+import 'package:reggypos/screens/shop/shop_cagories.dart';
+import 'package:reggypos/screens/shop/shops_page.dart';
+import 'package:reggypos/services/place_service.dart';
+import 'package:reggypos/services/shop_services.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/constants.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/shop_widget.dart';
 import 'package:switcher_button/switcher_button.dart';
 
 import '../../models/shop.dart';
@@ -280,6 +280,8 @@ class EditShopDetails extends StatelessWidget {
                 shopController.latitude.text = value.first.latitude.toString();
                 shopController.longitude.text =
                     value.first.longitude.toString();
+              }).catchError((_) {
+                // Address could not be geocoded: keep the text, skip coordinates.
               });
             }
           },
@@ -619,7 +621,7 @@ class EditShopDetails extends StatelessWidget {
           const SizedBox(width: 10),
           CupertinoSwitch(
             value: value,
-            activeColor: AppColors.mainColor,
+            activeTrackColor: AppColors.mainColor,
             onChanged: (v) => onChanged(v),
           ),
         ],

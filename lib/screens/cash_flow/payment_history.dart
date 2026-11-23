@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/screens/customers/components/cash_receipt.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/screens/customers/components/cash_receipt.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/paymentcontroller.dart';
 import '../../controllers/shopcontroller.dart';

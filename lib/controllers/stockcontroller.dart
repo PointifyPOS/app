@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/productcount.dart';
-import 'package:pointify/models/transferhistory.dart';
-import 'package:pointify/services/product_service.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/loading_dialog.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/productcount.dart';
+import 'package:reggypos/models/transferhistory.dart';
+import 'package:reggypos/services/product_service.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/loading_dialog.dart';
 
 import '../models/product.dart';
-import '../models/shop.dart';
-import '../screens/stock/transfer_history.dart';
 import '../utils/colors.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class StockController extends GetxController {
 

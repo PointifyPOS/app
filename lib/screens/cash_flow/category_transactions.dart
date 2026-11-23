@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/cash_flow/banks_transactions.dart';
-import 'package:pointify/screens/cash_flow/cashflow_categories.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/no_items_found.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/cash_flow/banks_transactions.dart';
+import 'package:reggypos/screens/cash_flow/cashflow_categories.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../../controllers/cashflowcontroller.dart';
 import '../../controllers/homecontroller.dart';
@@ -27,8 +27,7 @@ class CategoryTransactions extends StatelessWidget {
   final SalesController salesController = Get.find<SalesController>();
   final  CashFlowController cashflowController = Get.find<CashFlowController>();
 
-  CategoryTransactions({Key? key, this.page, required this.cashFlowCategory, this.bank})
-      : super(key: key) {
+  CategoryTransactions({super.key, this.page, required this.cashFlowCategory, this.bank}) {
     if (bank != null) {
       cashflowController.getBankTransactions(bank!);
     } else {

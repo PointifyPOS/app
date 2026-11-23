@@ -1,7 +1,7 @@
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/models/supplier.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/models/supplier.dart';
 
 class Invoice {
   String? sId;

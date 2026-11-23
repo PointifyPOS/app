@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/warehousecontroller.dart';
+import 'package:reggypos/controllers/warehousecontroller.dart';
 
 import '../../../functions/functions.dart';
 import '../../../models/wahoureinvoice.dart';

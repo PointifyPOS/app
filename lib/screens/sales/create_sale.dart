@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/barcode_scanner.dart';
-import 'package:pointify/screens/product/products_page.dart';
-import 'package:pointify/screens/sales/onholdsales.dart';
-import 'package:pointify/screens/sales/quick_sale.dart';
-import 'package:pointify/screens/sales/sale_preview.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/product/barcode_scanner.dart';
+import 'package:reggypos/screens/product/products_page.dart';
+import 'package:reggypos/screens/sales/onholdsales.dart';
+import 'package:reggypos/screens/sales/quick_sale.dart';
+import 'package:reggypos/screens/sales/sale_preview.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../controllers/customercontroller.dart';
 import '../../controllers/productcontroller.dart';

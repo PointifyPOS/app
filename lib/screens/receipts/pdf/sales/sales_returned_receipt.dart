@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/salereturn.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/salereturn.dart';
 
 import '../../../../main.dart';
 import '../../../../models/shop.dart';

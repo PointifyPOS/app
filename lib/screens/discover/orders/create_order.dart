@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/ordercontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/screens/discover/orders/order_preview.dart';
-import 'package:pointify/screens/product/products_page.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/ordercontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/screens/discover/orders/order_preview.dart';
+import 'package:reggypos/screens/product/products_page.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../../controllers/customercontroller.dart';
 import '../../../controllers/productcontroller.dart';
@@ -21,7 +21,7 @@ class CreateOrder extends StatelessWidget {
   final String? page;
   final Shop? shop;
 
-  CreateOrder({Key? key, this.page, this.shop}) : super(key: key) {
+  CreateOrder({super.key, this.page, this.shop}) {
     if (shop != null) {
       orderController.currentShop.value = shop;
     }

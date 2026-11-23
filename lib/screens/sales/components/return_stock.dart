@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/utils/themer.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/utils/themer.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../../utils/colors.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
+import 'package:reggypos/main.dart';
 
 import '../utils/colors.dart';
 import 'major_title.dart';

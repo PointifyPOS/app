@@ -1,8 +1,8 @@
-import 'package:pointify/main.dart';
-import 'package:pointify/models/customer.dart';
-import 'package:pointify/models/mpesa_payment.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/salemodel.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/customer.dart';
+import 'package:reggypos/models/mpesa_payment.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/salemodel.dart';
 
 import 'client.dart';
 import 'end_points.dart';

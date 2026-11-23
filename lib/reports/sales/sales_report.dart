@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:printing/printing.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/utils/helper.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../controllers/salescontroller.dart';
 import '../../../controllers/shopcontroller.dart';
 import '../../controllers/reports_controller.dart';
 import '../../models/salemodel.dart';
-import '../../screens/receipts/pdf/sales/sales_report.dart';
-import '../../screens/receipts/pdf/sales/sales_report_pdf.dart';
 import '../../screens/sales/components/sales_card.dart';
 import '../../utils/colors.dart';
 import '../../widgets/filter_dates.dart';
 import '../../widgets/no_items_found.dart';
-import '../../widgets/textbutton.dart';
 
 class SalesReport extends StatefulWidget {
   final String? title;
@@ -331,7 +326,7 @@ class _SalesReportState extends State<SalesReport> {
                                   ),
                                   const SizedBox(height: 10),
                                   DropdownButtonFormField<String>(
-                                    value: paymentType,
+                                    initialValue: paymentType,
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: Colors.grey.shade100,

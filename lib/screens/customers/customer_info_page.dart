@@ -4,12 +4,12 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/models/salereturn.dart';
-import 'package:pointify/pdfFiles/pdf/sales_by_items.dart';
-import 'package:pointify/screens/customers/edit_user.dart';
-import 'package:pointify/screens/customers/wallet_page.dart';
-import 'package:pointify/screens/sales/components/sales_card.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/models/salereturn.dart';
+import 'package:reggypos/pdfFiles/pdf/sales_by_items.dart';
+import 'package:reggypos/screens/customers/edit_user.dart';
+import 'package:reggypos/screens/customers/wallet_page.dart';
+import 'package:reggypos/screens/sales/components/sales_card.dart';
+import 'package:reggypos/utils/helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/customercontroller.dart';
@@ -514,7 +514,7 @@ class ReportFilterHeader extends StatelessWidget {
 class CreditInfo extends StatelessWidget {
   final Customer customerModel;
 
-  CreditInfo({Key? key, required this.customerModel}) : super(key: key);
+  CreditInfo({super.key, required this.customerModel});
 
   final SalesController salesController = Get.find<SalesController>();
   final CustomerController customerController = Get.find<CustomerController>();
@@ -596,7 +596,7 @@ class CreditInfo extends StatelessWidget {
 }
 
 class SalesTab extends StatelessWidget {
-  SalesTab({Key? key}) : super(key: key);
+  SalesTab({super.key});
 
   final CustomerController customerController = Get.find<CustomerController>();
   final SalesController salesController = Get.find<SalesController>();
@@ -683,7 +683,7 @@ class SalesTab extends StatelessWidget {
 }
 
 class ReturnsTab extends StatelessWidget {
-  ReturnsTab({Key? key}) : super(key: key);
+  ReturnsTab({super.key});
 
   final SalesController salesController = Get.find<SalesController>();
   final CustomerController customerController = Get.find<CustomerController>();
@@ -781,7 +781,7 @@ class ReturnsTab extends StatelessWidget {
 }
 
 class StatementTab extends StatelessWidget {
-  StatementTab({Key? key}) : super(key: key);
+  StatementTab({super.key});
 
   final CustomerController customerController = Get.find<CustomerController>();
 

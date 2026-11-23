@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 
 import '../models/package.dart';
 import '../services/plan_service.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class PlanController extends GetxController {
   RxList<Package> plans = RxList([]);

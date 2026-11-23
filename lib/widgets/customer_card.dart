@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/minor_title.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/minor_title.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 
 import '../controllers/salescontroller.dart';
 import '../models/customer.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/order.dart';
-import 'package:pointify/screens/discover/order_card.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/order.dart';
+import 'package:reggypos/screens/discover/order_card.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 

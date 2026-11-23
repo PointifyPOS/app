@@ -7,8 +7,7 @@ class ProductImage extends StatelessWidget {
   final String? element;
   final double? size;
  final  double? radius;
-  const ProductImage({Key? key, this.element, this.size, this.radius})
-      : super(key: key);
+  const ProductImage({super.key, this.element, this.size, this.radius});
 
   @override
   Widget build(BuildContext context) {

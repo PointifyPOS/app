@@ -1,9 +1,9 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/customers/create_customers.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/customers/create_customers.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/customercontroller.dart';
 import '../../controllers/salescontroller.dart';
@@ -190,7 +190,7 @@ class Customers extends StatelessWidget {
   final String type;
   final Function? function;
 
-  Customers({Key? key, required this.type, this.function}) : super(key: key);
+  Customers({super.key, required this.type, this.function});
   final CustomerController customersController = Get.find<CustomerController>();
 
   @override
@@ -376,7 +376,7 @@ class Customers extends StatelessWidget {
 class Debtors extends StatelessWidget {
   final String type;
 
-  Debtors({Key? key, required this.type}) : super(key: key);
+  Debtors({super.key, required this.type});
   final CustomerController customersController = Get.find<CustomerController>();
 
   @override

@@ -1,5 +1,5 @@
 
-import 'package:pointify/models/bank.dart';
+import 'package:reggypos/models/bank.dart';
 
 import 'client.dart';
 import 'end_points.dart';

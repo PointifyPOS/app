@@ -1,10 +1,10 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/stockcontroller.dart';
-import 'package:pointify/models/transferhistory.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/stock/transfer_history.dart';
+import 'package:reggypos/controllers/stockcontroller.dart';
+import 'package:reggypos/models/transferhistory.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/stock/transfer_history.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/productcontroller.dart';
@@ -13,8 +13,7 @@ import '../../widgets/no_items_found.dart';
 
 class TransferHistoryView extends StatelessWidget {
   final TransferHistory stockTransferHistory;
-  TransferHistoryView({Key? key, required this.stockTransferHistory})
-      : super(key: key);
+  TransferHistoryView({super.key, required this.stockTransferHistory});
 
   final ProductController productController = Get.find<ProductController>();
   final StockController stockTransferController = Get.find<StockController>();

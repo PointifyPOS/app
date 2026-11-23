@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/salescontroller.dart';
 import 'financial_page.dart';
 
 class ProductAnalysis extends StatefulWidget {
-  const ProductAnalysis({Key? key}) : super(key: key);
+  const ProductAnalysis({super.key});
 
   @override
   State<ProductAnalysis> createState() => _ProductAnalysisState();

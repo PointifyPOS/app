@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/screens/stock/transfer_history.dart';
-import 'package:pointify/widgets/shop_card.dart';
+import 'package:reggypos/screens/stock/transfer_history.dart';
+import 'package:reggypos/widgets/shop_card.dart';
 
 import '../../controllers/shopcontroller.dart';
 import '../../main.dart';

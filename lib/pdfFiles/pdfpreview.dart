@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/screens/receipts/pdf/sales/sales_receipt.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/screens/receipts/pdf/sales/sales_receipt.dart';
+import 'package:reggypos/utils/colors.dart';
 import 'package:printing/printing.dart';
 
 import '../models/salemodel.dart';
@@ -10,7 +10,7 @@ class PdfPreviewPage extends StatelessWidget {
   final SaleModel? invoice;
   final String? type;
 
-  const PdfPreviewPage({Key? key, this.invoice, this.type}) : super(key: key);
+  const PdfPreviewPage({super.key, this.invoice, this.type});
 
   @override
   Widget build(BuildContext context) {

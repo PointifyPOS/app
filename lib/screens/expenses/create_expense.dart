@@ -2,12 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/models/expense.dart';
-import 'package:pointify/reports/expenses/expense_page.dart';
-import 'package:pointify/responsive/responsiveness.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/models/expense.dart';
 
-import '../../controllers/homecontroller.dart';
 import '../../controllers/shopcontroller.dart';
 import '../../models/expensecategory.dart';
 import '../../utils/colors.dart';
@@ -17,7 +14,7 @@ class CreateExpense extends StatelessWidget {
   final String? from;
   final ExpenseModel? expense;
 
-  CreateExpense({Key? key, this.from, this.expense}) : super(key: key) {
+  CreateExpense({super.key, this.from, this.expense}) {
     expenseController.getExpenseCategoryWithTotals();
     if (expense != null) {
       expenseController.textEditingControllerDescriotion.text = expense!.name!;
@@ -253,7 +250,7 @@ class CreateExpense extends StatelessWidget {
                       Obx(
                         () => CupertinoSwitch(
                           value: expenseController.autoSave.value!,
-                          activeColor: AppColors.mainColor,
+                          activeTrackColor: AppColors.mainColor,
                           onChanged: (value) {
                             expenseController.autoSave.value = value;
                             expenseController.autoSave.refresh();

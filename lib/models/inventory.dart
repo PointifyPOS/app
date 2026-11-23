@@ -1,6 +1,6 @@
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/bundleitem.dart';
-import 'package:pointify/models/product.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/bundleitem.dart';
+import 'package:reggypos/models/product.dart';
 
 class Inventory {
   String? id;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../controllers/salescontroller.dart';
@@ -21,14 +21,13 @@ class DateFilter extends StatelessWidget {
   final int? i;
 
   DateFilter(
-      {Key? key,
+      {super.key,
       this.function,
       this.product,
       this.i,
       required this.from,
       this.page,
-      this.headline})
-      : super(key: key);
+      this.headline});
   final SalesController salesController = Get.find<SalesController>();
 
   @override

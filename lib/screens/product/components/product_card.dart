@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/barcode_scanner.dart';
-import 'package:pointify/widgets/minor_title.dart';
-import 'package:pointify/widgets/product_image.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/product/barcode_scanner.dart';
+import 'package:reggypos/widgets/minor_title.dart';
+import 'package:reggypos/widgets/product_image.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../../../controllers/productcontroller.dart';
 import '../../../controllers/salescontroller.dart';

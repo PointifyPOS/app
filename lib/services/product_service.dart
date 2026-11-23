@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/productcategory.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/models/wahoureinvoice.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/productcategory.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/models/wahoureinvoice.dart';
 
 import '../main.dart';
 import 'client.dart';

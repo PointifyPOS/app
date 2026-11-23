@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/screens/cash_flow/banks_transactions.dart';
-import 'package:pointify/screens/cash_flow/category_transactions.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/delete_dialog.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/screens/cash_flow/banks_transactions.dart';
+import 'package:reggypos/screens/cash_flow/category_transactions.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/delete_dialog.dart';
 
 import '../../../controllers/cashflowcontroller.dart';
 import '../../../controllers/homecontroller.dart';

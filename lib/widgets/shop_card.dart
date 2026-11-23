@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/stock/transfering_products.dart';
-import 'package:pointify/widgets/minor_title.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/stock/transfering_products.dart';
+import 'package:reggypos/widgets/minor_title.dart';
 
 import '../models/shop.dart';
 import '../screens/shop/shop_details.dart';

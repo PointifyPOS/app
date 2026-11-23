@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/productcategory.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/productcategory.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 
-import '../../controllers/productcontroller.dart';
 import '../../widgets/major_title.dart';
 
 class ProductCategories extends StatelessWidget {

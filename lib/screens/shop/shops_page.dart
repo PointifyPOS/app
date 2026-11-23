@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/warehouse/create_warehouse.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/warehouse/create_warehouse.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../models/shop.dart';

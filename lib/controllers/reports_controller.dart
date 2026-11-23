@@ -1,27 +1,26 @@
-import 'package:pointify/services/preference_manager.dart';
+import 'package:reggypos/services/preference_manager.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/models/stockreport.dart';
-import 'package:pointify/services/end_points.dart';
-import 'package:pointify/services/reports.dart';
-import 'package:pointify/widgets/snackbars.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/models/stockreport.dart';
+import 'package:reggypos/services/end_points.dart';
+import 'package:reggypos/services/reports.dart';
+import 'package:reggypos/widgets/snackbars.dart';
 
 import '../main.dart';
 import '../models/debtor.dart';
 import '../models/payment.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class ReportsController extends GetxController {
   RxBool isLoadingReports = RxBool(false);

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../../controllers/homecontroller.dart';

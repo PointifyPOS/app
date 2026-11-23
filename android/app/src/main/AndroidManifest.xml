@@ -18,10 +18,10 @@
 
 
     <application
-        android:label="Pointify"
+        android:label="ReggyPOS"
         android:requestLegacyExternalStorage="true"
         android:name=".Application"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <meta-data
             android:name="io.flutter.embedding.android.EnableImpeller"
             android:value="false" />

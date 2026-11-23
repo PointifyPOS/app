@@ -1,5 +1,5 @@
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/models/usermodel.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/models/usermodel.dart';
 
 class Awards {
   double? amount;

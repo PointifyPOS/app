@@ -44,37 +44,37 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDItqnV6baN3ZhFTZzTdGuSJyV-BUiYams',
-    appId: '1:321868996666:web:d2bbd5e4b7c32c32f59503',
-    messagingSenderId: '321868996666',
-    projectId: 'pointify-9e51e',
-    authDomain: 'pointify-9e51e.firebaseapp.com',
-    storageBucket: 'pointify-9e51e.appspot.com',
+    apiKey: 'YOUR_API_KEY',
+    appId: 'YOUR_APP_ID',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+    projectId: 'YOUR_PROJECT_ID',
+    authDomain: 'YOUR_AUTH_DOMAIN',
+    storageBucket: 'YOUR_STORAGE_BUCKET',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDFzz1_9FxOLPU7Ax_2mF18cwMhLvgWxGM',
-    appId: '1:321868996666:android:ade35dae952eae78f59503',
-    messagingSenderId: '321868996666',
-    projectId: 'pointify-9e51e',
-    storageBucket: 'pointify-9e51e.appspot.com',
+    apiKey: 'YOUR_API_KEY',
+    appId: 'YOUR_APP_ID',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+    projectId: 'YOUR_PROJECT_ID',
+    storageBucket: 'YOUR_STORAGE_BUCKET',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyChT375xLHNl9t7psymx3Mw8fuv_E2Y5OE',
-    appId: '1:321868996666:ios:46a2a5c8f23369dbf59503',
-    messagingSenderId: '321868996666',
-    projectId: 'pointify-9e51e',
-    storageBucket: 'pointify-9e51e.appspot.com',
-    iosBundleId: 'com.pointify.pos',
+    apiKey: 'YOUR_API_KEY',
+    appId: 'YOUR_APP_ID',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+    projectId: 'YOUR_PROJECT_ID',
+    storageBucket: 'YOUR_STORAGE_BUCKET',
+    iosBundleId: 'YOUR_IOS_BUNDLE_ID',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyChT375xLHNl9t7psymx3Mw8fuv_E2Y5OE',
-    appId: '1:321868996666:ios:e8b3921e58b03b21f59503',
-    messagingSenderId: '321868996666',
-    projectId: 'pointify-9e51e',
-    storageBucket: 'pointify-9e51e.appspot.com',
-    iosBundleId: 'com.pointify.com.RunnerTests',
+    apiKey: 'YOUR_API_KEY',
+    appId: 'YOUR_APP_ID',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+    projectId: 'YOUR_PROJECT_ID',
+    storageBucket: 'YOUR_STORAGE_BUCKET',
+    iosBundleId: 'YOUR_IOS_BUNDLE_ID',
   );
 }

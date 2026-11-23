@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/controllers/suppliercontroller.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/suppliers/edit_supplier.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/controllers/suppliercontroller.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/suppliers/edit_supplier.dart';
+import 'package:reggypos/utils/helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/shopcontroller.dart';
@@ -19,7 +19,7 @@ import '../purchases/components/invoice_table.dart';
 class SupplierInfoPage extends StatelessWidget {
   final Supplier supplierModel;
 
-  SupplierInfoPage({Key? key, required this.supplierModel}) : super(key: key) {
+  SupplierInfoPage({super.key, required this.supplierModel}) {
     supplierController.initialPage.value = 0;
     purchaseController.getPurchases(onCredit: true, supplier: supplierModel.id);
   }
@@ -316,7 +316,7 @@ class SupplierInfoPage extends StatelessWidget {
 class Purchase extends StatelessWidget {
   final Supplier supplierModel;
 
-  Purchase({Key? key, required this.supplierModel}) : super(key: key);
+  Purchase({super.key, required this.supplierModel});
 
   final SupplierController supplierController = Get.find<SupplierController>();
   final ShopController createShopController = Get.find<ShopController>();
@@ -362,7 +362,7 @@ class Purchase extends StatelessWidget {
 class ReturnedPurchases extends StatelessWidget {
   final String? id;
 
-  ReturnedPurchases({Key? key, required this.id}) : super(key: key);
+  ReturnedPurchases({super.key, required this.id});
 
   final ShopController createShopController = Get.find<ShopController>();
   final PurchaseController purchaseController = Get.find<PurchaseController>();
@@ -403,7 +403,7 @@ class CreditInfo extends StatelessWidget {
   final ShopController createShopController = Get.find<ShopController>();
   final PurchaseController purchaseController = Get.find<PurchaseController>();
 
-  CreditInfo({Key? key, required this.supplierModel}) : super(key: key);
+  CreditInfo({super.key, required this.supplierModel});
 
   @override
   Widget build(BuildContext context) {

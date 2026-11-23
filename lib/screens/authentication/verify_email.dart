@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../main.dart';

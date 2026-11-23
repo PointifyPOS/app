@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/warehousecontroller.dart';
+import 'package:reggypos/controllers/warehousecontroller.dart';
 
 import '../../models/product.dart';
 import '../../models/shop.dart';

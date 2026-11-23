@@ -1,6 +1,6 @@
 const apiEndPoint = String.fromEnvironment('API_BASE',
-    defaultValue: "https://dev.pointifypos.com/");
-const storeurl = "https://store.pointifypos.com/";
+    defaultValue: "https://api.yourdomain.com/");
+const storeurl = "https://store.yourdomain.com/";
 const apiEndPointv_2 = '${apiEndPoint}api/v2/';
 
 class EndPoints {
@@ -80,7 +80,7 @@ class EndPoints {
   static const purchasesreport = "${apiEndPoint}analysis/report/purchases";
   static const backupnow = "${apiEndPoint}analysis/backup/download";
   static const reports = "${apiEndPoint}reports/";
-  static const salesreportexcel = "${reports}/sales/excel/";
+  static const salesreportexcel = "$reports/sales/excel/";
 
   // SUPPLIERS
   static const supplier = "${apiEndPoint}suppliers/";

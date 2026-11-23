@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/screens/sales/components/return_stock.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/screens/sales/components/return_stock.dart';
 
 import '../../../main.dart';
 

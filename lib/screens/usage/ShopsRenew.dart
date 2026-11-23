@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_paystack_plus/flutter_paystack_plus.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/authcontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/paymentcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/package.dart';
-import 'package:pointify/models/shop.dart';
+import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/paymentcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/package.dart';
+import 'package:reggypos/models/shop.dart';
 import '../../models/payment_methods.dart';
 import '../../utils/colors.dart';
 
@@ -350,7 +350,7 @@ class ShopsToRenew extends StatelessWidget {
               const SizedBox(height: 20),
               ...paymentController.paymentmethods
                   .map((m) => _paymentOption(context, m))
-                  .toList(),
+                  ,
             ],
           ),
         ),

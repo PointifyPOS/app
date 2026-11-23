@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/models/order.dart';
-import 'package:pointify/screens/authentication/landing.dart';
-import 'package:pointify/screens/discover/order_card.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/themer.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/models/order.dart';
+import 'package:reggypos/screens/authentication/landing.dart';
+import 'package:reggypos/screens/discover/order_card.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/themer.dart';
 
 import '../../controllers/ordercontroller.dart';
 
@@ -61,7 +61,7 @@ class CustomerProfile extends StatelessWidget {
                               height: 5,
                             ),
                             const Text(
-                              "Welcome to Pointify online ",
+                              "Welcome to ReggyPOS online ",
                               style:
                                   TextStyle(fontSize: 13, color: Colors.white),
                             )

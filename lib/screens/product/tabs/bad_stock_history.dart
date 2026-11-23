@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/responsive/responsiveness.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../../controllers/homecontroller.dart';
@@ -198,12 +197,11 @@ class BadStockHistory extends StatelessWidget {
   final String? toDate;
 
   BadStockHistory(
-      {Key? key,
+      {super.key,
       required this.product,
       this.fromDate,
       this.toDate,
-      required this.i})
-      : super(key: key);
+      required this.i});
   final ProductController productController = Get.find<ProductController>();
 
   @override

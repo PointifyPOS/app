@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/minor_title.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/minor_title.dart';
 
 import '../../../models/invoice.dart';
 import '../../../utils/colors.dart';

@@ -2,12 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/loading_dialog.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
 import 'package:switcher_button/switcher_button.dart';
 
 import '../../../../utils/colors.dart';
@@ -17,7 +15,6 @@ import '../../../widgets/alert.dart';
 import '../../../widgets/attendant_user_inputs.dart';
 import '../../../widgets/delete_dialog.dart';
 import '../../../widgets/major_title.dart';
-import '../../../widgets/minor_title.dart';
 import 'attendants_page.dart';
 
 class AttendantDetails extends StatelessWidget {

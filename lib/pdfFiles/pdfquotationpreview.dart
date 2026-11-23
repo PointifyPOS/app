@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/utils/colors.dart';
 import 'package:printing/printing.dart';
 
 import '../models/salemodel.dart';
@@ -10,7 +10,7 @@ class PdfQuotation extends StatelessWidget {
   final SaleModel? invoice;
   final String? type;
 
-  const PdfQuotation({Key? key, this.invoice, this.type}) : super(key: key);
+  const PdfQuotation({super.key, this.invoice, this.type});
 
   @override
   Widget build(BuildContext context) {

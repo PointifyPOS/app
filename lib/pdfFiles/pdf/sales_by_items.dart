@@ -8,10 +8,10 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pointify/models/customer.dart';
-import 'package:pointify/models/payment.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/models/salereturn.dart';
+import 'package:reggypos/models/customer.dart';
+import 'package:reggypos/models/payment.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/models/salereturn.dart';
 
 Future<void> downloadSalesItemsPdf(
   List<SaleModel> sales, {
@@ -146,7 +146,7 @@ Future<void> downloadSalesItemsPdf(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(14),
       footer: (context) => _footer(
-        shopName: shop?.name ?? "Pointify",
+        shopName: shop?.name ?? "ReggyPOS",
         context: context,
       ),
       build: (context) {
@@ -351,7 +351,7 @@ Future<void> downloadCustomerReturnsPdf(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(14),
-      footer: (context) => _footer(shopName: "Pointify", context: context),
+      footer: (context) => _footer(shopName: "ReggyPOS", context: context),
       build: (context) {
         return [
           _header(
@@ -470,7 +470,7 @@ Future<void> downloadCustomerStatementPdf(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.all(14),
-      footer: (context) => _footer(shopName: "Pointify", context: context),
+      footer: (context) => _footer(shopName: "ReggyPOS", context: context),
       build: (context) {
         return [
           _header(
@@ -687,7 +687,7 @@ pw.Widget _customerAndFilterBox({
                 ),
               if (hasStatus)
                 pw.Text(
-                  "Status: ${_capitalize(status!)}",
+                  "Status: ${_capitalize(status)}",
                   style: const pw.TextStyle(fontSize: 7),
                 ),
               if (hasDate)

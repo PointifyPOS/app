@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/controllers/stockcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/controllers/stockcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/utils/colors.dart';
 
 class ProductSelections extends StatelessWidget {
   final Shop toShop;

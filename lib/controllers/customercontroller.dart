@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/services/customer.dart';
-import 'package:pointify/sqlite/helper.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/services/customer.dart';
+import 'package:reggypos/sqlite/helper.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../functions/functions.dart';
 import '../models/customer.dart';
 import '../models/payment.dart';
 import '../models/salemodel.dart';
-import '../responsive/responsiveness.dart';
-import '../screens/customers/customers_page.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
-import 'homecontroller.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class CustomerController extends GetxController
     with SingleGetTickerProviderMixin {

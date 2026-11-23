@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/expense.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/expense.dart';
 
 import '../../../utils/colors.dart';
 import '../../../widgets/delete_dialog.dart';

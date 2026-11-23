@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/widgets/minor_title.dart';
+import 'package:reggypos/widgets/minor_title.dart';
 
 import '../models/usermodel.dart';
 import '../screens/home/attendant/attendant_details.dart';

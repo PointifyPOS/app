@@ -1,7 +1,7 @@
-name: pointify
-description: "Pointify Pos."
+name: reggypos
+description: "ReggyPOS - Point of Sale & Inventory Management."
 publish_to: 'none'
-version: 2.0.193+213
+version: 2.0.195+215
 
 environment:
   sdk: '>=3.5.0 <4.0.0'
@@ -51,20 +51,19 @@ dependencies:
   bluetooth_print_plus: ^2.4.6
   uuid: ^4.4.0
   cs50sdkupdate:
-    git:
-      url: https://github.com/freddysundowner/-cs50sdkupdate
-      ref: main
+    path: packages/cs50sdkupdate
   flutter_chat_types:
   path:
   sunmi_printer_plus: ^2.1.3
   connectivity_plus: ^6.0.3
   in_app_review: ^2.0.10
   flutter_chat_bubble: ^2.0.2
-  in_app_purchase: ^3.2.0
   flutter_paystack_plus: ^2.3.0
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.3
@@ -73,7 +72,8 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/app_icon.png"
+  remove_alpha_ios: true
   min_sdk_android: 21
 
 flutter:
@@ -82,7 +82,9 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/
-fonts:
-  - family: Montserrat
-    fonts:
-      - asset: assets/fonts/Helvetica.ttf
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700

@@ -2,8 +2,8 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/main.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/main.dart';
 
 import '../../controllers/reports_controller.dart';
 import '../../models/product.dart';

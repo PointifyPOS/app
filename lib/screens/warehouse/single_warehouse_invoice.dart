@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/warehousecontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/warehouseitem.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/warehousecontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/warehouseitem.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 import 'package:printing/printing.dart';
 
 import '../../functions/functions.dart';

@@ -1,8 +1,8 @@
 // TODO Implement this library.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../../../utils/colors.dart';
 import '../../../main.dart';

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:pointify/main.dart';
+import 'package:reggypos/main.dart';
 
 import '../../../../models/salemodel.dart';
 

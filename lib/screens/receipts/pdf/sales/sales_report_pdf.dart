@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/models/shop.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/models/shop.dart';
 
 import '../../../../controllers/reports_controller.dart';
 

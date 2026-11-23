@@ -1,7 +1,7 @@
-import 'package:pointify/models/extra_charge.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/models/shop.dart';
+import 'package:reggypos/models/extra_charge.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/models/shop.dart';
 
 import 'customer.dart';
 

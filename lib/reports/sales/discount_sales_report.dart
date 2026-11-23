@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/utils/helper.dart';
 import 'package:printing/printing.dart';
 
 import '../../../controllers/homecontroller.dart';
@@ -20,10 +20,7 @@ import '../../widgets/textbutton.dart';
 class DiscountSalesReport extends StatefulWidget {
   final String? title;
   final String? keyFrom;
-  DiscountSalesReport({Key? key, this.title, this.keyFrom})
-      : super(
-          key: key,
-        ) {
+  DiscountSalesReport({super.key, this.title, this.keyFrom}) {
     ReportsController reportsController = Get.find<ReportsController>();
     reportsController.discountReport(
       shop: userController.currentUser.value!.primaryShop!.id!,

@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/utils/app_config.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/utils/app_config.dart';
 import 'package:sunmi_printer_plus/column_maker.dart';
 import 'package:sunmi_printer_plus/enums.dart';
 import 'package:sunmi_printer_plus/sunmi_printer_plus.dart';
@@ -93,14 +93,14 @@ class Sunmi {
     await initialize();
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.lineWrap(1);
-    await SunmiPrinter.printText(receiptTitle ?? "Pointify Receipt",
+    await SunmiPrinter.printText(receiptTitle ?? "ReggyPOS Receipt",
         style: SunmiStyle(
           fontSize: SunmiFontSize.XL,
           bold: true,
           align: SunmiPrintAlign.CENTER,
         ));
     await SunmiPrinter.printText(
-        userController.currentUser.value?.primaryShop?.name ?? "Pointify",
+        userController.currentUser.value?.primaryShop?.name ?? "ReggyPOS",
         style: SunmiStyle(
           fontSize: SunmiFontSize.LG,
           bold: true,
@@ -200,7 +200,7 @@ class Sunmi {
         "Paid by: ${saleModel.paymentTag?.toUpperCase() ?? saleModel.paymentType?.toUpperCase()}");
     await SunmiPrinter.lineWrap(1); // creates one line space
     await SunmiPrinter.printText("Thank you for shopping with us");
-    await printText("Powered by Pointify POS");
+    await printText("Powered by ReggyPOS");
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.lineWrap(1);
     await SunmiPrinter.lineWrap(1);

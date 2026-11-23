@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/controllers/stockcontroller.dart';
-import 'package:pointify/screens/stock/products_selection.dart';
-import 'package:pointify/screens/stock/stockqty.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/controllers/stockcontroller.dart';
+import 'package:reggypos/screens/stock/products_selection.dart';
+import 'package:reggypos/screens/stock/stockqty.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/productcontroller.dart';
@@ -12,12 +12,11 @@ import '../../controllers/shopcontroller.dart';
 import '../../models/product.dart';
 import '../../models/shop.dart';
 import '../../widgets/major_title.dart';
-import '../sales/components/sales_qty_dialog.dart';
 
 class StockSubmit extends StatelessWidget {
   final Shop toShop;
 
-  StockSubmit({Key? key, required this.toShop}) : super(key: key);
+  StockSubmit({super.key, required this.toShop});
   final StockController stockTransferController = Get.find<StockController>();
   final ProductController productController = Get.find<ProductController>();
   final ProductNewController productNewController =

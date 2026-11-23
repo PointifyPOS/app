@@ -4,8 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../controllers/authcontroller.dart';

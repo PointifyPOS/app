@@ -297,7 +297,7 @@ Future<Uint8List> generateThermalReceiptPdf(
 
               pw.Center(
                 child: pw.Text(
-                  "Powered by Pointify",
+                  "Powered by ReggyPOS",
                   style: const pw.TextStyle(
                     fontSize: 7,
                   ),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../../controllers/cashflowcontroller.dart';
 import '../../controllers/homecontroller.dart';
@@ -12,14 +11,13 @@ import '../../main.dart';
 import '../../models/bank.dart';
 import '../../models/cashflowcategory.dart';
 import '../../utils/colors.dart';
-import '../../widgets/alert.dart';
 import '../../widgets/major_title.dart';
 import 'cash_flow_manager.dart';
 
 class CashOutLayout extends StatelessWidget {
   final DateTime? date;
 
-  CashOutLayout({Key? key, this.date}) : super(key: key);
+  CashOutLayout({super.key, this.date});
 
   final CashFlowController cashFlowController = Get.find<CashFlowController>();
   final ShopController createShopController = Get.find<ShopController>();

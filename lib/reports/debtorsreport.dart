@@ -1,9 +1,9 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/models/debtor.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/models/debtor.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../functions/functions.dart';
 import '../main.dart';

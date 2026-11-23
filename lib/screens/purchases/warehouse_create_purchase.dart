@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/warehousecontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/purchases/product_stockin_warehouse_preview.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/warehousecontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/purchases/product_stockin_warehouse_preview.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/productcontroller.dart';
 import '../../controllers/shopcontroller.dart';
@@ -18,7 +18,7 @@ import '../../widgets/product_image.dart';
 
 class CartButton extends StatelessWidget {
   Shop shop;
-  CartButton({Key? key, required this.shop}) : super(key: key);
+  CartButton({super.key, required this.shop});
   WareHouseController wareHouseController = Get.find<WareHouseController>();
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class CartButton extends StatelessWidget {
 
 class WarehouseCreatePurchase extends StatelessWidget {
   Shop? shop;
-  WarehouseCreatePurchase({Key? key, this.shop}) : super(key: key) {
+  WarehouseCreatePurchase({super.key, this.shop}) {
     productController.searchProductCountController.text = "";
     productController.getProductsBySort(
         type: 'all', warehouse: true, shop: shop!.id!, limit: 50);
@@ -196,7 +196,7 @@ class WarehouseCreatePurchase extends StatelessWidget {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
             child: DropdownButtonFormField<Shop>(
-              value: shopController.allShops
+              initialValue: shopController.allShops
                   .where((w) => w.warehouse == true && shop?.id == w.id)
                   .first,
               hint: const Text('Select warehouse'),

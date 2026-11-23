@@ -1,14 +1,13 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/responsive/responsiveness.dart';
 
 import '../../../controllers/authcontroller.dart';
 import '../../../controllers/homecontroller.dart';
 import '../../../utils/themer.dart';
 
 class AttendantLogin extends StatelessWidget {
-  AttendantLogin({Key? key}) : super(key: key);
+  AttendantLogin({super.key});
   final AuthController authController = Get.find<AuthController>();
   final HomeController homeController = Get.find<HomeController>();
 

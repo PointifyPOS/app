@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/cash_flow/cash_flow_manager.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/cashflowcontroller.dart';
 import '../../controllers/homecontroller.dart';
@@ -14,15 +12,13 @@ import '../../models/bank.dart';
 import '../../models/cashflowcategory.dart';
 import '../../utils/colors.dart';
 import '../../widgets/delete_dialog.dart';
-import 'cashflow_categories.dart';
 import 'category_transactions.dart';
 
 class BanksTransactions extends StatelessWidget {
   final CashFlowCategory? cashFlowCategory;
   final String? page;
 
-  BanksTransactions({Key? key, this.cashFlowCategory, this.page})
-      : super(key: key) {
+  BanksTransactions({super.key, this.cashFlowCategory, this.page}) {
     cashflowController.getBanks();
   }
 

@@ -1,4 +1,4 @@
-import 'package:pointify/main.dart';
+import 'package:reggypos/main.dart';
 
 import '../models/package.dart';
 import 'client.dart';

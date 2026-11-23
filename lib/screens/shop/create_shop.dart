@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/shop/shop_address.dart';
-import 'package:pointify/screens/shop/shop_cagories.dart';
-import 'package:pointify/utils/constants.dart';
-import 'package:pointify/utils/themer.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/shop/shop_address.dart';
+import 'package:reggypos/screens/shop/shop_cagories.dart';
+import 'package:reggypos/utils/constants.dart';
+import 'package:reggypos/utils/themer.dart';
 import 'package:switcher_button/switcher_button.dart';
 
 import '../../models/shoptype.dart';
@@ -22,8 +22,7 @@ class CreateShop extends StatelessWidget {
   final String? type;
 
   CreateShop(
-      {Key? key, required this.page, this.clearInputs = false, this.type})
-      : super(key: key);
+      {super.key, required this.page, this.clearInputs = false, this.type});
 
   final ShopController shopController = Get.find<ShopController>();
 
@@ -156,6 +155,8 @@ class CreateShop extends StatelessWidget {
                 shopController.latitude.text = value.first.latitude.toString();
                 shopController.longitude.text =
                     value.first.longitude.toString();
+              }).catchError((_) {
+                // Address could not be geocoded: keep the text, skip coordinates.
               });
             }
           },

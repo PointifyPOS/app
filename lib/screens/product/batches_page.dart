@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/batch.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/receipts/pdf/products/productsexpirypdflist.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/batch.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/receipts/pdf/products/productsexpirypdflist.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 
 import '../../controllers/productcontroller.dart';
@@ -20,7 +20,7 @@ import '../receipts/pdf/products/productspdflist.dart';
 
 class BatchesPage extends StatelessWidget {
   Product product;
-  BatchesPage({Key? key, required this.product}) : super(key: key) {
+  BatchesPage({super.key, required this.product}) {
     productController.filteredBatches.value = product.batches!;
   }
 
@@ -280,7 +280,7 @@ class BatchesPage extends StatelessWidget {
   showBottomSheet(
     BuildContext context,
   ) {
-    final GlobalKey<State> _keyLoader = GlobalKey<State>();
+    final GlobalKey<State> keyLoader = GlobalKey<State>();
     return showModalBottomSheet(
         context: context,
         backgroundColor:
@@ -369,7 +369,7 @@ class BatchesPage extends StatelessWidget {
                     LoadingDialog.showLoadingDialog(
                       context: Get.context!,
                       title: "Please wait...",
-                      key: _keyLoader,
+                      key: keyLoader,
                     );
                     List<List<Object?>> data = [
                       ['Name', 'Bp', 'Sp', "qty", "category"],
@@ -398,7 +398,7 @@ class BatchesPage extends StatelessWidget {
                     LoadingDialog.showLoadingDialog(
                       context: Get.context!,
                       title: "Please wait...",
-                      key: _keyLoader,
+                      key: keyLoader,
                     );
                     List<List<Object?>> data = [
                       ['Name', 'Bp', 'Sp', "qty", "category"],
@@ -427,7 +427,7 @@ class BatchesPage extends StatelessWidget {
                     LoadingDialog.showLoadingDialog(
                       context: Get.context!,
                       title: "Please wait...",
-                      key: _keyLoader,
+                      key: keyLoader,
                     );
                     await productController.getProductsBySort(
                         type: "expired", reason: "download");

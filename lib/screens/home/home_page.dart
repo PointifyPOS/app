@@ -1,24 +1,20 @@
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/reports/expenses/expense_page.dart';
-import 'package:pointify/reports/stockreport.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/home/profile_page.dart';
-import 'package:pointify/screens/home/widgets/inventory_insights_section.dart';
-import 'package:pointify/screens/usage/inapppurchases_screen.dart';
-import 'package:pointify/screens/warehouse/invoices.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/reports/expenses/expense_page.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/home/profile_page.dart';
+import 'package:reggypos/screens/home/widgets/inventory_insights_section.dart';
+import 'package:reggypos/screens/warehouse/invoices.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../controllers/expensecontroller.dart';
@@ -36,7 +32,6 @@ import '../../widgets/normal_text.dart';
 import '../../widgets/shop_list_bottomsheet.dart';
 import '../cash_flow/cash_flow_manager.dart';
 import '../customers/customers_page.dart';
-import '../discover/shop_tags.dart';
 import '../product/products_page.dart';
 import '../sales/all_sales.dart';
 import '../sales/create_sale.dart';
@@ -47,7 +42,7 @@ import '../usage/share_and_use.dart';
 import '../warehouse/widgets/wh_invoice_card.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
+  HomePage({super.key});
 
   final ShopController shopController = Get.find<ShopController>();
   final ReportsController reportsController = Get.put(ReportsController());
@@ -369,12 +364,7 @@ class HomePage extends StatelessWidget {
                                               ),
                                             InkWell(
                                               onTap: () {
-                                                if (Platform.isIOS) {
-                                                  Get.to(() =>
-                                                      InAppPurchasesScreen());
-                                                } else {
-                                                  Get.to(() => ExtendUsage());
-                                                }
+                                                Get.to(() => ExtendUsage());
                                               },
                                               child: Container(
                                                 padding:

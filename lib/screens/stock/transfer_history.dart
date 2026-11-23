@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/main.dart';
 
 import '../../controllers/shopcontroller.dart';
 import '../../controllers/stockcontroller.dart';
@@ -10,7 +9,7 @@ import '../../widgets/no_items_found.dart';
 import '../../widgets/transfer_history_card.dart';
 
 class TransferHistoryPage extends StatelessWidget {
-  TransferHistoryPage({Key? key}) : super(key: key) {
+  TransferHistoryPage({super.key}) {
     stockTransferController.gettingTransferHistory(
         direction: "to",
         shopid: userController.currentUser.value?.primaryShop?.id);
@@ -113,7 +112,7 @@ class TransferHistoryPage extends StatelessWidget {
 
 class INWidget extends StatelessWidget {
   final String? typekey;
-  INWidget({Key? key, this.typekey}) : super(key: key);
+  INWidget({super.key, this.typekey});
   final ShopController createShopController = Get.find<ShopController>();
   final StockController stockTransferController = Get.find<StockController>();
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/reports/purchases/invoice_order_card.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/reports/purchases/invoice_order_card.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 
 import '../../../controllers/purchase_controller.dart';

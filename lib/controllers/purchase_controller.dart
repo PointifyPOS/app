@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/suppliercontroller.dart';
-import 'package:pointify/screens/suppliers/suppliers_page.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/suppliercontroller.dart';
+import 'package:reggypos/screens/suppliers/suppliers_page.dart';
 
 import '../functions/functions.dart';
 import '../main.dart';
@@ -22,7 +22,7 @@ import '../widgets/loading_dialog.dart';
 import '../widgets/major_title.dart';
 import '../widgets/minor_title.dart';
 import '../widgets/snackBars.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class PurchaseController extends GetxController {
   Rxn<Invoice> invoice = Rxn(null);

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/widgets/minor_title.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/widgets/minor_title.dart';
 
 import '../../../utils/colors.dart';
 import '../../../widgets/delete_dialog.dart';

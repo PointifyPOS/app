@@ -1,6 +1,6 @@
-import 'package:pointify/main.dart';
-import 'package:pointify/services/client.dart';
-import 'package:pointify/services/end_points.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/services/client.dart';
+import 'package:reggypos/services/end_points.dart';
 
 class SmsService {
   static Future topUpCredits(

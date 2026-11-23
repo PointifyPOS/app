@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/suppliers/supplier_info_page.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/suppliers/supplier_info_page.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/suppliercontroller.dart';
@@ -10,7 +10,7 @@ import '../../utils/colors.dart';
 class EditSupplier extends StatelessWidget {
   final String? userType;
 
-  EditSupplier({Key? key, this.userType}) :super(key: key){
+  EditSupplier({super.key, this.userType}){
     supplierController.nameController.text =
         supplierController.supplier.value!.name!;
     supplierController.phoneController.text =

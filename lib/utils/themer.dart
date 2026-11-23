@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/utils/colors.dart';
 
 class ThemeHelper {
   InputDecoration textInputDecoration(
@@ -71,14 +71,14 @@ class ThemeHelper {
 
   ButtonStyle buttonStyle() {
     return ButtonStyle(
-      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30.0),
         ),
       ),
-      minimumSize: MaterialStateProperty.all(const Size(50, 50)),
-      backgroundColor: MaterialStateProperty.all(AppColors.mainColor),
-      shadowColor: MaterialStateProperty.all(Colors.transparent),
+      minimumSize: WidgetStateProperty.all(const Size(50, 50)),
+      backgroundColor: WidgetStateProperty.all(AppColors.mainColor),
+      shadowColor: WidgetStateProperty.all(Colors.transparent),
     );
   }
 }

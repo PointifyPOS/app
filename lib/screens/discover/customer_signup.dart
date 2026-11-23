@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
 
 import '../../controllers/ordercontroller.dart';
 import '../../utils/colors.dart';

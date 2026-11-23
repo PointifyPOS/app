@@ -5,11 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
-import 'package:pointify/controllers/authcontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/services/end_points.dart';
-import 'package:pointify/services/preference_manager.dart';
-import 'package:pointify/utils/isrg_root_x1.dart';
+import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/services/end_points.dart';
+import 'package:reggypos/services/preference_manager.dart';
+import 'package:reggypos/utils/isrg_root_x1.dart';
 
 import '../widgets/snackbars.dart';
 

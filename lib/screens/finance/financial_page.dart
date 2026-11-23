@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/reports/net_profit_report.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/finance/product_comparison.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/reports/net_profit_report.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/finance/product_comparison.dart';
+import 'package:reggypos/utils/helper.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../../controllers/homecontroller.dart';
@@ -61,7 +61,7 @@ class FinancialPage extends StatelessWidget {
     },
   ];
 
-  FinancialPage({Key? key}) : super(key: key);
+  FinancialPage({super.key});
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     if (args.value is PickerDateRange) {

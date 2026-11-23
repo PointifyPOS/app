@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/salereturn.dart';
-import 'package:pointify/screens/receipts/view/sales_returned_receipt.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/salereturn.dart';
+import 'package:reggypos/screens/receipts/view/sales_returned_receipt.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../../../widgets/major_title.dart';
 

@@ -1,26 +1,24 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
-import 'package:pointify/bindings.dart';
-import 'package:pointify/controllers/authcontroller.dart';
-import 'package:pointify/controllers/chat_controller.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/controllers/plancontroller.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/suppliercontroller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/responsive/appbehaviour.dart';
-import 'package:pointify/screens/authentication/landing.dart';
-import 'package:pointify/services/end_points.dart';
-import 'package:pointify/services/settings.dart';
-import 'package:pointify/utils/app_config.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/constants.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/bindings.dart';
+import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/controllers/chat_controller.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/plancontroller.dart';
+import 'package:reggypos/controllers/product_controller_new.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/suppliercontroller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
+import 'package:reggypos/responsive/appbehaviour.dart';
+import 'package:reggypos/screens/authentication/landing.dart';
+import 'package:reggypos/services/end_points.dart';
+import 'package:reggypos/services/settings.dart';
+import 'package:reggypos/utils/app_config.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/helper.dart';
 
 import 'controllers/cashflowcontroller.dart';
 import 'controllers/ordercontroller.dart';
@@ -39,18 +37,38 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  final data = await SettingsApi.getThemes();
+  // Theme/branding is optional: fall back to defaults if the API is unreachable
+  // or has no theme saved yet, instead of failing before runApp().
+  Map data = {};
+  try {
+    final response = await SettingsApi.getThemes();
+    if (response is Map) data = response;
+  } catch (e) {
+    debugPrint("Could not load theme, using defaults: $e");
+  }
 
   final logoPath = (data['image'] ?? "").toString();
   AppConfig.app_logo =
       logoPath.isEmpty ? "" : apiEndPoint + logoPath.replaceFirst("/", "");
-  AppConfig.app_name = data['APP_NAME'] ?? "Pointify";
+  AppConfig.app_name = data['APP_NAME'] ?? "ReggyPOS";
   AppConfig.app_slogan = data['APP_SLOGAN'] ?? "";
 
-  AppColors.mainColor = parseColor(data["PRIMARY_COLOR"]);
-  AppColors.button_color = parseColor(data["BUTTON_COLOR"]);
-  AppColors.text_color = parseColor(data["TEXT_COLOR"]);
-  AppColors.secondary_color = parseColor(data["SECONDARY_COLOR"]);
+  // Keep the built-in colours unless the theme provides a valid one.
+  Color themeColor(dynamic hex, Color fallback) {
+    if (hex is! String || hex.trim().isEmpty) return fallback;
+    try {
+      return parseColor(hex.trim());
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  AppColors.mainColor = themeColor(data["PRIMARY_COLOR"], AppColors.mainColor);
+  AppColors.button_color =
+      themeColor(data["BUTTON_COLOR"], AppColors.button_color);
+  AppColors.text_color = themeColor(data["TEXT_COLOR"], AppColors.text_color);
+  AppColors.secondary_color =
+      themeColor(data["SECONDARY_COLOR"], AppColors.secondary_color);
 
   runApp(const MyApp());
 }
@@ -116,7 +134,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Pointify:',
+      title: 'ReggyPOS:',
       debugShowCheckedModeBanner: false,
       scrollBehavior: AppScrollBehavior(),
       theme: ThemeData(

@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/stockcontroller.dart';
-import 'package:pointify/models/productcount.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/stockcontroller.dart';
+import 'package:reggypos/models/productcount.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 
-import '../controllers/homecontroller.dart';
 import '../controllers/reports_controller.dart';
 import '../controllers/shopcontroller.dart';
 import '../main.dart';
 import '../screens/receipts/pdf/stocktake/stocktake_pdf.dart';
-import '../screens/stock/stock_counts.dart';
 import '../utils/colors.dart';
 import '../widgets/filter_dates.dart';
 
 class StockTakeReport extends StatelessWidget {
-  StockTakeReport({Key? key}) : super(key: key) {
+  StockTakeReport({super.key}) {
     stockController.getCountHistory(
       fromDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
       toDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),

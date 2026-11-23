@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -6,8 +9,15 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+// Release signing: add KEYSTORE_PATH, KEYSTORE_PASSWORD, KEY_ALIAS and KEY_PASSWORD
+// to android/key.properties (see documentation). Falls back to debug signing.
+val keyProps = Properties()
+val keyPropsFile = rootProject.file("key.properties")
+if (keyPropsFile.exists()) keyProps.load(FileInputStream(keyPropsFile))
+val hasReleaseKey = keyProps.getProperty("KEYSTORE_PATH") != null
+
 android {
-    namespace = "com.pointify.appp"
+    namespace = "com.reggypos.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
     compileOptions {
@@ -20,7 +30,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.pointify.com"
+        applicationId = "com.reggypos.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -29,16 +39,18 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file(project.properties["KEYSTORE_PATH"].toString())
-            storePassword = project.properties["KEYSTORE_PASSWORD"].toString()
-            keyAlias = project.properties["KEY_ALIAS"].toString()
-            keyPassword = project.properties["KEY_PASSWORD"].toString()
+            if (hasReleaseKey) {
+                storeFile = rootProject.file(keyProps.getProperty("KEYSTORE_PATH"))
+                storePassword = keyProps.getProperty("KEYSTORE_PASSWORD")
+                keyAlias = keyProps.getProperty("KEY_ALIAS")
+                keyPassword = keyProps.getProperty("KEY_PASSWORD")
+            }
         }
     }
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (hasReleaseKey) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

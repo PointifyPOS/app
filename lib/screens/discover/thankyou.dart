@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/ordercontroller.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/ordercontroller.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/utils/colors.dart';
 import 'package:printing/printing.dart';
 
 import '../../controllers/salescontroller.dart';
@@ -12,7 +12,7 @@ import '../receipts/pdf/sales/online_order_quote.dart';
 class ThankYouPage extends StatelessWidget {
   final SaleModel? order;
 
-  ThankYouPage({Key? key, this.order}) : super(key: key);
+  ThankYouPage({super.key, this.order});
 
   final Color textColor = const Color(0xFF32567A);
   final OrderController orderController = Get.find<OrderController>();

@@ -1,8 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/main.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/main.dart';
 
 import '../../../controllers/ordercontroller.dart';
 import '../../../utils/colors.dart';

@@ -5,12 +5,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/sqlite/helper.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
+import 'package:reggypos/sqlite/helper.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,7 +24,7 @@ import '../../widgets/minor_title.dart';
 import 'attendant/attendants_page.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -73,7 +73,7 @@ class _HomeState extends State<Home> {
     late List<ConnectivityResult> result;
     try {
       result = await _connectivity.checkConnectivity();
-    } on PlatformException catch (e) {
+    } on PlatformException {
       return;
     }
     if (!mounted) {

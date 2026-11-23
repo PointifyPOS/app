@@ -1,7 +1,7 @@
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/shoptype.dart';
-import 'package:pointify/models/subscription.dart';
-import 'package:pointify/models/usermodel.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/shoptype.dart';
+import 'package:reggypos/models/subscription.dart';
+import 'package:reggypos/models/usermodel.dart';
 
 class Shop {
   bool? primary;

@@ -1,5 +1,5 @@
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/product.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/product.dart';
 
 import 'inventory.dart';
 

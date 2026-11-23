@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/customer.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/salemodel.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/screens/customers/customers_page.dart';
-import 'package:pointify/screens/sales/sale_preview.dart';
-import 'package:pointify/services/product_service.dart';
-import 'package:pointify/widgets/snackbars.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/customer.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/salemodel.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/screens/customers/customers_page.dart';
+import 'package:reggypos/screens/sales/sale_preview.dart';
+import 'package:reggypos/services/product_service.dart';
+import 'package:reggypos/widgets/snackbars.dart';
 
 /// One row on the quick-sale screen. [product] is set when the row matches a
 /// product already in the system (picked from suggestions).

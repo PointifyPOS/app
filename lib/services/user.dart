@@ -1,8 +1,8 @@
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/usermodel.dart';
-import 'package:pointify/sqlite/helper.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/usermodel.dart';
+import 'package:reggypos/sqlite/helper.dart';
+import 'package:reggypos/utils/helper.dart';
 
 import 'client.dart';
 import 'end_points.dart';

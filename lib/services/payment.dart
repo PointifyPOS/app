@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:pointify/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
 
 import 'client.dart';
 import 'end_points.dart';

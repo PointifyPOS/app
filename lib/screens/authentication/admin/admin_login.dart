@@ -2,19 +2,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/authcontroller.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/authentication/admin/forgot_password.dart';
-import 'package:pointify/screens/authentication/admin/sign_up.dart';
-import 'package:pointify/screens/authentication/landing.dart';
+import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
+import 'package:reggypos/screens/authentication/admin/forgot_password.dart';
+import 'package:reggypos/screens/authentication/admin/sign_up.dart';
+import 'package:reggypos/screens/authentication/landing.dart';
 
 import '../../../utils/app_config.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/themer.dart';
 
 class AdminLogin extends StatefulWidget {
-  AdminLogin({Key? key}) : super(key: key);
+  const AdminLogin({super.key});
 
   @override
   State<AdminLogin> createState() => _AdminLoginState();

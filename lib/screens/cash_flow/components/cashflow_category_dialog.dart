@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/screens/cash_flow/category_transactions.dart';
+import 'package:reggypos/screens/cash_flow/category_transactions.dart';
 
 import '../../../controllers/cashflowcontroller.dart';
 import '../../../controllers/homecontroller.dart';

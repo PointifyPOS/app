@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/cash_flow/cash_flow_manager.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/utils/helper.dart';
 
 import '../../controllers/cashflowcontroller.dart';
 import '../../controllers/homecontroller.dart';
@@ -16,7 +15,7 @@ import 'components/cashflow_category_dialog.dart';
 import 'components/category_card.dart';
 
 class CashFlowCategories extends StatelessWidget {
-  CashFlowCategories({Key? key}) : super(key: key);
+  CashFlowCategories({super.key});
 
   final ShopController createShopController = Get.find<ShopController>();
   final  CashFlowController cashflowController = Get.find<CashFlowController>();

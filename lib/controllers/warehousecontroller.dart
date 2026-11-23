@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/models/wahoureinvoice.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/models/wahoureinvoice.dart';
+import 'package:reggypos/widgets/alert.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../main.dart';
@@ -18,8 +18,8 @@ import '../screens/receipts/pdf/sales/warehouse_invoice.dart';
 import '../services/product_service.dart';
 import '../utils/colors.dart';
 import '../widgets/loading_dialog.dart';
-import 'package:pointify/services/client.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:reggypos/services/client.dart';
+import 'package:reggypos/functions/functions.dart';
 
 class WareHouseController extends GetxController {
   final GlobalKey<State> _keyLoader = GlobalKey<State>();
@@ -33,10 +33,6 @@ class WareHouseController extends GetxController {
   RxList<WareHouseInvoice> requests = RxList([]);
   RxBool isLoadingCount = RxBool(false);
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   incrementQuantityWidget(context,
       {Product? product, WareHouseInvoice? wareHouseInvoice, String? type}) {

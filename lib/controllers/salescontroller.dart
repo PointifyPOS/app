@@ -6,23 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/controllers/printercontroller.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/analysis.dart';
-import 'package:pointify/models/cashflow.dart';
-import 'package:pointify/models/mpesa_payment.dart';
-import 'package:pointify/models/order.dart';
-import 'package:pointify/models/payment.dart';
-import 'package:pointify/models/salereturn.dart';
-import 'package:pointify/screens/sales/onholdsales.dart';
-import 'package:pointify/sqlite/helper.dart';
-import 'package:pointify/utils/formatter.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/controllers/printercontroller.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/analysis.dart';
+import 'package:reggypos/models/cashflow.dart';
+import 'package:reggypos/models/mpesa_payment.dart';
+import 'package:reggypos/models/order.dart';
+import 'package:reggypos/models/payment.dart';
+import 'package:reggypos/models/salereturn.dart';
+import 'package:reggypos/screens/sales/onholdsales.dart';
+import 'package:reggypos/sqlite/helper.dart';
+import 'package:reggypos/utils/formatter.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -548,7 +548,9 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
   void _onScroll() {
     if (loadingMoreSales.value) return;
     if (scrollController.position.pixels <
-        scrollController.position.maxScrollExtent) return;
+        scrollController.position.maxScrollExtent) {
+      return;
+    }
     _loadMoreData();
   }
 
@@ -1276,7 +1278,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
     final ticket = await Get.find<PrinterController>().printSalesReceipt(
       items: items,
-      storeName: shop?.name ?? 'Pointify',
+      storeName: shop?.name ?? 'ReggyPOS',
       phone: shop?.contact ?? '',
       email: shop?.receiptemail ?? '',
       address: shop?.addressReceipt ?? '',
@@ -1285,7 +1287,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
       paymentType: saleModel.paymentType ?? 'Cash',
       customer: saleModel.customerId?.name ?? '',
       date: saleModel.createdAt ?? '',
-      receiptUrl: 'https://store.pointifypos.com',
+      receiptUrl: 'https://store.yourdomain.com',
       is80mm: paperSize == '80 mm',
       extraCharges: saleModel.extraCharges,
     );
@@ -2152,7 +2154,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     final path = '${dir.path}/${salesModel.sId!}.pdf';
 
     await File(path).writeAsBytes(pdfBytes);
-    Share.shareXFiles([XFile(path)], text: 'Poinitify receipt');
+    Share.shareXFiles([XFile(path)], text: 'ReggyPOS receipt');
   }
 
   Future<void> sendReportEmail({

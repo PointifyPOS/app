@@ -9,10 +9,10 @@ class ResponsiveWidget extends StatelessWidget {
   final Widget smallScreen;
 
   const ResponsiveWidget({
-    Key? key,
+    super.key,
     required this.largeScreen,
     required this.smallScreen,
-  }) : super(key: key);
+  });
 
   static bool isTabletScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 1200 &&

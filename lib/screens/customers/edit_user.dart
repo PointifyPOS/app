@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/customers/customer_info_page.dart';
 
 import '../../controllers/customercontroller.dart';
-import '../../controllers/homecontroller.dart';
 import '../../utils/colors.dart';
 
 class EditCustomer extends StatelessWidget {
   final String? userType;
 
-  EditCustomer({Key? key, this.userType}) : super(key: key);
+  EditCustomer({super.key, this.userType});
 
   final CustomerController customersController = Get.find<CustomerController>();
 

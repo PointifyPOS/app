@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/models/transferhistory.dart';
+import 'package:reggypos/models/transferhistory.dart';
 
 import '../screens/stock/transfer_history_view.dart';
 

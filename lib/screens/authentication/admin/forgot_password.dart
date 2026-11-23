@@ -1,15 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/homecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
+import 'package:reggypos/controllers/homecontroller.dart';
 
 import '../../../controllers/authcontroller.dart';
 import '../../../utils/app_config.dart';
 import '../../../utils/themer.dart';
 
 class ForgotPassword extends StatelessWidget {
-  ForgotPassword({Key? key}) : super(key: key);
+  ForgotPassword({super.key});
   final AuthController authController = Get.find<AuthController>();
   final HomeController homeController = Get.find<HomeController>();
 

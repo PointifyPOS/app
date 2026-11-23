@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/controllers/suppliercontroller.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/controllers/suppliercontroller.dart';
 
 import '../../functions/functions.dart';
 import '../../main.dart';
@@ -593,7 +593,6 @@ class _PurchaesPreviewState extends State<PurchaesPreview> {
   }
 
   void _sell({
-    String status = "cashed",
     String selectedpaymentMethod = "",
   }) {
     if (purchaseController.invoice.value == null ||

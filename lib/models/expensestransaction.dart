@@ -1,6 +1,6 @@
-import 'package:pointify/models/bank.dart';
-import 'package:pointify/models/cashflowcategory.dart';
-import 'package:pointify/models/product.dart';
+import 'package:reggypos/models/bank.dart';
+import 'package:reggypos/models/cashflowcategory.dart';
+import 'package:reggypos/models/product.dart';
 
 class ExpensesTransactionModel {
   String? sId;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/screens/customers/deposit_history.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/screens/customers/deposit_history.dart';
+import 'package:reggypos/utils/colors.dart';
 import 'package:printing/printing.dart';
 
 import '../receipts/pdf/wallet_pdf.dart';

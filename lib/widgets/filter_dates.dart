@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
 
 import '../reports/daterange_picker.dart';
 import '../utils/colors.dart';

@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/services/user.dart';
-import 'package:pointify/sqlite/helper.dart';
+import 'package:reggypos/services/user.dart';
+import 'package:reggypos/sqlite/helper.dart';
 
 import '../main.dart';
 import '../models/usermodel.dart';
-import '../responsive/responsiveness.dart';
-import '../screens/home/attendant/attendants_page.dart';
 import '../utils/app_config.dart';
 import '../utils/helper.dart';
 import '../widgets/alert.dart';
 import '../widgets/loading_dialog.dart';
-import 'homecontroller.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class UserController {
   TextEditingController textEditingCredit = TextEditingController();

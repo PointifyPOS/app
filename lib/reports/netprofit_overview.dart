@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/helper.dart';
 import 'package:printing/printing.dart';
 
 import '../controllers/reports_controller.dart';
@@ -25,8 +25,7 @@ class NetProfitOverview extends StatelessWidget {
   final  String? page;
 
   NetProfitOverview(
-      {Key? key, this.headline, this.page, this.firstday, this.lastday})
-      : super(key: key) ;
+      {super.key, this.headline, this.page, this.firstday, this.lastday}) ;
 
   final SalesController salesController = Get.find<SalesController>();
   final  ShopController shopController = Get.find<ShopController>();

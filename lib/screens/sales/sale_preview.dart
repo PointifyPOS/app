@@ -38,8 +38,9 @@ class _SalePreviewState extends State<SalePreview> {
 
       final total = salesController.receipt.value?.totalWithDiscount ?? 0;
       final paid = double.tryParse(salesController.amountPaid.text) ?? 0;
-      if (paid + 0.0001 < total)
+      if (paid + 0.0001 < total) {
         return; // not fully covered → leave it to the cashier
+      }
 
       salesController.saveSale(
         screen: widget.page ?? 'admin',

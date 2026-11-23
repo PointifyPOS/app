@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/screens/receipts/view/invoice_screen.dart';
-import 'package:pointify/widgets/minor_title.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/screens/receipts/view/invoice_screen.dart';
+import 'package:reggypos/widgets/minor_title.dart';
 
 import '../../models/invoice.dart';
 import '../../widgets/major_title.dart';

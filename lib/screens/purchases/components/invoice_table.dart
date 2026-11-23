@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/reports/purchases/invoice_order_card.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/reports/purchases/invoice_order_card.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../functions/functions.dart';

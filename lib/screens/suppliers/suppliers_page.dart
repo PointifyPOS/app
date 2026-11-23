@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/screens/suppliers/create_suppliers.dart';
-import 'package:pointify/screens/suppliers/supplier_info_page.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/screens/suppliers/create_suppliers.dart';
+import 'package:reggypos/screens/suppliers/supplier_info_page.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/customercontroller.dart';
 import '../../controllers/productcontroller.dart';
@@ -18,7 +18,7 @@ import '../../widgets/minor_title.dart';
 import '../../widgets/textbutton.dart';
 
 class SuppliersPage extends StatelessWidget {
-  SuppliersPage({Key? key}) : super(key: key) {
+  SuppliersPage({super.key}) {
     supplierController.getSuppliers("all");
   }
 

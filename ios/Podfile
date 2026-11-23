@@ -37,8 +37,23 @@ target 'Runner' do
 end
 
 post_install do |installer|
+  # GSDK (from bluetooth_print_plus) ships an arm64 slice built for devices only,
+  # so simulator builds must use x86_64 (runs natively on Intel, via Rosetta on Apple Silicon).
+  # Device and App Store builds are not affected.
+  installer.aggregate_targets.each do |aggregate|
+    aggregate.user_project.native_targets.each do |t|
+      t.build_configurations.each do |config|
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      end
+    end
+    aggregate.user_project.save
+  end
+
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
 
     # FIX for bluetooth_print_plus non-modular headers
     if target.name == 'bluetooth_print_plus'

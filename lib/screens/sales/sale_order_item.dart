@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/models/saleitem.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/home/home_page.dart';
-import 'package:pointify/screens/sales/all_sales.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/models/saleitem.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/home/home_page.dart';
+import 'package:reggypos/screens/sales/all_sales.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/salescontroller.dart';
@@ -19,8 +19,7 @@ class SaleOrderItem extends StatelessWidget {
   final String id;
   final String page;
 
-  SaleOrderItem({Key? key, required this.id, required this.page})
-      : super(key: key);
+  SaleOrderItem({super.key, required this.id, required this.page});
   final SalesController salesController = Get.find<SalesController>();
   final ShopController shopController = Get.find<ShopController>();
 

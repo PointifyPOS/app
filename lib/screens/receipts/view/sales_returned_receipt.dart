@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/widgets/alert.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 import 'package:printing/printing.dart';
 
 import '../../../controllers/salescontroller.dart';

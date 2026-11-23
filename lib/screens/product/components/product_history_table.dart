@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/models/saleitem.dart';
+import 'package:reggypos/models/saleitem.dart';
 
 import '../../../functions/functions.dart';
 import '../../../models/product.dart';

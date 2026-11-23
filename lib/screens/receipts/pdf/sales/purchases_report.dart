@@ -3,10 +3,10 @@ import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:pointify/controllers/purchase_controller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/shop.dart';
+import 'package:reggypos/controllers/purchase_controller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/shop.dart';
 
 import '../../../../controllers/reports_controller.dart';
 

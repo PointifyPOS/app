@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/stockcontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/barcode_scanner.dart';
-import 'package:pointify/screens/stock/product_cout_preview.dart';
-import 'package:pointify/utils/constants.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/stockcontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/product/barcode_scanner.dart';
+import 'package:reggypos/screens/stock/product_cout_preview.dart';
+import 'package:reggypos/utils/constants.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 
 import '../../controllers/productcontroller.dart';
 import '../../controllers/shopcontroller.dart';
@@ -20,6 +20,8 @@ import '../product/components/product_card.dart';
 
 class CartButton extends StatelessWidget {
   StockController stockController = Get.find<StockController>();
+
+  CartButton({super.key});
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -62,7 +64,7 @@ class CartButton extends StatelessWidget {
 }
 
 class StockCount extends StatelessWidget {
-  StockCount({Key? key}) : super(key: key) {
+  StockCount({super.key}) {
     productController.searchProductCountController.text = "";
   }
 

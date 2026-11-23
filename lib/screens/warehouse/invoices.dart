@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/warehousecontroller.dart';
-import 'package:pointify/models/wahoureinvoice.dart';
-import 'package:pointify/screens/warehouse/widgets/wh_invoice_card.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/warehousecontroller.dart';
+import 'package:reggypos/models/wahoureinvoice.dart';
+import 'package:reggypos/screens/warehouse/widgets/wh_invoice_card.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 
 import '../../controllers/homecontroller.dart';

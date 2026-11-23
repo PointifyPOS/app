@@ -1,8 +1,8 @@
-import 'package:pointify/models/batch.dart';
-import 'package:pointify/models/bundleitem.dart';
-import 'package:pointify/models/productcategory.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/models/supplier.dart';
+import 'package:reggypos/models/batch.dart';
+import 'package:reggypos/models/bundleitem.dart';
+import 'package:reggypos/models/productcategory.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/models/supplier.dart';
 
 import '../screens/product/create_product.dart';
 

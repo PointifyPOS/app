@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
 import 'components/wallet_card.dart';
 
 class DepositHistory extends StatelessWidget {

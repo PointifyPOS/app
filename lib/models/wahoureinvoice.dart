@@ -1,6 +1,6 @@
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/shop.dart';
-import 'package:pointify/models/warehouseitem.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/shop.dart';
+import 'package:reggypos/models/warehouseitem.dart';
 
 class WareHouseInvoice {
   String? id;

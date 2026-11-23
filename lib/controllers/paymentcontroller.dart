@@ -1,15 +1,15 @@
 import 'package:get/get.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/controllers/usercontroller.dart';
-import 'package:pointify/models/customer.dart';
-import 'package:pointify/services/payment.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/controllers/usercontroller.dart';
+import 'package:reggypos/models/customer.dart';
+import 'package:reggypos/services/payment.dart';
 
 import '../models/awards.dart';
 import '../models/payment.dart';
 import '../models/payment_methods.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class PaymentController extends GetxController {
   RxBool isPaymentLoading = false.obs;

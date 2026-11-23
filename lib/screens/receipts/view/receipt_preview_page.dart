@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/salescontroller.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
 import 'package:printing/printing.dart';
 
 import '../../../models/salemodel.dart';
@@ -407,7 +407,7 @@ class _ReceiptCard extends StatelessWidget {
       const SizedBox(height: 2),
       const Center(
         child: Text(
-          'Powered by Pointify',
+          'Powered by ReggyPOS',
           style: TextStyle(fontSize: 10, fontFamily: 'Courier'),
         ),
       ),

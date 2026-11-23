@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/product_categories.dart';
-import 'package:pointify/screens/product/products_page.dart';
-import 'package:pointify/screens/suppliers/suppliers_page.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/product/product_categories.dart';
+import 'package:reggypos/screens/product/products_page.dart';
+import 'package:reggypos/screens/suppliers/suppliers_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../utils/colors.dart';
@@ -45,11 +45,10 @@ class CreateProduct extends StatelessWidget {
   final bool? clearInputs;
 
   CreateProduct(
-      {Key? key,
+      {super.key,
       required this.page,
       required this.productModel,
-      this.clearInputs = true})
-      : super(key: key) {
+      this.clearInputs = true}) {
     if (page == "create") {
       if (clearInputs!) {
         productController.clearControllers();
@@ -489,7 +488,7 @@ class CreateProduct extends StatelessWidget {
                           fillColor: Colors.white,
                           filled: true,
                           labelStyle: const TextStyle(
-                              fontFamily: 'Montserrat',
+                              fontFamily: 'Roboto',
                               fontWeight: FontWeight.bold,
                               color: Colors.grey),
                           border: OutlineInputBorder(
@@ -549,7 +548,7 @@ class CreateProduct extends StatelessWidget {
                                       fillColor: Colors.white,
                                       filled: true,
                                       labelStyle: const TextStyle(
-                                          fontFamily: 'Montserrat',
+                                          fontFamily: 'Roboto',
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey),
                                       border: OutlineInputBorder(
@@ -592,7 +591,7 @@ class CreateProduct extends StatelessWidget {
                                       fillColor: Colors.white,
                                       filled: true,
                                       labelStyle: const TextStyle(
-                                          fontFamily: 'Montserrat',
+                                          fontFamily: 'Roboto',
                                           fontWeight: FontWeight.bold,
                                           color: Colors.grey),
                                       border: OutlineInputBorder(
@@ -653,7 +652,7 @@ class CreateProduct extends StatelessWidget {
                                               fillColor: Colors.white,
                                               filled: true,
                                               labelStyle: const TextStyle(
-                                                  fontFamily: 'Montserrat',
+                                                  fontFamily: 'Roboto',
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.grey),
                                               border: OutlineInputBorder(
@@ -907,7 +906,7 @@ class CreateProduct extends StatelessWidget {
                                             filled: true,
                                             hintText: "0",
                                             labelStyle: const TextStyle(
-                                                fontFamily: 'Montserrat',
+                                                fontFamily: 'Roboto',
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey),
                                             border: OutlineInputBorder(
@@ -1015,9 +1014,7 @@ class CreateProduct extends StatelessWidget {
                                                       const ColorScheme.dark(
                                                     onPrimary: Colors.white,
                                                     onSurface: Colors.white,
-                                                  ),
-                                                  dialogBackgroundColor:
-                                                      Colors.white,
+                                                  ), dialogTheme: DialogThemeData(backgroundColor: Colors.white),
                                                 ),
                                                 child: child!,
                                               );
@@ -1044,7 +1041,7 @@ class CreateProduct extends StatelessWidget {
                                           hintText: DateFormat("yyyy-MM-dd")
                                               .format(DateTime.now()),
                                           labelStyle: const TextStyle(
-                                              fontFamily: 'Montserrat',
+                                              fontFamily: 'Roboto',
                                               fontWeight: FontWeight.bold,
                                               color: Colors.grey),
                                           border: OutlineInputBorder(
@@ -1091,7 +1088,7 @@ class CreateProduct extends StatelessWidget {
                                 filled: true,
                                 hintText: 'Manufacturer',
                                 labelStyle: const TextStyle(
-                                    fontFamily: 'Montserrat',
+                                    fontFamily: 'Roboto',
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey),
                                 border: OutlineInputBorder(
@@ -1396,7 +1393,7 @@ class CreateProduct extends StatelessWidget {
                           filled: true,
                           hintText: "optional",
                           labelStyle: const TextStyle(
-                              fontFamily: 'Montserrat',
+                              fontFamily: 'Roboto',
                               fontWeight: FontWeight.bold,
                               color: Colors.grey),
                           border: OutlineInputBorder(

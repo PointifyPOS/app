@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/reports/netprofit_overview.dart';
-import 'package:pointify/reports/summary/sales_summary.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/helper.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/reports/netprofit_overview.dart';
+import 'package:reggypos/reports/summary/sales_summary.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/helper.dart';
 import 'package:printing/printing.dart';
 
 import '../controllers/productcontroller.dart';
@@ -29,8 +29,7 @@ class NetProfitReport extends StatelessWidget {
   final String? page;
 
   NetProfitReport(
-      {Key? key, this.headline, this.page, this.firstday, this.lastday})
-      : super(key: key) {
+      {super.key, this.headline, this.page, this.firstday, this.lastday}) {
     reportsController.activeFilter.value = 'today';
     reportsController.filterStartDate.value = DateFormat(
       "yyyy-MM-dd",

@@ -1,6 +1,6 @@
-import 'package:pointify/models/cashflowcategory.dart';
-import 'package:pointify/models/product.dart';
-import 'package:pointify/models/shop.dart';
+import 'package:reggypos/models/cashflowcategory.dart';
+import 'package:reggypos/models/product.dart';
+import 'package:reggypos/models/shop.dart';
 
 class CashFlowModel {
   String? sId;

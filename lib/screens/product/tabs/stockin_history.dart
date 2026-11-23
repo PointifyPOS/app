@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/product_controller_new.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/receipts/pdf/single_product_purchase_pdf.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/receipts/pdf/single_product_purchase_pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
@@ -192,12 +191,11 @@ class ProductStockHistory extends StatelessWidget {
    final String? toDate;
 
   ProductStockHistory(
-      {Key? key,
+      {super.key,
       required this.product,
       required this.i,
       this.fromDate,
-      this.toDate})
-      : super(key: key){
+      this.toDate}){
     productController.fromDate.value=fromDate!;
     productController.toDate.value=toDate!;
   }

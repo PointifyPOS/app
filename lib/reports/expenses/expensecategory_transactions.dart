@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 
 import '../../controllers/salescontroller.dart';
@@ -24,8 +24,7 @@ class ExpenseCategoryTransactions extends StatelessWidget {
   final SalesController salesController = Get.find<SalesController>();
   final ExpenseController expenseController = Get.find<ExpenseController>();
 
-  ExpenseCategoryTransactions({Key? key, this.page, this.expenseCategory})
-      : super(key: key) {
+  ExpenseCategoryTransactions({super.key, this.page, this.expenseCategory}) {
     expenseController.getExpensesCategorytransactions(expenseCategory!.id!);
   }
   final String title = "";

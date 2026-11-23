@@ -1,9 +1,9 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/productcontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/stock/stock_transfer.dart';
+import 'package:reggypos/controllers/productcontroller.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/stock/stock_transfer.dart';
 
 import '../../controllers/shopcontroller.dart';
 import '../../functions/functions.dart';
@@ -12,7 +12,7 @@ import '../../widgets/alert.dart';
 import '../../widgets/major_title.dart';
 
 class ImportProducts extends StatelessWidget {
-  ImportProducts({Key? key}) : super(key: key);
+  ImportProducts({super.key});
 
   final ProductController productController = Get.find<ProductController>();
   final ShopController shopController = Get.find<ShopController>();

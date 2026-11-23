@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:pointify/services/end_points.dart';
+import 'package:reggypos/services/end_points.dart';
 
 import '../main.dart';
 import 'client.dart';

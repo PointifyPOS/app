@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/expensecontroller.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/cash_flow/cash_flow_manager.dart';
-import 'package:pointify/widgets/alert.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/controllers/expensecontroller.dart';
+import 'package:reggypos/screens/cash_flow/cash_flow_manager.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../../controllers/cashflowcontroller.dart';
 import '../../controllers/homecontroller.dart';
@@ -16,7 +14,7 @@ import '../../utils/colors.dart';
 import '../../widgets/major_title.dart';
 
 class CashInLayout extends StatelessWidget {
-  CashInLayout({Key? key}) : super(key: key);
+  CashInLayout({super.key});
 
   final ShopController createShopController = Get.find<ShopController>();
 

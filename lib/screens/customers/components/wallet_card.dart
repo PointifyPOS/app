@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:reggypos/functions/functions.dart';
 
 import '../../../models/payment.dart';
 import 'cash_receipt.dart';

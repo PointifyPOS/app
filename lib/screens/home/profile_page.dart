@@ -4,14 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/ios_ble_printer_page.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/profile/sms_settings_page.dart';
-import 'package:pointify/screens/usage/extend_usage.dart';
-import 'package:pointify/services/shop_services.dart';
-import 'package:pointify/widgets/loading_dialog.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/ios_ble_printer_page.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/profile/sms_settings_page.dart';
+import 'package:reggypos/screens/usage/extend_usage.dart';
+import 'package:reggypos/services/shop_services.dart';
+import 'package:reggypos/widgets/loading_dialog.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../printing_page.dart';
@@ -691,7 +691,7 @@ class ProfilePage extends StatelessWidget {
                     controller: smsSenderController,
                     enabled: smsEnabled.value,
                     decoration: _dialogInputDecoration(
-                      hintText: "e.g Pointify",
+                      hintText: "e.g ReggyPOS",
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -830,7 +830,7 @@ class ProfilePage extends StatelessWidget {
           const SizedBox(width: 10),
           CupertinoSwitch(
             value: smsEnabled.value,
-            activeColor: AppColors.mainColor,
+            activeTrackColor: AppColors.mainColor,
             onChanged: (value) {
               smsEnabled.value = value;
             },

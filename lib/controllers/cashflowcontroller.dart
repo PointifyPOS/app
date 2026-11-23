@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/salescontroller.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/cashflow.dart';
-import 'package:pointify/models/cashflowcategory.dart';
-import 'package:pointify/models/cashflowtransaction.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/alert.dart';
+import 'package:reggypos/controllers/salescontroller.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/cashflow.dart';
+import 'package:reggypos/models/cashflowcategory.dart';
+import 'package:reggypos/models/cashflowtransaction.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/alert.dart';
 
 import '../functions/functions.dart';
 import '../models/bank.dart';
 import '../screens/sales/all_sales.dart';
 import '../services/cashflow.dart';
 import '../widgets/snackBars.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class CashFlowController extends GetxController {
   RxList<CashFlowModel> cashflows = RxList([]);

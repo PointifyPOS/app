@@ -2,16 +2,14 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/customercontroller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/cash_flow/cashout_layout.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/controllers/customercontroller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/cash_flow/cashout_layout.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../../controllers/cashflowcontroller.dart';
 import '../../controllers/expensecontroller.dart';
-import '../../controllers/homecontroller.dart';
 import '../../controllers/productcontroller.dart';
 import '../../controllers/salescontroller.dart';
 import '../../controllers/shopcontroller.dart';
@@ -28,7 +26,7 @@ class CashFlowManager extends StatelessWidget {
   final SalesController salesController = Get.find<SalesController>();
   final ProductController productController = Get.find<ProductController>();
 
-  CashFlowManager({Key? key}) : super(key: key) {
+  CashFlowManager({super.key}) {
     cashFlowController.filteringCashflow.value = false;
     cashFlowController.toDate.value = DateTime.now();
     cashFlowController.fromDate.value = DateTime(

@@ -1,4 +1,4 @@
-import 'package:pointify/models/product.dart';
+import 'package:reggypos/models/product.dart';
 
 class ProductCount {
   String? sId;

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/models/awards.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/models/awards.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../../controllers/authcontroller.dart';
 import '../../controllers/paymentcontroller.dart';
@@ -134,7 +134,7 @@ class ShareAndUse extends StatelessWidget {
                       //   userController.currentUser.value!.id!,
                       //   type: "app",
                       //   title:
-                      //       "Hello, Check out Pointify to manage your shops, sales, cashflow etc",
+                      //       "Hello, Check out ReggyPOS to manage your shops, sales, cashflow etc",
                       // )
                       //     .then((value) async {
                       //   await Share.share(value,

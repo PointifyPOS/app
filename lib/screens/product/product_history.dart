@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/responsive/responsiveness.dart';
-import 'package:pointify/screens/product/products_page.dart';
-import 'package:pointify/screens/product/tabs/bad_stock_history.dart';
-import 'package:pointify/screens/product/tabs/count_history.dart';
-import 'package:pointify/screens/product/tabs/product_sales.dart';
-import 'package:pointify/screens/product/tabs/stockin_history.dart';
-import 'package:pointify/utils/colors.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/responsive/responsiveness.dart';
+import 'package:reggypos/screens/product/products_page.dart';
+import 'package:reggypos/screens/product/tabs/bad_stock_history.dart';
+import 'package:reggypos/screens/product/tabs/count_history.dart';
+import 'package:reggypos/screens/product/tabs/product_sales.dart';
+import 'package:reggypos/screens/product/tabs/stockin_history.dart';
+import 'package:reggypos/utils/colors.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/productcontroller.dart';

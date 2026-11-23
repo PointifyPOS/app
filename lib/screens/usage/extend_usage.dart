@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/minor_title.dart';
-import 'package:pointify/widgets/shop_list_bottomsheet.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/shop_list_bottomsheet.dart';
 
 import '../../controllers/plancontroller.dart';
 import '../../controllers/shopcontroller.dart';

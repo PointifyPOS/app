@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/screens/product/tabs/receipts_sales.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/screens/product/tabs/receipts_sales.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../controllers/salescontroller.dart';
@@ -17,9 +17,9 @@ class SalesPages extends StatelessWidget {
   final SalesController salesController = Get.find<SalesController>();
 
   SalesPages({
-    Key? key,
+    super.key,
     required this.product,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 
 
-import 'package:pointify/models/supplier.dart';
+import 'package:reggypos/models/supplier.dart';
 
 import 'client.dart';
 import 'end_points.dart';

@@ -1,4 +1,4 @@
-import 'package:pointify/functions/functions.dart';
+import 'package:reggypos/functions/functions.dart';
 
 class Customer {
   String? name;

@@ -4,8 +4,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/models/invoice.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/models/invoice.dart';
 
 Future<Uint8List> invoiceReceipt(Invoice invoice, String type) async {
   final pdf = Document();

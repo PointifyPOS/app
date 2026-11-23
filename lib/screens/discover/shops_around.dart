@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pointify/controllers/ordercontroller.dart';
-import 'package:pointify/controllers/shopcontroller.dart';
-import 'package:pointify/screens/discover/orders/create_order.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/widgets/no_items_found.dart';
-import 'package:pointify/widgets/textbutton.dart';
+import 'package:reggypos/controllers/ordercontroller.dart';
+import 'package:reggypos/controllers/shopcontroller.dart';
+import 'package:reggypos/screens/discover/orders/create_order.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
+import 'package:reggypos/widgets/textbutton.dart';
 
 import '../../models/shop.dart';
 

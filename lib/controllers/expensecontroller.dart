@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/main.dart';
-import 'package:pointify/services/expenses.dart';
-import 'package:pointify/widgets/snackBars.dart';
+import 'package:reggypos/main.dart';
+import 'package:reggypos/services/expenses.dart';
+import 'package:reggypos/widgets/snackBars.dart';
 
 import '../models/expense.dart';
 import '../models/expensecategory.dart';
 import '../models/expensestransaction.dart';
 import '../widgets/alert.dart';
 import 'cashflowcontroller.dart';
-import 'package:pointify/services/client.dart';
+import 'package:reggypos/services/client.dart';
 
 class ExpenseController {
   RxList<ExpenseModel> expenses = RxList([]);

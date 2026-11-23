@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:pointify/functions/functions.dart';
+import 'package:reggypos/functions/functions.dart';
 
 import '../../../../models/salemodel.dart';
 

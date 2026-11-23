@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:pointify/controllers/paymentcontroller.dart';
-import 'package:pointify/controllers/reports_controller.dart';
-import 'package:pointify/functions/functions.dart';
-import 'package:pointify/reports/sales/sales_report.dart';
-import 'package:pointify/reports/sales/salesreturns_report.dart';
-import 'package:pointify/utils/colors.dart';
-import 'package:pointify/utils/helper.dart';
-import 'package:pointify/widgets/filter_dates.dart';
-import 'package:pointify/widgets/no_items_found.dart';
+import 'package:reggypos/controllers/paymentcontroller.dart';
+import 'package:reggypos/controllers/reports_controller.dart';
+import 'package:reggypos/functions/functions.dart';
+import 'package:reggypos/reports/sales/sales_report.dart';
+import 'package:reggypos/reports/sales/salesreturns_report.dart';
+import 'package:reggypos/utils/colors.dart';
+import 'package:reggypos/utils/helper.dart';
+import 'package:reggypos/widgets/filter_dates.dart';
+import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
 
 import '../../../main.dart';
