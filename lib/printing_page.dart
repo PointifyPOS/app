@@ -362,8 +362,8 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
 
   Future<List<int>> testTicket({
     String storeName = "ReggyPOS Limited",
-    String phone = "Phone: 0720 044 055",
-    String email = "Email: reggypos@gmail.com",
+    String phone = "Phone: +000 000 000",
+    String email = "Email: support@yourdomain.com",
     String paymentType = "M-Pesa",
     String receiptUrl = "https://yourdomain.com/receipt/INV12345678",
     required List<Map<String, dynamic>> items,
