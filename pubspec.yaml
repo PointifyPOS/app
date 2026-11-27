@@ -24,9 +24,7 @@ dependencies:
   pdf: ^3.10.4
   shimmer: ^3.0.0
   barcode_widget: ^2.0.4
-  syncfusion_flutter_charts: ^29.1.35
   url_launcher: ^6.1.10
-  syncfusion_flutter_datepicker: ^29.1.35
   data_table_2: ^2.5.3
   printing: ^5.11.0
   excel: ^3.0.0

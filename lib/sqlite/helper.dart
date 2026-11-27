@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 import 'package:path/path.dart';
@@ -662,7 +663,7 @@ class DatabaseHelper {
 
       await insertSubscription(shop['subscription']);
     } catch (e) {
-      print("Error inserting shop: $e");
+      debugPrint("Error inserting shop: $e");
     }
   }
 

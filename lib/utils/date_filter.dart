@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reggypos/controllers/homecontroller.dart';
 import 'package:reggypos/responsive/responsiveness.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import '../widgets/range_calendar.dart';
 
 import '../controllers/salescontroller.dart';
 import '../models/product.dart';
@@ -46,18 +46,12 @@ class DateFilter extends StatelessWidget {
               color: isSmallScreen(context) ? Colors.white : Colors.black,
             )),
       ),
-      body: SfDateRangePicker(
+      body: SingleChildScrollView(
+        child: RangeCalendar(
           showActionButtons: true,
           confirmText: "Filter",
-          selectionMode: DateRangePickerSelectionMode.range,
           maxDate: DateTime.now(),
-          monthViewSettings: const DateRangePickerMonthViewSettings(),
-          headerStyle:  DateRangePickerHeaderStyle(
-              textAlign: TextAlign.center,
-              textStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.mainColor,
-                  fontSize: 18)),
+          color: AppColors.mainColor,
           onSubmit: (value) {
             function!(value);
 
@@ -66,7 +60,9 @@ class DateFilter extends StatelessWidget {
             } else {
               backPress();
             }
-          }),
+          },
+        ),
+      ),
     );
   }
 

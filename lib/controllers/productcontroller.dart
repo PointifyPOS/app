@@ -224,7 +224,7 @@ class ProductController extends GetxController {
     if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent &&
         !loadingProducts.value) {
-      print("Load more data");
+      debugPrint("Load more data");
       _loadMoreData();
     }
   }
@@ -436,7 +436,7 @@ class ProductController extends GetxController {
         "bundle": bundleEnabled.value,
         "virtual": virtualProduct.value
       };
-      print("product $product");
+      debugPrint("product $product");
 
       var response =
           await ProductService.updateProduct(product, productData!.sId!);

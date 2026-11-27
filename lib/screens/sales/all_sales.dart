@@ -8,7 +8,7 @@ import 'package:reggypos/utils/helper.dart';
 import 'package:reggypos/widgets/alert.dart';
 import 'package:reggypos/widgets/no_items_found.dart';
 import 'package:printing/printing.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import '../../widgets/range_calendar.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/reports_controller.dart';

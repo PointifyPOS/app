@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:reggypos/responsive/responsiveness.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import '../../../widgets/range_calendar.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../controllers/productcontroller.dart';

@@ -134,7 +134,7 @@ class ReportsController extends GetxController {
     String? toDate,
     String? shopid,
   }) async {
-    print("getPurchasesReport");
+    debugPrint("getPurchasesReport");
     var types = [
       {
         "title": "Total Purchases",
@@ -176,7 +176,7 @@ class ReportsController extends GetxController {
     isLoadingReports.value = true;
     var respose = await ReportsService().getPurchasesReport(
         startDate: startDate, toDate: toDate, shopid: shopid);
-    print(respose);
+    debugPrint(respose);
     salesCard.clear();
     totalSales.value = 0;
     for (var element in types) {
@@ -280,7 +280,7 @@ class ReportsController extends GetxController {
         }
       }
     }
-    print("respose: $respose");
+    debugPrint("respose: $respose");
 
     debtbreakdown = respose['debtpaid_breakdown'];
     salesReportData.value = respose;

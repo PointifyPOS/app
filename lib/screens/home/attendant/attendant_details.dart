@@ -540,7 +540,6 @@ class Permissions extends StatelessWidget {
                     "key": keyy,
                     "value": [key]
                   };
-                  print(role);
                   userController.roles.addAll([role]);
                 }
               },

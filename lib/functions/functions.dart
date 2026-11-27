@@ -18,7 +18,7 @@ import '../models/product.dart';
 
 debugPrintMessage(message) {
   if (kDebugMode) {
-    print(message);
+    debugPrint(message);
   }
 }
 
@@ -105,7 +105,6 @@ verifyPermission({required String category, permission, bool group = false}) {
   if (userController.currentUser.value?.usertype == "attendant") {
     List role =
         userController.roles.where((p0) => p0["key"] == category).toList();
-    print(role);
     if (role.isEmpty) return false;
     if (group) {
       return role.isNotEmpty;
@@ -187,7 +186,6 @@ Future<List<List<String>>> readExcel(String path) async {
 
   // Access the specific sheet by name
   var sheet = excel['Sheet1'];
-  print(sheet.rows);
 
   // Skip the header row
   bool isFirstRow = true;

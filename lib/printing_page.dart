@@ -330,7 +330,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
       _msj = result ? "Printer connected" : "Failed to connect printer";
     });
 
-    print("result status connect: $result");
+    debugPrint("result status connect: $result");
   }
 
   Future<void> disconnect() async {
@@ -338,7 +338,7 @@ class BluetoothReceiptPrinterState extends State<BluetoothReceiptPrinter> {
     setState(() {
       connected = false;
     });
-    print("status disconnect $status");
+    debugPrint("status disconnect $status");
   }
 
   Future<void> printTest() async {

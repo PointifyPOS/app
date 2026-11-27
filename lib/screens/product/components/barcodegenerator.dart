@@ -96,7 +96,7 @@ class BarcodeGenerator extends StatelessWidget {
                         );
                       } catch (e) {
                         if (kDebugMode) {
-                          print('Error printing PDF: $e');
+                          debugPrint('Error printing PDF: $e');
                         }
                       }
                     },

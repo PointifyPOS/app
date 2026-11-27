@@ -44,7 +44,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
         if (widget.onScanned != null) {
           await widget.onScanned!(code);
         }
-        print("scanned: $code");
+        debugPrint("scanned: $code");
         if (widget.popAfterScan) {
           Get.back(result: code);
         }

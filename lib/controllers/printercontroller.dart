@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
@@ -464,7 +465,7 @@ class PrinterController extends GetxController {
 
       return true;
     } catch (e) {
-      print("iOS BLE print failed: $e");
+      debugPrint("iOS BLE print failed: $e");
       generalAlert(
         title: "Printer Error",
         message: "iPhone printer failed: $e",

@@ -5,7 +5,7 @@ import 'package:reggypos/functions/functions.dart';
 import 'package:reggypos/main.dart';
 import 'package:reggypos/utils/helper.dart';
 import 'package:reggypos/widgets/no_items_found.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import '../../widgets/range_calendar.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../controllers/salescontroller.dart';

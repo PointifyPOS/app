@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:reggypos/models/product.dart';
 
 class ProductCount {
@@ -57,7 +58,7 @@ class Item {
   Item.fromJson(Map<String, dynamic> json) {
     name = json['productId']["name"];
     if (json['productId']["buyingPrice"] is double) {
-      print("Buying price is double ${json['productId']["buyingPrice"]}");
+      debugPrint("Buying price is double ${json['productId']["buyingPrice"]}");
     }
     buyingPrice = json['productId']["buyingPrice"];
     quantity = json['productId']["quantity"];

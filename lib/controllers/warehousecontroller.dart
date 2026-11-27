@@ -173,7 +173,6 @@ class WareHouseController extends GetxController {
         });
       }
     }
-    print(items);
     var productdata = {
       "attendantId": userController.currentUser.value!.attendantId?.sId,
       "useWarehouse": true,
@@ -187,7 +186,6 @@ class WareHouseController extends GetxController {
               })
           .toList()
     };
-    print(productdata);
 
     LoadingDialog.showLoadingDialog(
         context: Get.context!, title: "Please wait", key: _keyLoader);

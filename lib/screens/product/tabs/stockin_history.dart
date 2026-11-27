@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:reggypos/responsive/responsiveness.dart';
 import 'package:reggypos/screens/receipts/pdf/single_product_purchase_pdf.dart';
 import 'package:printing/printing.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import '../../../widgets/range_calendar.dart';
 
 import '../../../controllers/homecontroller.dart';
 import '../../../controllers/productcontroller.dart';

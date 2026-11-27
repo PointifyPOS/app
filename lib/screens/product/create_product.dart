@@ -370,9 +370,9 @@ class CreateProduct extends StatelessWidget {
                                                             return;
                                                           }
                                                         }
-                                                        print(product
+                                                        debugPrint(product
                                                             .inventoryId);
-                                                        print(productController
+                                                        debugPrint(productController
                                                             .bundleQty.text);
                                                         productController
                                                             .bundledProducts

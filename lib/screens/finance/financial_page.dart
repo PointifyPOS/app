@@ -7,7 +7,7 @@ import 'package:reggypos/reports/net_profit_report.dart';
 import 'package:reggypos/responsive/responsiveness.dart';
 import 'package:reggypos/screens/finance/product_comparison.dart';
 import 'package:reggypos/utils/helper.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import '../../widgets/range_calendar.dart';
 
 import '../../controllers/homecontroller.dart';
 import '../../controllers/salescontroller.dart';
@@ -63,22 +63,22 @@ class FinancialPage extends StatelessWidget {
 
   FinancialPage({super.key});
 
-  void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
-    if (args.value is PickerDateRange) {
+  void _onSelectionChanged(PickerDateRange range) {
+    if (range.startDate != null) {
       salesController.range.value =
-          '${DateFormat('dd/MM/yyyy').format(args.value.startDate)} -'
-          ' ${DateFormat('dd/MM/yyyy').format(args.value.endDate ?? args.value.startDate)}';
+          '${DateFormat('dd/MM/yyyy').format(range.startDate!)} -'
+          ' ${DateFormat('dd/MM/yyyy').format(range.endDate ?? range.startDate!)}';
 
-      if (args.value.startDate != null && args.value.endDate != null) {
+      if (range.endDate != null) {
         salesController.getNetAnalysis(
-            fromDate: DateFormat('yyy-MM-dd').format(args.value.startDate),
+            fromDate: DateFormat('yyy-MM-dd').format(range.startDate!),
             toDate: DateFormat('yyy-MM-dd')
-                .format(args.value.endDate ?? args.value.startDate),
+                .format(range.endDate ?? range.startDate!),
             shopId: userController.currentUser.value!.primaryShop!.id!);
         Get.to(() => NetProfitReport(
               headline: "from\n${salesController.range.value}",
-              firstday: args.value.startDate,
-              lastday: args.value.endDate ?? args.value.startDate,
+              firstday: range.startDate!,
+              lastday: range.endDate ?? range.startDate!,
             ));
       }
     }
@@ -92,23 +92,9 @@ class FinancialPage extends StatelessWidget {
         child: ListView(
           children: [
             const SizedBox(height: 10),
-            SfDateRangePicker(
+            RangeCalendar(
                 onSelectionChanged: _onSelectionChanged,
-                selectionMode: DateRangePickerSelectionMode.range,
-                monthCellStyle: DateRangePickerMonthCellStyle(
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.mainColor,
-                  ),
-                ),
-                monthViewSettings: const DateRangePickerMonthViewSettings(),
-                headerStyle: DateRangePickerHeaderStyle(
-                    textAlign: TextAlign.center,
-                    textStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.mainColor,
-                        fontSize: 18)),
-                onSubmit: (v) {}),
+                color: AppColors.mainColor),
             ListView.builder(
                 shrinkWrap: true,
                 itemCount: operations.length,

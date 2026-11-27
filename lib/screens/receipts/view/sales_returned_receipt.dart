@@ -148,7 +148,7 @@ class ReturnedReceipt extends StatelessWidget {
                           itemCount: saleRetuns!.items!.length,
                           itemBuilder: (BuildContext c, int i) {
                             Items receiptitem = saleRetuns!.items![i];
-                            print("receiptitem ${receiptitem.quantity}");
+                            debugPrint("receiptitem ${receiptitem.quantity}");
                             return Row(
                               children: [
                                 Expanded(

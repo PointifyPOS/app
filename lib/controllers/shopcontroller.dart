@@ -369,7 +369,6 @@ RxBool viewAllCustomers = false.obs;
           subscriptionid: response['subscriptionid']);
     } catch (e) {
       if (kDebugMode) {
-        print(e);
       }
     }
   }
@@ -409,7 +408,6 @@ RxBool viewAllCustomers = false.obs;
           return true;
         } catch (e) {
           if (kDebugMode) {
-            print(e);
           }
         }
       } else if (value.status.name == "requires_payment_method") {

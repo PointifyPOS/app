@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 import 'package:reggypos/models/product.dart';
@@ -27,7 +28,7 @@ class ProductService {
 
       return response;
     } catch (e, s) {
-      print(s);
+      debugPrint(s.toString());
       return null;
     }
   }

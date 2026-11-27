@@ -1246,7 +1246,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         receiptTitle: 'Cash Sale Receipt',
       );
     } catch (e) {
-      print('Sunmi print skipped: $e');
+      debugPrint('Sunmi print skipped: $e');
     }
   }
 
@@ -1257,7 +1257,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         receiptTitle: 'Cash Sale Receipt',
       );
     } catch (e) {
-      print('CS50 print skipped: $e');
+      debugPrint('CS50 print skipped: $e');
     }
   }
 
@@ -1274,7 +1274,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
 
     final paperSize = prefs.getString('printer_paper_size') ?? '58 mm';
-    print("saleModel.extraCharges ${saleModel.extraCharges}");
+    debugPrint("saleModel.extraCharges ${saleModel.extraCharges}");
 
     final ticket = await Get.find<PrinterController>().printSalesReceipt(
       items: items,
@@ -1309,7 +1309,7 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
 
     await Future.delayed(const Duration(milliseconds: 800));
     final result = await PrintBluetoothThermal.writeBytes(ticket);
-    print('Bluetooth print result: $result');
+    debugPrint('Bluetooth print result: $result');
 
     await Future.delayed(const Duration(seconds: 3));
     await PrintBluetoothThermal.disconnect;
@@ -1943,7 +1943,6 @@ class SalesController extends GetxController with GetTickerProviderStateMixin {
         'reason': 'test',
         'deleteReceipt': deleteReceipt,
       };
-      print(returnData);
 
       final response = await SalesService.returnItem(returnData);
 
