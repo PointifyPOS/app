@@ -10,8 +10,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:integration_test/integration_test.dart';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:reggypos/controllers/authcontroller.dart';
+import 'package:reggypos/services/end_points.dart';
+import 'package:reggypos/services/preference_manager.dart';
+import 'package:reggypos/services/product_service.dart';
 import 'package:reggypos/main.dart' as app;
+import 'package:reggypos/main.dart' show userController;
 import 'package:reggypos/reports/reports.dart';
 import 'package:reggypos/screens/customers/customers_page.dart';
 import 'package:reggypos/screens/product/products_page.dart';
@@ -22,6 +30,10 @@ import 'package:reggypos/utils/date_filter.dart';
 
 const demoEmail = String.fromEnvironment('DEMO_EMAIL');
 const demoPassword = String.fromEnvironment('DEMO_PASSWORD');
+
+// Small purple PNG used to test the product image upload.
+const _samplePng =
+    'iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAIAAADbtmxLAAAAMUlEQVR42u3OQQ0AAAgEoCtkGFsa0xbOBxsBSNe8EiEhISEhISEhISEhISEhISGhSwvw3eRbFxv5iQAAAABJRU5ErkJggg==';
 
 Future<void> pumpUntil(WidgetTester tester, Finder finder,
     {Duration timeout = const Duration(seconds: 45), String? what}) async {
@@ -78,6 +90,24 @@ void main() {
         timeout: const Duration(seconds: 60), what: 'home screen');
     await settle(tester, 24);
     await shot(tester, '03_home');
+
+    // Product image upload goes to the API (no cloud storage).
+    final url = await tester.runAsync(() async {
+      final token = await PreferenceManager().getString('user_token');
+      final shopId = userController.currentUser.value!.primaryShop!.id!;
+      final list = await Dio().get(
+          "${EndPoints.products}?page=1&limit=5&shopid=$shopId&type=all",
+          options: Options(headers: {"Authorization": "Bearer $token"}));
+      final data = list.data;
+      final products = data is List ? data : (data["data"] ?? data["products"]) as List;
+      final file = File("${Directory.systemTemp.path}/product.png");
+      await file.writeAsBytes(base64Decode(_samplePng));
+      return ProductService.uploadProductImage(products.first["_id"], file.path);
+    });
+    // ignore: avoid_print
+    print('IMAGE_UPLOAD:$url');
+    expect(url, isNotNull, reason: 'product image upload to the API failed');
+    expect(url, contains('/uploads/shops/'));
 
     await open(tester, () => CreateSale(), '04_sell');
     await open(tester, () => ProductPage(), '05_products');

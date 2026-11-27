@@ -7,7 +7,10 @@ import 'package:reggypos/models/shop.dart';
 import 'package:reggypos/models/wahoureinvoice.dart';
 
 import '../main.dart';
+import 'package:dio/dio.dart';
+
 import 'client.dart';
+import 'preference_manager.dart';
 import 'end_points.dart';
 
 class ProductService {
@@ -33,9 +36,30 @@ class ProductService {
     }
   }
 
-  static String getPathForProductImage(String id, int index) {
-    String path = "products/images/$id";
-    return "${path}_$index";
+  /// Uploads [filePath] as the product's image. Returns the image URL, or null.
+  static Future<String?> uploadProductImage(
+      String productId, String filePath) async {
+    try {
+      final token = await PreferenceManager().getString('user_token');
+      final response = await Dio().post(
+        "${EndPoints.products}image/$productId",
+        data: FormData.fromMap(
+            {"image": await MultipartFile.fromFile(filePath)}),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          validateStatus: (_) => true,
+        ),
+      );
+      final data = response.data;
+      if (response.statusCode == 200 && data is Map && data["url"] is String) {
+        return data["url"] as String;
+      }
+      debugPrint("Image upload failed: ${response.statusCode} $data");
+      return null;
+    } catch (e) {
+      debugPrint("Image upload failed: $e");
+      return null;
+    }
   }
 
   static updateProductsImages(String productId, List<dynamic> imgUrl) async {

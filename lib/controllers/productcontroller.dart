@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
@@ -32,7 +31,6 @@ import '../models/supplier.dart';
 import '../models/transferitems.dart';
 import '../screens/product/components/barcodegenerator.dart';
 import '../screens/product/products_page.dart';
-import '../services/firestore_files_access_service.dart';
 import '../sqlite/helper.dart';
 import '../utils/helper.dart';
 import '../widgets/alert.dart';
@@ -682,28 +680,29 @@ class ProductController extends GetxController {
     }
   }
 
+  // Product images are stored by the API (uploads/shops/<shop>/<product>.webp).
+  // A product has one image: a newly picked photo is uploaded, otherwise the
+  // remaining image list is saved (e.g. after removing the image).
   Future<void> uploadImage(Product product) async {
-    await uploadProductImages(product.sId!, Get.context!);
-
-    List<dynamic> downloadUrls = selectedImages
-        .map((e) => e.imgType == ImageType.network ? e.path : null)
-        .toList();
-
     String snackbarMessage = "";
     try {
-      final updateProductFuture =
-          ProductService.updateProductsImages(product.sId!, downloadUrls);
-      await showDialog(
+      final local = selectedImages
+          .where((e) => e.imgType == ImageType.local)
+          .toList();
+      final Future<dynamic> job = local.isNotEmpty
+          ? ProductService.uploadProductImage(product.sId!, local.last.path)
+          : ProductService.updateProductsImages(product.sId!,
+              selectedImages.map((e) => e.path).toList());
+      final result = await showDialog(
         context: Get.context!,
-        builder: (context) {
-          return AsyncProgressDialog(
-            updateProductFuture,
-            message: const Text("Updating Product"),
-          );
-        },
+        builder: (context) => AsyncProgressDialog(
+          job,
+          message: Text(local.isNotEmpty ? "Uploading image..." : "Updating Product"),
+        ),
       );
-    } on FirebaseException {
-      snackbarMessage = "something went wrong";
+      if (local.isNotEmpty && result == null) {
+        snackbarMessage = "The image could not be uploaded";
+      }
     } catch (e) {
       snackbarMessage = e.toString();
     } finally {
@@ -713,47 +712,6 @@ class ProductController extends GetxController {
         showSnackBar(message: snackbarMessage, color: Colors.red);
       }
     }
-  }
-
-  Future<bool> uploadProductImages(
-      String productId, BuildContext context) async {
-    bool allImagesUpdated = true;
-    for (int i = 0; i < selectedImages.length; i++) {
-      if (selectedImages[i].imgType == ImageType.local) {
-        String? downloadUrl;
-        try {
-          final imgUploadFuture = FirestoreFilesAccess().uploadFileToPath(
-              File(selectedImages[i].path),
-              ProductService.getPathForProductImage(productId, i));
-          downloadUrl = await showDialog(
-            context: context,
-            builder: (context) {
-              return AsyncProgressDialog(
-                imgUploadFuture,
-                message: const Text("uploading images..."),
-              );
-            },
-          );
-        } finally {
-          if (downloadUrl != null) {
-            selectedImages[i] =
-                CustomImage(imgType: ImageType.network, path: downloadUrl);
-          } else {
-            allImagesUpdated = false;
-            ScaffoldMessenger.of(Get.context!).showSnackBar(
-              SnackBar(
-                content: Text(
-                  "error",
-                  style: TextStyle(color: Colors.white),
-                ),
-                backgroundColor: AppColors.mainColor,
-              ),
-            );
-          }
-        }
-      }
-    }
-    return allImagesUpdated;
   }
 
   clearControllers() {

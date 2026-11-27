@@ -75,8 +75,10 @@ class CreateProduct extends StatelessWidget {
     String path = "";
     path = await choseImageFromLocalFiles(context);
     if (index == null) {
-      productController.selectedImages
-          .add(CustomImage(imgType: ImageType.local, path: path));
+      // One image per product: a new pick replaces the current one.
+      productController.selectedImages.value = [
+        CustomImage(imgType: ImageType.local, path: path)
+      ];
     } else {
       if (index < productController.selectedImages.length) {
         productController.selectedImages[index] =

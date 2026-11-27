@@ -1,9 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reggypos/bindings.dart';
 import 'package:reggypos/controllers/authcontroller.dart';
-import 'package:reggypos/controllers/chat_controller.dart';
 import 'package:reggypos/controllers/customercontroller.dart';
 import 'package:reggypos/controllers/plancontroller.dart';
 import 'package:reggypos/controllers/product_controller_new.dart';
@@ -26,16 +24,12 @@ import 'controllers/paymentcontroller.dart';
 import 'controllers/printercontroller.dart';
 import 'controllers/shopcontroller.dart';
 import 'controllers/stockcontroller.dart';
-import 'firebase_options.dart';
 
 final AuthController authController = Get.put(AuthController());
 UserController userController = Get.put<UserController>(UserController());
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   // Theme/branding is optional: fall back to defaults if the API is unreachable
   // or has no theme saved yet, instead of failing before runApp().
@@ -124,7 +118,6 @@ class _MyAppState extends State<MyApp> {
   );
 
   OrderController orderController = Get.put<OrderController>(OrderController());
-  ChatController chatController = Get.put<ChatController>(ChatController());
 
   @override
   void initState() {

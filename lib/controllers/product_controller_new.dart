@@ -4,7 +4,6 @@ import 'package:reggypos/main.dart';
 import 'package:reggypos/models/product.dart';
 import 'package:reggypos/models/productcategory.dart';
 import 'package:reggypos/models/shop.dart';
-import 'package:reggypos/services/firestore_files_access_service.dart';
 import 'package:reggypos/services/product_service.dart';
 import 'package:reggypos/widgets/alert.dart';
 import 'package:reggypos/widgets/loading_dialog.dart';
@@ -136,11 +135,7 @@ class ProductNewController extends GetxController {
     var i = productlist.indexWhere((element) => element.sId == product.sId);
     productlist.removeAt(i);
     await ProductService.deleteProduct(product.sId!);
-    if (product.images != null && product.images!.isNotEmpty) {
-      for (int i = 0; i < product.images!.length; i++) {
-        FirestoreFilesAccess().deleteFileFromPath("${product.sId!}_$i");
-      }
-    }
+    // The API deletes the product's image file together with the product.
   }
 
   void addToList(

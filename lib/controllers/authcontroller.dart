@@ -297,23 +297,16 @@ class AuthController {
       if (userController.currentUser.value == null) {
         return;
       }
-      //check last time this prompt was shown if its greater less than 7 days then break
-      if (userController.currentUser.value!.lastAppRatingDate != null) {
-        final DateTime now = DateTime.now();
-        int days = DateTime.parse(
-          userController.currentUser.value!.lastAppRatingDate!,
-        ).difference(DateTime(now.year, now.month, now.day)).inDays;
-        if (days <= 7) {
-          return;
+      // Ask for a rating at most once every 30 days, and never on the first
+      // sign-in: the first visit only records the date to count from.
+      final last = DateTime.tryParse(
+          userController.currentUser.value!.lastAppRatingDate ?? "");
+      if (last != null) {
+        if (DateTime.now().difference(last).inDays < 30) return;
+        final InAppReview inAppReview = InAppReview.instance;
+        if (await inAppReview.isAvailable()) {
+          await inAppReview.requestReview();
         }
-      }
-      final InAppReview inAppReview = InAppReview.instance;
-      if (await inAppReview.isAvailable()) {
-        // The review dialog can be displayed
-        await inAppReview.requestReview();
-      } else {
-        // Optionally, you can redirect the user to the app store page
-        await inAppReview.openStoreListing(appStoreId: AppConfig.appstoreId);
       }
       if (userController.currentUser.value!.usertype == "admin") {
         userController.profileUpdate(
