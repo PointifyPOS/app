@@ -11,6 +11,7 @@ import 'package:reggypos/screens/authentication/landing.dart';
 import '../../../utils/app_config.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/themer.dart';
+import '../../../widgets/demo_login_card.dart';
 
 class AdminLogin extends StatefulWidget {
   const AdminLogin({super.key});
@@ -89,6 +90,7 @@ class _AdminLoginState extends State<AdminLogin> {
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             children: [
+              if (DemoLoginCard.owner() != null) DemoLoginCard.owner()!,
               Container(
                 decoration: ThemeHelper().inputBoxDecorationShaddow(),
                 child: TextFormField(

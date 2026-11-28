@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../../controllers/authcontroller.dart';
 import '../../../controllers/homecontroller.dart';
 import '../../../utils/themer.dart';
+import '../../../widgets/demo_login_card.dart';
 
 class AttendantLogin extends StatelessWidget {
   AttendantLogin({super.key});
@@ -68,6 +69,7 @@ class AttendantLogin extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: Column(
             children: [
+              if (DemoLoginCard.staff() != null) DemoLoginCard.staff()!,
               Container(
                 decoration: ThemeHelper().inputBoxDecorationShaddow(),
                 child: TextFormField(
